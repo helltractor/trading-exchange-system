@@ -1,0 +1,15 @@
+# application.yml
+# 通用配置:
+spring:
+  datasource:
+    url: jdbc:mysql://localhost/test
+
+---
+
+# test profile:
+spring:
+  config:
+    activate:
+      on-profile: test
+  datasource:
+    url: jdbc:mysql://172.16.0.100/test

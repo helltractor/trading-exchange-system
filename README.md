@@ -7,6 +7,7 @@
 ```PowerShell
 docker-compose up --d
 ```
+> WARNING: Don't specify the groupId in the `pom.xml` file, otherwise the `mvn` command will fail.
 
 ## Reference
 

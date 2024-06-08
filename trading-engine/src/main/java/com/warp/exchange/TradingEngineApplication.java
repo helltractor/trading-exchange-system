@@ -1,11 +1,11 @@
-package com.tradingapi;
+package com.warp.exchange;
 
 import org.springframework.boot.SpringApplication;
 import org.springframework.boot.autoconfigure.SpringBootApplication;
 
 @SpringBootApplication
-public class TradingApiApplication {
+public class TradingEngineApplication {
     public static void main(String[] args) {
-        SpringApplication.run(TradingApiApplication.class, args);
+        SpringApplication.run(TradingEngineApplication.class, args);
     }
 }

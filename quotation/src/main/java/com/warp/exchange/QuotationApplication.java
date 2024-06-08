@@ -1,11 +1,11 @@
-package com.ui;
+package com.warp.exchange;
 
 import org.springframework.boot.SpringApplication;
 import org.springframework.boot.autoconfigure.SpringBootApplication;
 
 @SpringBootApplication
-public class UiApplication {
+public class QuotationApplication {
     public static void main(String[] args) {
-        SpringApplication.run(UiApplication.class, args);
+        SpringApplication.run(QuotationApplication.class, args);
     }
 }

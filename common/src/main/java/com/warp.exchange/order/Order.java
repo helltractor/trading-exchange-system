@@ -1,4 +1,4 @@
-package com.warp.exchange.entity;
+package com.warp.exchange.order;
 
 import com.fasterxml.jackson.annotation.JsonIgnore;
 import com.warp.exchange.enums.*;
@@ -27,6 +27,12 @@ public class Order implements EntitySupport, Comparable<Order> {
      */
     @Column(nullable = false, updatable = false)
     public Long userId;
+
+    /**
+     * 交易对ID
+     */
+    @Column(nullable = false, updatable = false)
+    public Long symbolId;
 
     /**
      * 序列ID
@@ -84,11 +90,10 @@ public class Order implements EntitySupport, Comparable<Order> {
         return version;
     }
 
-    public void updateOrder(DirectionEnum direction, BigDecimal price, BigDecimal quantity) {
-        this.version++;
+    public void updateOrder(BigDecimal unfilledQuantity, OrderStatus status, long timeStamp) {
         this.status = status;
         this.unfilledQuantity = unfilledQuantity;
-        this.updateTime = updateTime;
+        this.updateTime = timeStamp;
         this.version++;
     }
 

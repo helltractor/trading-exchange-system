@@ -1,4 +1,4 @@
-package com.warp.exchange.entity;
+package com.warp.exchange.asset;
 
 import java.math.BigDecimal;
 

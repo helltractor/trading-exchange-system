@@ -1,6 +1,5 @@
-package com.warp.exchange.service;
+package com.warp.exchange.asset;
 
-import com.warp.exchange.entity.Asset;
 import com.warp.exchange.enums.AssetEnum;
 import com.warp.exchange.enums.TransferEnum;
 import static org.junit.jupiter.api.Assertions.*;

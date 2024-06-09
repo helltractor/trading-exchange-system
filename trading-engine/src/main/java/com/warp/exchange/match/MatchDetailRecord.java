@@ -8,9 +8,9 @@ import java.util.Objects;
 public class MatchDetailRecord {
 
     BigDecimal price;
-    BigDecimal quantity;
+    public BigDecimal quantity;
     Order takerOrder;
-    Order makerOrder;
+    public Order makerOrder;
 
     public MatchDetailRecord(BigDecimal price, BigDecimal quantity, Order takerOrder, Order makerOrder) {
         this.price = price;

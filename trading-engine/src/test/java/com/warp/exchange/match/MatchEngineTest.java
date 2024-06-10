@@ -1,7 +1,7 @@
 package com.warp.exchange.match;
 
-import com.warp.exchange.order.Order;
-import com.warp.exchange.enums.DirectionEnum;
+import com.warp.exchange.entity.OrderEntity;
+import com.warp.exchange.enums.Direction;
 import com.warp.exchange.enums.OrderStatus;
 import org.junit.jupiter.api.BeforeEach;
 import org.junit.jupiter.api.Test;
@@ -29,18 +29,18 @@ public class MatchEngineTest {
 
     @Test
     void processOrders() {
-        List<Order> orders = List.of( //
-                createOrder(DirectionEnum.BUY, "12300.21", "1.02"), // 0
-                createOrder(DirectionEnum.BUY, "12305.39", "0.33"), // 1
-                createOrder(DirectionEnum.SELL, "12305.39", "0.11"), // 2
-                createOrder(DirectionEnum.SELL, "12300.01", "0.33"), // 3
-                createOrder(DirectionEnum.SELL, "12400.00", "0.10"), // 4
-                createOrder(DirectionEnum.SELL, "12400.00", "0.20"), // 5
-                createOrder(DirectionEnum.SELL, "12390.00", "0.15"), // 6
-                createOrder(DirectionEnum.BUY, "12400.01", "0.55"), // 7
-                createOrder(DirectionEnum.BUY, "12300.00", "0.77")); // 8
+        List<OrderEntity> orders = List.of( //
+                createOrder(Direction.BUY, "12300.21", "1.02"), // 0
+                createOrder(Direction.BUY, "12305.39", "0.33"), // 1
+                createOrder(Direction.SELL, "12305.39", "0.11"), // 2
+                createOrder(Direction.SELL, "12300.01", "0.33"), // 3
+                createOrder(Direction.SELL, "12400.00", "0.10"), // 4
+                createOrder(Direction.SELL, "12400.00", "0.20"), // 5
+                createOrder(Direction.SELL, "12390.00", "0.15"), // 6
+                createOrder(Direction.BUY, "12400.01", "0.55"), // 7
+                createOrder(Direction.BUY, "12300.00", "0.77")); // 8
         List<MatchDetailRecord> matches = new ArrayList<>();
-        for (Order order : orders) {
+        for (OrderEntity order : orders) {
             MatchResult mr = this.engine.processOrder(order.sequenceId, order);
             matches.addAll(mr.matchDetails);
         }
@@ -54,13 +54,13 @@ public class MatchEngineTest {
         }, matches.toArray(MatchDetailRecord[]::new));
         assertTrue(bd("12400.00").compareTo(engine.marketPrice) == 0);
     }
-
-    Order createOrder(DirectionEnum DirectionEnum, String price, String quantity) {
+    
+    OrderEntity createOrder(Direction Direction, String price, String quantity) {
         this.sequenceId++;
-        var order = new Order();
-        order.orderId = this.sequenceId << 4;
+        var order = new OrderEntity();
+        order.id = this.sequenceId << 4;
         order.sequenceId = this.sequenceId;
-        order.direction = DirectionEnum;
+        order.direction = Direction;
         order.price = bd(price);
         order.quantity = order.unfilledQuantity = bd(quantity);
         order.status = OrderStatus.PENDING;

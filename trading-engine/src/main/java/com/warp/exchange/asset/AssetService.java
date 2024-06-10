@@ -1,18 +1,23 @@
 package com.warp.exchange.asset;
 
-
-import org.springframework.stereotype.Component;
 import com.warp.exchange.enums.AssetEnum;
-import com.warp.exchange.enums.TransferEnum;
+import com.warp.exchange.enums.Transfer;
+import com.warp.exchange.support.LoggerSupport;
+import org.springframework.stereotype.Component;
+
 import java.math.BigDecimal;
+import java.util.ArrayList;
+import java.util.Collections;
+import java.util.List;
 import java.util.Map;
 import java.util.concurrent.ConcurrentHashMap;
+import java.util.concurrent.ConcurrentMap;
 
 @Component
-public class AssetService {
+public class AssetService extends LoggerSupport {
 
     // UserId -> Map(AssetEnum -> Assets[available/frozen])
-    final ConcurrentHashMap<Long, ConcurrentHashMap<AssetEnum, Asset>> userAssets = new ConcurrentHashMap<>();
+    final ConcurrentMap<Long, ConcurrentMap<AssetEnum, Asset>> userAssets = new ConcurrentHashMap<>();
 
     /**
      * 获取用户资产
@@ -22,7 +27,7 @@ public class AssetService {
      * @return
      */
     public Asset getAsset(Long userId, AssetEnum assetId) {
-        ConcurrentHashMap<AssetEnum, Asset> assets = userAssets.get(userId);
+        ConcurrentMap<AssetEnum, Asset> assets = userAssets.get(userId);
         if (assets == null) {
             return null;
         }
@@ -48,7 +53,7 @@ public class AssetService {
      *
      * @return
      */
-    public ConcurrentHashMap<Long, ConcurrentHashMap<AssetEnum, Asset>> getUserAssets() {
+    public ConcurrentMap<Long, ConcurrentMap<AssetEnum, Asset>> getUserAssets() {
         return this.userAssets;
     }
 
@@ -60,7 +65,7 @@ public class AssetService {
      * @return
      */
     public Asset initAssets(Long userId, AssetEnum assetId) {
-        ConcurrentHashMap<AssetEnum, Asset> assets = userAssets.get(userId);
+        ConcurrentMap<AssetEnum, Asset> assets = userAssets.get(userId);
         if (assets == null) {
             assets = new ConcurrentHashMap<>();
             userAssets.put(userId, assets);
@@ -81,7 +86,7 @@ public class AssetService {
      * @param checkBalance
      * @return
      */
-    public boolean tryTransfer(TransferEnum type, Long fromUserId, Long toUserId, AssetEnum assetId,
+    public boolean tryTransfer(Transfer type, Long fromUserId, Long toUserId, AssetEnum assetId,
                                BigDecimal amount, boolean checkBalance) {
         if (amount.signum() < 0) {
             throw new IllegalArgumentException("Amount must be positive");
@@ -136,9 +141,13 @@ public class AssetService {
      * @param assetId
      * @param amount
      */
-    public void transfer(TransferEnum type, Long fromUserId, Long toUserId, AssetEnum assetId, BigDecimal amount) {
+    public void transfer(Transfer type, Long fromUserId, Long toUserId, AssetEnum assetId, BigDecimal amount) {
         if (!tryTransfer(type, fromUserId, toUserId, assetId, amount, true)) {
-            throw new IllegalArgumentException("TransferEnum failed");
+            throw new RuntimeException("Transfer failed for " + type + ", from user " + fromUserId + " to user " + toUserId
+                    + ", asset = " + assetId + ", amount = " + amount);
+        }
+        if (logger.isDebugEnabled()) {
+            logger.debug("transfer asset {}, from {} => {}, amount {}", assetId, fromUserId, toUserId, amount);
         }
     }
 
@@ -151,7 +160,11 @@ public class AssetService {
      * @return
      */
     public boolean tryFreeze(Long userId, AssetEnum assetId, BigDecimal amount) {
-        return tryTransfer(TransferEnum.AVAILABLE_TO_FROZEN, userId, userId, assetId, amount, true);
+        boolean ok = tryTransfer(Transfer.AVAILABLE_TO_FROZEN, userId, userId, assetId, amount, true);
+        if (ok && logger.isDebugEnabled()) {
+            logger.debug("freezed user {}, asset {}, amount {}", userId, assetId, amount);
+        }
+        return ok;
     }
 
     /**
@@ -162,8 +175,28 @@ public class AssetService {
      * @param amount
      */
     public void unfreeze(Long userId, AssetEnum assetId, BigDecimal amount) {
-        if (!tryFreeze(userId, assetId, amount)) {
-            throw new IllegalArgumentException("Unfreeze failed");
+        if (!tryTransfer(Transfer.FROZEN_TO_AVAILABLE, userId, userId, assetId, amount, true)) {
+            throw new RuntimeException(
+                    "Unfreeze failed for user " + userId + ", asset = " + assetId + ", amount = " + amount);
         }
+        if (logger.isDebugEnabled()) {
+            logger.debug("unfreezed user {}, asset {}, amount {}", userId, assetId, amount);
+        }
+    }
+    
+    public void debug() {
+        System.out.println("---------- assets ----------");
+        List<Long> userIds = new ArrayList<>(userAssets.keySet());
+        Collections.sort(userIds);
+        for (Long userId : userIds) {
+            System.out.println("  user " + userId + " ----------");
+            Map<AssetEnum, Asset> assets = userAssets.get(userId);
+            List<AssetEnum> assetIds = new ArrayList<>(assets.keySet());
+            Collections.sort(assetIds);
+            for (AssetEnum assetId : assetIds) {
+                System.out.println("    " + assetId + ": " + assets.get(assetId));
+            }
+        }
+        System.out.println("---------- // assets ----------");
     }
 }

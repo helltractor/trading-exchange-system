@@ -1,6 +1,6 @@
 package com.warp.exchange.match;
 
-import com.warp.exchange.order.Order;
+import com.warp.exchange.entity.OrderEntity;
 
 import java.util.HashMap;
 import java.util.Map;
@@ -10,8 +10,8 @@ import java.util.Map;
  */
 public class MatchEngineGroup {
     private final Map<Long, MatchEngine> engines = new HashMap<>();
-
-    public MatchResult processOrder(long sequenceId, Order order) {
+    
+    public MatchResult processOrder(long sequenceId, OrderEntity order) {
         Long symbolId = order.symbolId;
         MatchEngine engine = engines.get(symbolId);
         if (engine == null) {

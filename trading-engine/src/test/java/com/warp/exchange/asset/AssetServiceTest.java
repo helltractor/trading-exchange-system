@@ -1,12 +1,14 @@
 package com.warp.exchange.asset;
 
 import com.warp.exchange.enums.AssetEnum;
-import com.warp.exchange.enums.TransferEnum;
-import static org.junit.jupiter.api.Assertions.*;
-import java.math.BigDecimal;
+import com.warp.exchange.enums.Transfer;
 import org.junit.jupiter.api.AfterEach;
 import org.junit.jupiter.api.BeforeEach;
 import org.junit.jupiter.api.Test;
+
+import java.math.BigDecimal;
+
+import static org.junit.jupiter.api.Assertions.*;
 
 public class AssetServiceTest {
 
@@ -31,13 +33,13 @@ public class AssetServiceTest {
     @Test
     void tryTransfer() {
         // A -> B ok:
-        service.tryTransfer(TransferEnum.AVAILABLE_TO_AVAILABLE, USER_A, USER_B, AssetEnum.USD, new BigDecimal("12000"),
+        service.tryTransfer(Transfer.AVAILABLE_TO_AVAILABLE, USER_A, USER_B, AssetEnum.USD, new BigDecimal("12000"),
                 true);
         assertBDEquals(300, service.getAsset(USER_A, AssetEnum.USD).available);
         assertBDEquals(12000 + 45600, service.getAsset(USER_B, AssetEnum.USD).available);
 
         // A -> B failed:
-        assertFalse(service.tryTransfer(TransferEnum.AVAILABLE_TO_AVAILABLE, USER_A, USER_B, AssetEnum.USD,
+        assertFalse(service.tryTransfer(Transfer.AVAILABLE_TO_AVAILABLE, USER_A, USER_B, AssetEnum.USD,
                 new BigDecimal("301"), true));
 
         assertBDEquals(300, service.getAsset(USER_A, AssetEnum.USD).available);
@@ -79,18 +81,18 @@ public class AssetServiceTest {
     @Test
     void transfer() {
         // A USD -> A frozen:
-        service.transfer(TransferEnum.AVAILABLE_TO_FROZEN, USER_A, USER_A, AssetEnum.USD, new BigDecimal("9000"));
+        service.transfer(Transfer.AVAILABLE_TO_FROZEN, USER_A, USER_A, AssetEnum.USD, new BigDecimal("9000"));
         assertBDEquals(3300, service.getAsset(USER_A, AssetEnum.USD).available);
         assertBDEquals(9000, service.getAsset(USER_A, AssetEnum.USD).frozen);
 
         // A frozen -> C available:
-        service.transfer(TransferEnum.FROZEN_TO_AVAILABLE, USER_A, USER_C, AssetEnum.USD, new BigDecimal("8000"));
+        service.transfer(Transfer.FROZEN_TO_AVAILABLE, USER_A, USER_C, AssetEnum.USD, new BigDecimal("8000"));
         assertBDEquals(1000, service.getAsset(USER_A, AssetEnum.USD).frozen);
         assertBDEquals(8000, service.getAsset(USER_C, AssetEnum.USD).available);
 
         // A frozen -> B available failed:
         assertThrows(RuntimeException.class, () -> {
-            service.transfer(TransferEnum.FROZEN_TO_AVAILABLE, USER_A, USER_B, AssetEnum.USD, new BigDecimal("1001"));
+            service.transfer(Transfer.FROZEN_TO_AVAILABLE, USER_A, USER_B, AssetEnum.USD, new BigDecimal("1001"));
         });
     }
 
@@ -102,15 +104,15 @@ public class AssetServiceTest {
      * C: BTC=34
      */
     void init() {
-        service.tryTransfer(TransferEnum.AVAILABLE_TO_AVAILABLE, DEBT, USER_A, AssetEnum.USD, BigDecimal.valueOf(12300),
+        service.tryTransfer(Transfer.AVAILABLE_TO_AVAILABLE, DEBT, USER_A, AssetEnum.USD, BigDecimal.valueOf(12300),
                 false);
-        service.tryTransfer(TransferEnum.AVAILABLE_TO_AVAILABLE, DEBT, USER_A, AssetEnum.BTC, BigDecimal.valueOf(12),
+        service.tryTransfer(Transfer.AVAILABLE_TO_AVAILABLE, DEBT, USER_A, AssetEnum.BTC, BigDecimal.valueOf(12),
                 false);
-
-        service.tryTransfer(TransferEnum.AVAILABLE_TO_AVAILABLE, DEBT, USER_B, AssetEnum.USD, BigDecimal.valueOf(45600),
+        
+        service.tryTransfer(Transfer.AVAILABLE_TO_AVAILABLE, DEBT, USER_B, AssetEnum.USD, BigDecimal.valueOf(45600),
                 false);
-
-        service.tryTransfer(TransferEnum.AVAILABLE_TO_AVAILABLE, DEBT, USER_C, AssetEnum.BTC, BigDecimal.valueOf(34),
+        
+        service.tryTransfer(Transfer.AVAILABLE_TO_AVAILABLE, DEBT, USER_C, AssetEnum.BTC, BigDecimal.valueOf(34),
                 false);
 
         assertBDEquals(-57900, service.getAsset(DEBT, AssetEnum.USD).available);

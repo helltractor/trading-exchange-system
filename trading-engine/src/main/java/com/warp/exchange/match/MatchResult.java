@@ -1,6 +1,6 @@
 package com.warp.exchange.match;
 
-import com.warp.exchange.order.Order;
+import com.warp.exchange.entity.OrderEntity;
 
 import java.math.BigDecimal;
 import java.util.ArrayList;
@@ -10,15 +10,15 @@ import java.util.List;
  * 匹配结果
  */
 public class MatchResult {
-
-    public final Order takerOrder;
+    
+    public final OrderEntity takerOrder;
     public final List<MatchDetailRecord> matchDetails = new ArrayList<>();
-
-    public MatchResult(Order takerOrder) {
+    
+    public MatchResult(OrderEntity takerOrder) {
         this.takerOrder = takerOrder;
     }
-
-    public void add(BigDecimal price, BigDecimal quantity, Order makerOrder) {
+    
+    public void add(BigDecimal price, BigDecimal quantity, OrderEntity makerOrder) {
         matchDetails.add(new MatchDetailRecord(price, quantity, this.takerOrder, makerOrder));
     }
 

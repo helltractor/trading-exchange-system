@@ -1,33 +1,39 @@
 package com.warp.exchange.order;
 
 import com.warp.exchange.asset.AssetService;
-import com.warp.exchange.enums.*;
+import com.warp.exchange.entity.OrderEntity;
+import com.warp.exchange.enums.AssetEnum;
+import com.warp.exchange.enums.Direction;
 import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.stereotype.Component;
 
 import java.math.BigDecimal;
+import java.util.ArrayList;
+import java.util.Collections;
+import java.util.List;
 import java.util.concurrent.ConcurrentHashMap;
+import java.util.concurrent.ConcurrentMap;
 
 @Component
 public class OrderService {
     final AssetService assetService;
-
-    final ConcurrentHashMap<Long, Order> activeOrders = new ConcurrentHashMap<>();  // 跟踪所有活动订单
-    final ConcurrentHashMap<Long, ConcurrentHashMap<Long, Order>> userOrders = new ConcurrentHashMap<>();    // 跟踪用户活动订单
+    
+    final ConcurrentMap<Long, OrderEntity> activeOrders = new ConcurrentHashMap<>();  // 跟踪所有活动订单
+    final ConcurrentMap<Long, ConcurrentHashMap<Long, OrderEntity>> userOrders = new ConcurrentHashMap<>();    // 跟踪用户活动订单
 
     public OrderService(@Autowired AssetService assetService) {
         this.assetService = assetService;
     }
-
-    public Order getOrder(Long orderId) {
+    
+    public OrderEntity getOrder(Long orderId) {
         return this.activeOrders.get(orderId);
     }
-
-    public ConcurrentHashMap<Long, Order> getActiveOrders() {
+    
+    public ConcurrentMap<Long, OrderEntity> getActiveOrders() {
         return this.activeOrders;
     }
-
-    public ConcurrentHashMap<Long, Order> getUserOrders(Long userId) {
+    
+    public ConcurrentMap<Long, OrderEntity> getUserOrders(Long userId) {
         return this.userOrders.get(userId);
     }
 
@@ -36,14 +42,14 @@ public class OrderService {
      *
      * @param sequenceId
      * @param timeStamp
-     * @param orderId
+     * @param id
      * @param userId
      * @param direction
      * @param price
      * @param quantity
      * @return
      */
-    public Order createOrder(long sequenceId, long timeStamp, Long orderId, Long userId, DirectionEnum direction, BigDecimal price, BigDecimal quantity) {
+    public OrderEntity createOrder(long sequenceId, long timeStamp, Long id, Long userId, Direction direction, BigDecimal price, BigDecimal quantity) {
         switch (direction) {
             case BUY -> {
                 // 买入，需冻结USD：
@@ -59,8 +65,8 @@ public class OrderService {
             }
             default -> throw new IllegalArgumentException("Invalid direction: " + direction);
         }
-        Order order = new Order();
-        order.orderId = orderId;
+        OrderEntity order = new OrderEntity();
+        order.id = id;
         order.userId = userId;
         order.sequenceId = sequenceId;
         order.price = price;
@@ -68,14 +74,14 @@ public class OrderService {
         order.quantity = quantity;
         order.unfilledQuantity = quantity;
         order.createTime = order.updateTime = timeStamp;
-
-        this.activeOrders.put(sequenceId, order);
-        ConcurrentHashMap<Long, Order> tmpUserOrders = this.userOrders.get(userId);
+        
+        this.activeOrders.put(id, order);
+        ConcurrentHashMap<Long, OrderEntity> tmpUserOrders = this.userOrders.get(userId);
         if (tmpUserOrders == null) {
             tmpUserOrders = new ConcurrentHashMap<>();
             userOrders.put(userId, tmpUserOrders);
         }
-        tmpUserOrders.put(sequenceId, order);
+        tmpUserOrders.put(id, order);
         return order;
     }
 
@@ -85,16 +91,28 @@ public class OrderService {
      * @param orderId
      */
     public void removeOrder(long orderId) {
-        Order removed = this.activeOrders.remove(orderId);
+        OrderEntity removed = this.activeOrders.remove(orderId);
         if (removed == null) {
-            throw new IllegalArgumentException("Order not found: " + orderId);
+            throw new IllegalArgumentException("OrderEntity not found: " + orderId);
         }
-        ConcurrentHashMap<Long, Order> tmpUserOrders = this.userOrders.get(removed.userId);
+        ConcurrentHashMap<Long, OrderEntity> tmpUserOrders = this.userOrders.get(removed.userId);
         if (tmpUserOrders == null) {
             throw new IllegalArgumentException("User removed not found: " + removed.userId);
         }
         if (tmpUserOrders.remove(orderId) == null) {
-            throw new IllegalArgumentException("Order not found in user orders: " + removed.userId);
+            throw new IllegalArgumentException("OrderEntity not found in user orders: " + removed.userId);
         }
+    }
+    
+    public void debug() {
+        System.out.println("---------- orders ----------");
+        List<OrderEntity> orders = new ArrayList<>(this.activeOrders.values());
+        Collections.sort(orders);
+        for (OrderEntity order : orders) {
+            System.out.println("  " + order.id + " " + order.direction + " price: " + order.price + " unfilled: "
+                    + order.unfilledQuantity + " quantity: " + order.quantity + " sequenceId: " + order.sequenceId
+                    + " userId: " + order.userId);
+        }
+        System.out.println("---------- // orders ----------");
     }
 }

@@ -83,7 +83,7 @@ spring:
       auto-commit: false
       connection-timeout: ${DB_TIMEOUT:3000}
       validation-timeout: ${DB_TIMEOUT:3000}
-      #      max-lifetime: 600000
+      max-lifetime: 600000
       maximum-pool-size: ${DB_POOL_MAX:500}
       minimum-idle: ${DB_POOL_IDEL:1}
 

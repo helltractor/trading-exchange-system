@@ -50,3 +50,5 @@ services:
     volumes:
       - "./sql/schema.sql:/docker-entrypoint-initdb.d/1-schema.sql:ro"
       - "./docker/mysql-data:/var/lib/mysql"
+    tmpfs:
+      - "/var/lib/mysql/mysql.sock"

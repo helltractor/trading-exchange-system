@@ -38,7 +38,8 @@ public class DataBaseTemplate {
         this.jdbcTemplate = jdbcTemplate;
         String pkg = getClass().getPackageName();
         int pos = pkg.lastIndexOf(".");
-        String basePackage = pkg.substring(0, pos) + ".model";
+        // 自定义扫描包路径
+        String basePackage = pkg.substring(0, pos) + ".entity";
         
         List<Class<?>> classes = scanEntities(basePackage);
         Map<Class<?>, Mapper<?>> classMapping = new HashMap<>();

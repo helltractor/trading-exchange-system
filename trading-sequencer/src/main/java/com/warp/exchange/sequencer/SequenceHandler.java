@@ -1,7 +1,7 @@
 package com.warp.exchange.sequencer;
 
 import com.warp.exchange.entity.EventEntity;
-import com.warp.exchange.entity.UniqueEventEntity;
+import com.warp.exchange.entity.sequencer.UniqueEventEntity;
 import com.warp.exchange.message.event.AbstractEvent;
 import com.warp.exchange.messaging.MessageTypes;
 import com.warp.exchange.support.AbstractDbSupport;
@@ -90,7 +90,7 @@ public class SequenceHandler extends AbstractDbSupport {
             event.previousId = previousId;
             event.sequenceId = currentId;
             event.data = messageTypes.serialize(message);
-            event.createTime = this.lastTimestamp; // same as message.createdAt
+            event.createTime = this.lastTimestamp; // same as message.createTime
             events.add(event);
             // will send later:
             sequenceMessages.add(message);

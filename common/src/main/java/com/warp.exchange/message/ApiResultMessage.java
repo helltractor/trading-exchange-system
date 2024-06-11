@@ -1,6 +1,6 @@
 package com.warp.exchange.message;
 
-import com.warp.exchange.ApiErrorResponse;
+import com.warp.exchange.api.ApiErrorResponse;
 import com.warp.exchange.entity.OrderEntity;
 import com.warp.exchange.enums.ApiError;
 

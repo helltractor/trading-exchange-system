@@ -2,6 +2,7 @@ version: '3'
 services:
   zookeeper:
     image: bitnami/zookeeper:3.5
+    user: "root"
     container_name: zookeeper
     ports:
       - "2181:2181"
@@ -12,6 +13,7 @@ services:
 
   kafka:
     image: bitnami/kafka:3.0
+    user: "root"
     container_name: kafka
     ports:
       - "9092:9092"
@@ -41,8 +43,7 @@ services:
     ports:
       - "3306:3306"
     restart: always
-    command:
-      --default-authentication-plugin=mysql_native_password
+    command: --default-authentication-plugin=mysql_native_password
     environment:
       - MYSQL_ROOT_PASSWORD=password
       # MySQL:latest 已经弃用--default-authentication-plugin参数，使用MYSQL_AUTH_PLUGIN参数，才能够连接到数据库
@@ -50,5 +51,3 @@ services:
     volumes:
       - "./sql/schema.sql:/docker-entrypoint-initdb.d/1-schema.sql:ro"
       - "./docker/mysql-data:/var/lib/mysql"
-#    tmpfs:
-#      - "/var/lib/mysql/mysql.sock"

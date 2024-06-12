@@ -34,7 +34,7 @@
         <dependency>
             <groupId>com.warp.exchange</groupId>
             <artifactId>common</artifactId>
-            <version>1.0</version>
+            <version>${project.version}</version>
         </dependency>
 
         <!-- 依赖第三方模块 -->

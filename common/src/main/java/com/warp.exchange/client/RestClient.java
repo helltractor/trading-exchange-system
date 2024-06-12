@@ -127,7 +127,7 @@ public class RestClient {
             } else if (response.code() == 400) {
                 try (ResponseBody body = response.body()) {
                     String bodyString = body.string();
-                    logger.warn("response 400. error: " + bodyString);
+                    logger.warn("response 400. error: {}", bodyString);
                     ApiErrorResponse err = objectMapper.readValue(bodyString, ApiErrorResponse.class);
                     if (err == null || err.error() == null) {
                         throw ERROR_UNKNOWN;

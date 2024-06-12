@@ -118,6 +118,7 @@ public class ApiFilterRegistrationBean extends FilterRegistrationBean<Filter> {
                 }
                 return userId;
             }
+            logger.info("parse from bearer authorization: {}", auth);
             if (auth.startsWith("Bearer ")) {
                 AuthToken token = AuthToken.fromSecureString(auth.substring(7), hmacKey);
                 if (token.isExpired()) {

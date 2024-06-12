@@ -21,13 +21,19 @@ public class UserService extends AbstractDbService {
         return dataBase.get(UserProfileEntity.class, userId);
     }
     
+    /**
+     * 通过邮件从数据库查找用户信息
+     *
+     * @param email
+     * @return
+     */
     @Nullable
     public UserProfileEntity fetchUserProfileByEmail(String email) {
         return dataBase.from(UserProfileEntity.class).where("email = ?", email).first();
     }
     
     /**
-     * Get user profile by email.
+     * 通过邮件查找用户信息
      *
      * @param email
      * @return
@@ -41,7 +47,7 @@ public class UserService extends AbstractDbService {
     }
     
     /**
-     * Sign up with email, name and password.
+     * 通过邮箱，名字和密码注册用户
      *
      * @param email
      * @param name
@@ -50,19 +56,19 @@ public class UserService extends AbstractDbService {
      */
     public UserProfileEntity signup(String email, String name, String password) {
         final long timestamp = System.currentTimeMillis();
-        // insert user
+        // 插入用户信息
         var user = new UserEntity();
         user.type = UserType.TRADER;
         user.createTime = timestamp;
         dataBase.insert(user);
-        // insert user profile:
+        // 插入用户配置
         var up = new UserProfileEntity();
         up.userId = user.id;
         up.email = email;
         up.name = name;
         up.createTime = up.updateTime = timestamp;
         dataBase.insert(up);
-        // insert password auth:
+        // 插入密码身份验证
         var pa = new PasswordAuthEntity();
         pa.userId = user.id;
         pa.random = RandomUtil.createRandomString(32);
@@ -72,7 +78,7 @@ public class UserService extends AbstractDbService {
     }
     
     /**
-     * Sign in with email and password.
+     * 使用邮箱，密码进行登录
      *
      * @param email
      * @param passwd
@@ -80,12 +86,13 @@ public class UserService extends AbstractDbService {
      */
     public UserProfileEntity signin(String email, String passwd) {
         UserProfileEntity userProfile = getUserProfileByEmail(email);
-        // find PasswordAuthEntity by user id:
+        // 按用户ID查找密码身份验证
         PasswordAuthEntity pa = dataBase.fetch(PasswordAuthEntity.class, userProfile.userId);
+        logger.info("pa: {}", pa);
         if (pa == null) {
             throw new ApiException(ApiError.USER_CANNOT_SIGNIN);
         }
-        // check password hash:
+        // 检查密码哈希
         String hash = HashUtil.hmacSha256(passwd, pa.random);
         if (!hash.equals(pa.password)) {
             throw new ApiException(ApiError.AUTH_SIGNIN_FAILED);

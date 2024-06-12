@@ -6,7 +6,7 @@ import org.springframework.beans.factory.annotation.Autowired;
 /**
  * Service with data base support.
  */
-public abstract class AbstractDbSupport extends LoggerSupport {
+public abstract class AbstractDbService extends LoggerSupport {
     
     @Autowired
     protected DataBaseTemplate dataBase;

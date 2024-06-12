@@ -1,6 +1,6 @@
 package com.warp.exchange.match;
 
-import com.warp.exchange.entity.OrderEntity;
+import com.warp.exchange.entity.trade.OrderEntity;
 
 import java.math.BigDecimal;
 

@@ -4,8 +4,8 @@ import com.warp.exchange.asset.Asset;
 import com.warp.exchange.asset.AssetService;
 import com.warp.exchange.bean.OrderBookBean;
 import com.warp.exchange.clearing.ClearingService;
-import com.warp.exchange.entity.MatchDetailEntity;
-import com.warp.exchange.entity.OrderEntity;
+import com.warp.exchange.entity.trade.MatchDetailEntity;
+import com.warp.exchange.entity.trade.OrderEntity;
 import com.warp.exchange.enums.AssetEnum;
 import com.warp.exchange.enums.MatchType;
 import com.warp.exchange.enums.Transfer;
@@ -14,11 +14,13 @@ import com.warp.exchange.match.MatchDetailRecord;
 import com.warp.exchange.match.MatchEngine;
 import com.warp.exchange.match.MatchResult;
 import com.warp.exchange.message.ApiResultMessage;
+import com.warp.exchange.message.TickMessage;
 import com.warp.exchange.message.event.AbstractEvent;
 import com.warp.exchange.message.event.OrderCancelEvent;
 import com.warp.exchange.message.event.OrderRequestEvent;
 import com.warp.exchange.message.event.TransferEvent;
 import com.warp.exchange.messaging.MessageConsumer;
+import com.warp.exchange.messaging.MessageProducer;
 import com.warp.exchange.messaging.Messaging;
 import com.warp.exchange.messaging.MessagingFactory;
 import com.warp.exchange.order.OrderService;
@@ -80,6 +82,8 @@ public class TradingEngineService extends LoggerSupport {
     
     private MessageConsumer consumer;
     
+    private MessageProducer<TickMessage> producer;
+    
     private long lastSequenceId = 0;
     
     private boolean orderBookChanged = false;
@@ -95,7 +99,7 @@ public class TradingEngineService extends LoggerSupport {
     private OrderBookBean lastedOrderBook = null;
     private Queue<List<OrderEntity>> orderQueue = new ConcurrentLinkedQueue<>();
     private Queue<List<MatchDetailEntity>> matchQueue = new ConcurrentLinkedQueue<>();
-    //    private Queue<TickMessage> tickQueue = new ConcurrentLinkedQueue<>();
+    private Queue<TickMessage> tickQueue = new ConcurrentLinkedQueue<>();
     private Queue<ApiResultMessage> apiResultQueue = new ConcurrentLinkedQueue<>();
 //    private Queue<NotificationMessage> notificationQueue = new ConcurrentLinkedQueue<>();
     
@@ -104,7 +108,7 @@ public class TradingEngineService extends LoggerSupport {
         this.shaUpdateOrderBookLua = this.redisService.loadScriptFromClassPath("/redis/update-orderbook.lua");
         this.consumer = this.messagingFactory.createBatchMessageListener(Messaging.Topic.TRADE, IpUtil.getHostId(),
                 this::processMessages);
-//        this.producer = this.messagingFactory.createMessageProducer(Topic.TICK, TickMessage.class);
+        this.producer = this.messagingFactory.createMessageProducer(Messaging.Topic.TICK, TickMessage.class);
         this.tickThread = new Thread(this::runTickThread, "async-tick");
         this.tickThread.start();
         this.notifyThread = new Thread(this::runNotifyThread, "async-notify");
@@ -125,6 +129,35 @@ public class TradingEngineService extends LoggerSupport {
     }
     
     void runTickThread() {
+        logger.info("start tick thread...");
+        for (; ; ) {
+            List<TickMessage> messages = new ArrayList<>();
+            for (; ; ) {
+                TickMessage message = this.tickQueue.poll();
+                if (message != null) {
+                    messages.add(message);
+                    if (messages.size() >= 1000) {
+                        break;
+                    }
+                } else {
+                    break;
+                }
+            }
+            if (!messages.isEmpty()) {
+                if (logger.isDebugEnabled()) {
+                    logger.debug("send {} tick messages...", messages.size());
+                }
+                this.producer.sendMessages(messages);
+            } else {
+                // 无TickMessage时，暂停1ms:
+                try {
+                    Thread.sleep(1);
+                } catch (InterruptedException e) {
+                    logger.warn("{} was interrupted.", Thread.currentThread().getName());
+                    break;
+                }
+            }
+        }
     }
     
     void runNotifyThread() {

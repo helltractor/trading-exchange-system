@@ -1,7 +1,7 @@
 package com.warp.exchange.match;
 
 import com.warp.exchange.bean.OrderBookBean;
-import com.warp.exchange.entity.OrderEntity;
+import com.warp.exchange.entity.trade.OrderEntity;
 import com.warp.exchange.enums.Direction;
 import com.warp.exchange.enums.OrderStatus;
 import com.warp.exchange.order.OrderBook;

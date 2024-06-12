@@ -1,7 +1,7 @@
 package com.warp.exchange.store;
 
 import com.warp.exchange.database.DataBaseTemplate;
-import com.warp.exchange.entity.EventEntity;
+import com.warp.exchange.entity.trade.EventEntity;
 import com.warp.exchange.message.event.AbstractEvent;
 import com.warp.exchange.messaging.MessageTypes;
 import com.warp.exchange.support.EntitySupport;

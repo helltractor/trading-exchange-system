@@ -1,7 +1,7 @@
 package com.warp.exchange.order;
 
 import com.warp.exchange.asset.AssetService;
-import com.warp.exchange.entity.OrderEntity;
+import com.warp.exchange.entity.trade.OrderEntity;
 import com.warp.exchange.enums.AssetEnum;
 import com.warp.exchange.enums.Direction;
 import org.springframework.beans.factory.annotation.Autowired;

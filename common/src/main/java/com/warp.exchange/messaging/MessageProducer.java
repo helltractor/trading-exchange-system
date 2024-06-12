@@ -7,11 +7,11 @@ import java.util.List;
 @FunctionalInterface
 public interface MessageProducer<T extends AbstractMessage> {
     
-    void sendMessage(T message);
+    void sendMessages(T message);
     
-    default void sendMessage(List<T> messages) {
+    default void sendMessages(List<T> messages) {
         for (T message : messages) {
-            sendMessage(message);
+            sendMessages(message);
         }
     }
 }

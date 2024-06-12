@@ -1,10 +1,10 @@
 package com.warp.exchange.sequencer;
 
-import com.warp.exchange.entity.EventEntity;
 import com.warp.exchange.entity.sequencer.UniqueEventEntity;
+import com.warp.exchange.entity.trade.EventEntity;
 import com.warp.exchange.message.event.AbstractEvent;
 import com.warp.exchange.messaging.MessageTypes;
-import com.warp.exchange.support.AbstractDbSupport;
+import com.warp.exchange.support.AbstractDbService;
 import org.springframework.stereotype.Component;
 import org.springframework.transaction.annotation.Transactional;
 
@@ -19,7 +19,7 @@ import java.util.concurrent.atomic.AtomicLong;
  */
 @Component
 @Transactional(rollbackFor = Throwable.class)
-public class SequenceHandler extends AbstractDbSupport {
+public class SequenceHandler extends AbstractDbService {
     
     private long lastTimestamp = 0;
     

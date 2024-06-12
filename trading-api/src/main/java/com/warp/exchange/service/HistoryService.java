@@ -1,9 +1,9 @@
 package com.warp.exchange.service;
 
 import com.warp.exchange.bean.SimpleMatchDetailRecord;
-import com.warp.exchange.entity.MatchDetailEntity;
-import com.warp.exchange.entity.OrderEntity;
-import com.warp.exchange.support.AbstractDbSupport;
+import com.warp.exchange.entity.trade.MatchDetailEntity;
+import com.warp.exchange.entity.trade.OrderEntity;
+import com.warp.exchange.support.AbstractDbService;
 import org.springframework.stereotype.Component;
 
 import java.util.List;
@@ -13,7 +13,7 @@ import java.util.stream.Collectors;
  * 通过数据库查询用户的历史订单
  */
 @Component
-public class HistoryService extends AbstractDbSupport {
+public class HistoryService extends AbstractDbService {
     
     /**
      * 获取历史订单列表

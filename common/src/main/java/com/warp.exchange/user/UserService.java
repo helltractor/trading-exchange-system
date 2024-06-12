@@ -6,7 +6,7 @@ import com.warp.exchange.entity.ui.UserEntity;
 import com.warp.exchange.entity.ui.UserProfileEntity;
 import com.warp.exchange.enums.ApiError;
 import com.warp.exchange.enums.UserType;
-import com.warp.exchange.support.AbstractDbSupport;
+import com.warp.exchange.support.AbstractDbService;
 import com.warp.exchange.util.HashUtil;
 import com.warp.exchange.util.RandomUtil;
 import org.springframework.lang.Nullable;
@@ -15,7 +15,7 @@ import org.springframework.transaction.annotation.Transactional;
 
 @Component
 @Transactional
-public class UserService extends AbstractDbSupport {
+public class UserService extends AbstractDbService {
     
     public UserProfileEntity getUserProfile(String userId) {
         return dataBase.get(UserProfileEntity.class, userId);

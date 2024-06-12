@@ -25,6 +25,6 @@ public class SendEventService {
     }
     
     public void sendMessage(AbstractEvent message) {
-        this.messageProducer.sendMessage(message);
+        this.messageProducer.sendMessages(message);
     }
 }

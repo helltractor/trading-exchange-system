@@ -73,7 +73,7 @@ public class MessagingFactory extends LoggerSupport {
         final String name = topic.name();
         return new MessageProducer<>() {
             @Override
-            public void sendMessage(AbstractMessage message) {
+            public void sendMessages(AbstractMessage message) {
                 kafkaTemplate.send(name, messageTypes.serialize(message));
             }
         };

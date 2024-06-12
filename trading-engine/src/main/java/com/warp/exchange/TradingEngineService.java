@@ -14,6 +14,7 @@ import com.warp.exchange.match.MatchDetailRecord;
 import com.warp.exchange.match.MatchEngine;
 import com.warp.exchange.match.MatchResult;
 import com.warp.exchange.message.ApiResultMessage;
+import com.warp.exchange.message.NotificationMessage;
 import com.warp.exchange.message.TickMessage;
 import com.warp.exchange.message.event.AbstractEvent;
 import com.warp.exchange.message.event.OrderCancelEvent;
@@ -101,7 +102,7 @@ public class TradingEngineService extends LoggerSupport {
     private Queue<List<MatchDetailEntity>> matchQueue = new ConcurrentLinkedQueue<>();
     private Queue<TickMessage> tickQueue = new ConcurrentLinkedQueue<>();
     private Queue<ApiResultMessage> apiResultQueue = new ConcurrentLinkedQueue<>();
-//    private Queue<NotificationMessage> notificationQueue = new ConcurrentLinkedQueue<>();
+    private Queue<NotificationMessage> notificationQueue = new ConcurrentLinkedQueue<>();
     
     @PostConstruct
     public void init() {
@@ -161,6 +162,21 @@ public class TradingEngineService extends LoggerSupport {
     }
     
     void runNotifyThread() {
+        logger.info("start notify thread...");
+        for (; ; ) {
+            NotificationMessage message = this.notificationQueue.poll();
+            if (message != null) {
+                redisService.publish(RedisCache.Topic.NOTIFICATION, JsonUtil.writeJson(message));
+            } else {
+                // 无NotificationMessage时，暂停1ms:
+                try {
+                    Thread.sleep(1);
+                } catch (InterruptedException e) {
+                    logger.warn("{} was interrupted.", Thread.currentThread().getName());
+                    break;
+                }
+            }
+        }
     }
     
     void runOrderBookThread() {

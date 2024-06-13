@@ -65,7 +65,7 @@ public class MvcController extends LoggerSupport {
     }
     
     /**
-     * Index page.
+     * 首页
      */
     @GetMapping("/")
     public ModelAndView index() {
@@ -75,6 +75,9 @@ public class MvcController extends LoggerSupport {
         return prepareModelAndView("index");
     }
     
+    /**
+     * 跳转注册页面
+     */
     @GetMapping("/signup")
     public ModelAndView signup() {
         if (UserContext.getUserId() != null) {
@@ -83,9 +86,12 @@ public class MvcController extends LoggerSupport {
         return prepareModelAndView("signup");
     }
     
+    /**
+     * 注册
+     */
     @PostMapping("/signup")
     public ModelAndView signup(@RequestParam("email") String email, @RequestParam("name") String name, @RequestParam("password") String password) {
-        // 检查email
+        // check email
         if (email == null || email.isBlank()) {
             return prepareModelAndView("signup", Map.of("email", email, "name", name, "error", "Invalid email."));
         }
@@ -96,12 +102,12 @@ public class MvcController extends LoggerSupport {
         if (userService.fetchUserProfileByEmail(email) != null) {
             return prepareModelAndView("signup", Map.of("email", email, "name", name, "error", "Email exists."));
         }
-        // check name:
+        // check name
         if (name == null || name.isBlank() || name.strip().length() > 100) {
             return prepareModelAndView("signup", Map.of("email", email, "name", name, "error", "Invalid name."));
         }
         name = name.strip();
-        // check password:
+        // check password
         if (password == null || password.length() < 8 || password.length() > 32) {
             return prepareModelAndView("signup", Map.of("email", email, "name", name, "error", "Invalid password."));
         }
@@ -125,7 +131,9 @@ public class MvcController extends LoggerSupport {
         return "\"" + strToken + "\"";
     }
     
-    
+    /**
+     * 跳转登录页面
+     */
     @GetMapping("/signin")
     public ModelAndView signin(HttpServletRequest request) {
         if (UserContext.getUserId() != null) {
@@ -135,11 +143,12 @@ public class MvcController extends LoggerSupport {
     }
     
     /**
-     * Do sign in.
+     * 登录
      */
     @PostMapping("/signin")
     public ModelAndView signin(@RequestParam("email") String email, @RequestParam("password") String password,
                                HttpServletRequest request, HttpServletResponse response) {
+        // 检查email和password
         if (email == null || email.isEmpty()) {
             return prepareModelAndView("signin", Map.of("email", email, "error", "Invalid email or password."));
         }
@@ -148,23 +157,28 @@ public class MvcController extends LoggerSupport {
         }
         email = email.toLowerCase();
         try {
+            // 获取用户配置
             UserProfileEntity userProfile = userService.signin(email, password);
-            // sign in ok and set cookie:
+            // 登录成功后设置Cookie
             AuthToken token = new AuthToken(userProfile.userId,
                     System.currentTimeMillis() + 1000 * cookieService.getExpiresInSeconds());
             cookieService.setSessionCookie(request, response, token);
         } catch (ApiException e) {
+            // 登录失败
             logger.warn("sign in failed for {}", e.getMessage(), e);
             return prepareModelAndView("signin", Map.of("email", email, "error", "Invalid email or password."));
         } catch (Exception e) {
+            // 登录失败
             logger.warn("sign in failed for {}", e.getMessage(), e);
             return prepareModelAndView("signin", Map.of("email", email, "error", "Internal server error."));
         }
-        
         logger.info("signin ok.");
         return redirect("/");
     }
     
+    /**
+     * 登出
+     */
     @GetMapping("/signout")
     public ModelAndView signout(HttpServletRequest request, HttpServletResponse response) {
         cookieService.deleteSessionCookie(request, response);
@@ -172,6 +186,7 @@ public class MvcController extends LoggerSupport {
     }
     
     private UserProfileEntity doSignup(String email, String name, String password) {
+        // 注册用户
         UserProfileEntity profile = userService.signin(email, password);
         // 本地开发环境下自动给用户增加资产
         if (isLocalDevEnv()) {

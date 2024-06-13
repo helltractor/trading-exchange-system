@@ -1,7 +1,7 @@
 # ui configuration
 
 server:
-  port: ${APP_PORT:8000}
+  port: ${APP_PORT:8006}
 
 pebble:
   prefix: /templates/

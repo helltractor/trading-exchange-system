@@ -45,7 +45,7 @@ public class CookieService extends LoggerSupport {
     
     public void setSessionCookie(HttpServletRequest request, HttpServletResponse response, AuthToken token) {
         String cookieStr = token.toSecureString(this.hmacKey);
-        logger.info("[Cookie] set session cookie: " + cookieStr);
+        logger.info("[Cookie] set session cookie: {}", cookieStr);
         Cookie cookie = new Cookie(SESSION_COOKIE, cookieStr);
         cookie.setPath("/");
         cookie.setMaxAge(3600);

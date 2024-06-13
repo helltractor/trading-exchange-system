@@ -27,6 +27,6 @@ public class UserEntity implements EntitySupport {
     
     @Override
     public String toString() {
-        return "UserEntity [id=" + id + ", type=" + type + ", createdAt=" + createTime + "]";
+        return "UserEntity [id=" + id + ", type=" + type + ", createTime=" + createTime + "]";
     }
 }

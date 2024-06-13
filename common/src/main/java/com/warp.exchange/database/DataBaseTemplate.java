@@ -45,7 +45,7 @@ public class DataBaseTemplate {
         Map<Class<?>, Mapper<?>> classMapping = new HashMap<>();
         try {
             for (Class<?> clazz : classes) {
-                logger.info("Found class: " + clazz.getName());
+                logger.info("Found class: {}", clazz.getName());
                 Mapper<?> mapper = new Mapper<>(clazz);
                 classMapping.put(clazz, mapper);
             }

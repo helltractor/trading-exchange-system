@@ -187,7 +187,7 @@ public class MvcController extends LoggerSupport {
     
     private UserProfileEntity doSignup(String email, String name, String password) {
         // 注册用户
-        UserProfileEntity profile = userService.signin(email, password);
+        UserProfileEntity profile = userService.signup(email, name, password);
         // 本地开发环境下自动给用户增加资产
         if (isLocalDevEnv()) {
             logger.warn("auto deposit assets for user {} in local dev env...", profile.email);

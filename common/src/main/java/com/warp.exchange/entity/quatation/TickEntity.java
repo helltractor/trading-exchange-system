@@ -8,7 +8,7 @@ import java.math.BigDecimal;
 
 @Entity
 @Table(name = "ticks", uniqueConstraints = @UniqueConstraint(name = "UNI_T_M", columnNames = {"takerOrderId",
-        "makerOrderId"}), indexes = @Index(name = "IDX_CAT", columnList = "createdAt"))
+        "makerOrderId"}), indexes = @Index(name = "IDX_CAT", columnList = "createTime"))
 public class TickEntity implements EntitySupport {
     
     @Id
@@ -41,9 +41,9 @@ public class TickEntity implements EntitySupport {
      * Created time (milliseconds).
      */
     @Column(nullable = false, updatable = false)
-    public long createdAt;
+    public long createTime;
     
     public String toJson() {
-        return "[" + createdAt + "," + (takerDirection ? 1 : 0) + "," + price + "," + quantity + "]";
+        return "[" + createTime + "," + (takerDirection ? 1 : 0) + "," + price + "," + quantity + "]";
     }
 }

@@ -88,6 +88,7 @@ public class UserService extends AbstractDbService {
         UserProfileEntity userProfile = getUserProfileByEmail(email);
         // 按用户ID查找密码身份验证
         PasswordAuthEntity pa = dataBase.fetch(PasswordAuthEntity.class, userProfile.userId);
+        logger.info("pa: {}", pa);
         if (pa == null) {
             throw new ApiException(ApiError.USER_CANNOT_SIGNIN);
         }

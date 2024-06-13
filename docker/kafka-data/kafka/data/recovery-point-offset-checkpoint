@@ -27,7 +27,7 @@ TICK 0 0
 __consumer_offsets 18 0
 __consumer_offsets 37 0
 __consumer_offsets 15 0
-__consumer_offsets 24 2
+__consumer_offsets 24 18
 __consumer_offsets 38 0
 __consumer_offsets 17 0
 __consumer_offsets 48 0
@@ -52,5 +52,5 @@ __consumer_offsets 29 0
 __consumer_offsets 34 0
 __consumer_offsets 10 0
 __consumer_offsets 32 0
-__consumer_offsets 40 0
+__consumer_offsets 40 40
 TRADE 0 0

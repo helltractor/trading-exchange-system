@@ -58,7 +58,7 @@ exchange:
 
 spring:
   kafka:
-    bootstrap-servers: ${KAFKA_SERVERS:localhost:9092}
+    bootstrap-servers: ${KAFKA_SERVERS:http://localhost:9092}
     consumer:
       # set consumer group id (blank for auto):
       group-id: ${KAFKA_CONSUMER_GROUP_ID:}
@@ -91,4 +91,4 @@ logging:
   level:
     root: ${LOGGING_ROOT_LEVEL:INFO}
     org.apache.kafka: ${LOGGING_KAFKA_LEVEL:WARN}
-    com.warp.exchange: ${LOGGING_EXCHANGE_LEVEL:INFO}
+    com.helltractor.exchange: ${LOGGING_EXCHANGE_LEVEL:INFO}

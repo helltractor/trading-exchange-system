@@ -19,7 +19,7 @@
     <logger name="org.eclipse.jetty.util.component.AbstractLifeCycle" level="ERROR"/>
     <logger name="org.hibernate.validator.internal.util.Version" level="WARN"/>
     <logger name="org.springframework.boot.actuate.autoconfigure.CrshAutoConfiguration" level="WARN"/>
-    <logger name="org.springframework.cloud.config.client" level="ERROR"/>
+    <logger name="org.springframework.cloud.config.okHttpClient" level="ERROR"/>
 
     <root level="INFO">
         <appender-ref ref="CONSOLE"/>

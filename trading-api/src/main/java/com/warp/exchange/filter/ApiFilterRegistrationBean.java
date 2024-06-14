@@ -1,12 +1,12 @@
-package com.warp.exchange.web;
+package com.warp.exchange.filter;
 
 import com.fasterxml.jackson.databind.ObjectMapper;
 import com.warp.exchange.api.ApiException;
 import com.warp.exchange.bean.AuthToken;
-import com.warp.exchange.ctx.UserContext;
 import com.warp.exchange.entity.ui.UserProfileEntity;
 import com.warp.exchange.enums.ApiError;
 import com.warp.exchange.support.AbstractFilter;
+import com.warp.exchange.user.UserContext;
 import com.warp.exchange.user.UserService;
 import jakarta.annotation.PostConstruct;
 import jakarta.servlet.*;
@@ -74,7 +74,7 @@ public class ApiFilterRegistrationBean extends FilterRegistrationBean<Filter> {
             }
         }
         
-        private void sendErrorResponse(HttpServletResponse response, ApiException e) throws IOException {
+        void sendErrorResponse(HttpServletResponse response, ApiException e) throws IOException {
             response.sendError(400);
             response.setContentType("application/json");
             PrintWriter pw = response.getWriter();
@@ -82,7 +82,7 @@ public class ApiFilterRegistrationBean extends FilterRegistrationBean<Filter> {
             pw.flush();
         }
         
-        private Long parseUser(HttpServletRequest request) {
+        Long parseUser(HttpServletRequest request) {
             // 尝试通过Authorization Header认证用户:
             String auth = request.getHeader("Authorization");
             if (auth != null) {
@@ -97,12 +97,12 @@ public class ApiFilterRegistrationBean extends FilterRegistrationBean<Filter> {
             return null;
         }
         
-        private Long parseUserFromApiKey(String apiKey, String apiSignature, HttpServletRequest request) {
+        Long parseUserFromApiKey(String apiKey, String apiSignature, HttpServletRequest request) {
             // TODO: 验证API-Key, API-Secret并返回userId
             return null;
         }
         
-        private Long parseUserFromAuthorization(String auth) {
+        Long parseUserFromAuthorization(String auth) {
             if (auth.startsWith("Basic ")) {
                 String eap = new String(Base64.getDecoder().decode(auth.substring(6)), StandardCharsets.UTF_8);
                 int pos = eap.indexOf(':');

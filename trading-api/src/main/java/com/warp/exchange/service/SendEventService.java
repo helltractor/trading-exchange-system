@@ -15,9 +15,9 @@ import org.springframework.stereotype.Component;
 public class SendEventService {
     
     @Autowired
-    private MessagingFactory messagingFactory;
+    MessagingFactory messagingFactory;
     
-    private MessageProducer<AbstractEvent> messageProducer;
+    MessageProducer<AbstractEvent> messageProducer;
     
     @PostConstruct
     public void init() {

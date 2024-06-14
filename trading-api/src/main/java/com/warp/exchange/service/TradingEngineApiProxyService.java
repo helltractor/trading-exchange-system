@@ -11,21 +11,24 @@ import java.io.IOException;
 import java.util.concurrent.TimeUnit;
 
 /**
- * 交易引擎 API 代理服务
+ * 交易引擎API代理服务
  */
 @Component
 public class TradingEngineApiProxyService extends LoggerSupport {
     
     @Value("#{exchangeConfiguration.apiEndpoints.tradingEngineApi}")
-    private String tradingEngineInternalApiEndpoint;
+    String tradingEngineInternalApiEndpoint;    // http://localhost:8002/
     
-    private OkHttpClient okHttpClient = new OkHttpClient.Builder()
+    OkHttpClient okHttpClient = new OkHttpClient.Builder()
             .connectTimeout(1, TimeUnit.SECONDS)
             .readTimeout(1, TimeUnit.SECONDS)
-            .connectionPool(new ConnectionPool(10, 5, TimeUnit.MINUTES))
-            .retryOnConnectionFailure(true)
+            .connectionPool(new ConnectionPool(20, 60, TimeUnit.SECONDS))
+            .retryOnConnectionFailure(false)
             .build();
     
+    /**
+     * 使用代理处理GET请求
+     */
     public String get(String url) throws IOException {
         Request request = new Request.Builder()
                 .url(tradingEngineInternalApiEndpoint + url)

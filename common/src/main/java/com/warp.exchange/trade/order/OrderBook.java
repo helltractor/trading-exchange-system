@@ -1,4 +1,4 @@
-package com.warp.exchange.order;
+package com.warp.exchange.trade.order;
 
 import com.warp.exchange.bean.OrderBookItemBean;
 import com.warp.exchange.entity.trade.OrderEntity;

@@ -21,7 +21,7 @@ import java.util.concurrent.atomic.AtomicLong;
 @Transactional(rollbackFor = Throwable.class)
 public class SequenceHandler extends AbstractDbService {
     
-    private long lastTimestamp = 0;
+    long lastTimestamp = 0;
     
     public long getMaxSequenceId() {
         EventEntity last = dataBase.from(EventEntity.class).orderBy("sequenceId").desc().first();

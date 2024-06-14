@@ -1,8 +1,8 @@
 package com.warp.exchange.ui.web;
 
 import com.warp.exchange.bean.AuthToken;
-import com.warp.exchange.ctx.UserContext;
 import com.warp.exchange.support.AbstractFilter;
+import com.warp.exchange.user.UserContext;
 import com.warp.exchange.user.UserService;
 import jakarta.annotation.PostConstruct;
 import jakarta.servlet.*;

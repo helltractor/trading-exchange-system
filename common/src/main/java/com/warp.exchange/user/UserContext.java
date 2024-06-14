@@ -1,4 +1,4 @@
-package com.warp.exchange.ctx;
+package com.warp.exchange.user;
 
 import com.warp.exchange.api.ApiException;
 import com.warp.exchange.enums.ApiError;

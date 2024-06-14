@@ -4,13 +4,14 @@ import com.warp.exchange.api.ApiException;
 import com.warp.exchange.bean.AuthToken;
 import com.warp.exchange.bean.TransferRequestBean;
 import com.warp.exchange.client.RestClient;
-import com.warp.exchange.ctx.UserContext;
 import com.warp.exchange.entity.ui.UserProfileEntity;
 import com.warp.exchange.enums.AssetEnum;
 import com.warp.exchange.enums.UserType;
 import com.warp.exchange.support.LoggerSupport;
+import com.warp.exchange.user.UserContext;
 import com.warp.exchange.user.UserService;
 import com.warp.exchange.util.HashUtil;
+import jakarta.annotation.PostConstruct;
 import jakarta.servlet.http.HttpServletRequest;
 import jakarta.servlet.http.HttpServletResponse;
 import org.springframework.beans.factory.annotation.Autowired;
@@ -49,8 +50,9 @@ public class MvcController extends LoggerSupport {
     @Autowired
     Environment environment;
     
+    @PostConstruct
     public void init() {
-        // 本地开发环境下自动创建用户user0@example.com ~ user9@example.com:
+        // 本地开发环境下自动创建用户user0@example.com ~ user9@example.com
         if (isLocalDevEnv()) {
             for (int i = 0; i <= 9; i++) {
                 String email = "user" + i + "@example.com";
@@ -115,7 +117,6 @@ public class MvcController extends LoggerSupport {
         return redirect("/signup");
     }
     
-    
     @PostMapping(value = "/websocket/token", produces = "application/json")
     @ResponseBody
     String requestWebSocketToken() {
@@ -146,8 +147,7 @@ public class MvcController extends LoggerSupport {
      * 登录
      */
     @PostMapping("/signin")
-    public ModelAndView signin(@RequestParam("email") String email, @RequestParam("password") String password,
-                               HttpServletRequest request, HttpServletResponse response) {
+    public ModelAndView signin(@RequestParam("email") String email, @RequestParam("password") String password, HttpServletRequest request, HttpServletResponse response) {
         // 检查email和password
         if (email == null || email.isEmpty()) {
             return prepareModelAndView("signin", Map.of("email", email, "error", "Invalid email or password."));
@@ -185,7 +185,7 @@ public class MvcController extends LoggerSupport {
         return redirect("/");
     }
     
-    private UserProfileEntity doSignup(String email, String name, String password) {
+    UserProfileEntity doSignup(String email, String name, String password) {
         // 注册用户
         UserProfileEntity profile = userService.signup(email, name, password);
         // 本地开发环境下自动给用户增加资产
@@ -200,7 +200,7 @@ public class MvcController extends LoggerSupport {
         return profile;
     }
     
-    private void deposit(Long userId, AssetEnum asset, BigDecimal amount) {
+    void deposit(Long userId, AssetEnum asset, BigDecimal amount) {
         var req = new TransferRequestBean();
         req.transferId = HashUtil.sha256(userId + "/" + asset + "/" + amount.stripTrailingZeros().toPlainString())
                 .substring(0, 32);
@@ -249,6 +249,7 @@ public class MvcController extends LoggerSupport {
     }
     
     boolean isLocalDevEnv() {
+        logger.info("activeProfiles: {}, defaultProfiles: {}", environment.getActiveProfiles(), environment.getDefaultProfiles());
         return environment.getActiveProfiles().length == 0
                 && Arrays.equals(environment.getDefaultProfiles(), new String[]{"default"});
     }

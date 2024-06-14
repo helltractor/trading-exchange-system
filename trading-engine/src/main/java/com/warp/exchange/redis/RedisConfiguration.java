@@ -7,13 +7,13 @@ import org.springframework.context.annotation.Configuration;
 @ConfigurationProperties("spring.redis")
 public class RedisConfiguration {
     
-    private String host;
+    String host;
     
-    private int port;
+    int port;
     
-    private String password;
+    String password;
     
-    private int database;
+    int database;
     
     public String getHost() {
         return host;

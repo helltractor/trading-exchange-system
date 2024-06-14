@@ -24,7 +24,7 @@ public interface Messaging {
          */
         TICK(1);
         
-        private final int concurrency;
+        final int concurrency;
         
         Topic(int concurrency) {
             this.concurrency = concurrency;

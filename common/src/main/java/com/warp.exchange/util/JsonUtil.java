@@ -27,13 +27,13 @@ public final class JsonUtil {
     };
     public static final TypeReference<Map<String, Boolean>> TYPE_MAP_STRING_BOOLEAN = new TypeReference<>() {
     };
-    private static final Logger logger = LoggerFactory.getLogger(JsonUtil.class);
+    static final Logger logger = LoggerFactory.getLogger(JsonUtil.class);
     /**
      * Holds ObjectMapper for internal use: NEVER modify!
      */
-    private static final ObjectMapper OBJECT_MAPPER = createObjectMapperForInternal();
+    static final ObjectMapper OBJECT_MAPPER = createObjectMapperForInternal();
     
-    private static ObjectMapper createObjectMapperForInternal() {
+    static ObjectMapper createObjectMapperForInternal() {
         final ObjectMapper mapper = new ObjectMapper();
         mapper.setSerializationInclusion(JsonInclude.Include.ALWAYS);
         // disabled features:

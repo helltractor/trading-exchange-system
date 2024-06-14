@@ -21,25 +21,25 @@ import java.util.concurrent.atomic.AtomicLong;
 @Component
 public class SequenceService extends LoggerSupport implements CommonErrorHandler {
     
-    private static final String GROUP_ID = "SequenceGroup";
+    static final String GROUP_ID = "SequenceGroup";
     
     @Autowired
-    private SequenceHandler sequenceHandler;
+    SequenceHandler sequenceHandler;
     
     @Autowired
-    private MessagingFactory messagingFactory;
+    MessagingFactory messagingFactory;
     
     @Autowired
-    private MessageTypes messageTypes;
+    MessageTypes messageTypes;
     
-    private MessageProducer<AbstractEvent> messageProducer;
+    MessageProducer<AbstractEvent> messageProducer;
     
-    private AtomicLong sequence;
+    AtomicLong sequence;
     
-    private Thread jobThread;
+    Thread jobThread;
     
-    private boolean crash = false;
-    private boolean running;
+    boolean crash = false;
+    boolean running;
     
     @PostConstruct
     void init() {
@@ -99,7 +99,7 @@ public class SequenceService extends LoggerSupport implements CommonErrorHandler
         panic();
     }
     
-    private synchronized void processMessage(List<AbstractEvent> messages) {
+    synchronized void processMessage(List<AbstractEvent> messages) {
         if (!running || crash) {
             panic();
             return;

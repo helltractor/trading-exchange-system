@@ -1,4 +1,4 @@
-package com.warp.exchange.web.api;
+package com.warp.exchange.controller;
 
 import com.fasterxml.jackson.core.JsonProcessingException;
 import com.fasterxml.jackson.databind.ObjectMapper;
@@ -7,7 +7,6 @@ import com.warp.exchange.api.ApiException;
 import com.warp.exchange.bean.OrderBookBean;
 import com.warp.exchange.bean.OrderRequestBean;
 import com.warp.exchange.bean.SimpleMatchDetailRecord;
-import com.warp.exchange.ctx.UserContext;
 import com.warp.exchange.entity.trade.OrderEntity;
 import com.warp.exchange.enums.ApiError;
 import com.warp.exchange.message.ApiResultMessage;
@@ -19,6 +18,7 @@ import com.warp.exchange.service.HistoryService;
 import com.warp.exchange.service.SendEventService;
 import com.warp.exchange.service.TradingEngineApiProxyService;
 import com.warp.exchange.support.LoggerSupport;
+import com.warp.exchange.user.UserContext;
 import com.warp.exchange.util.IdUtil;
 import com.warp.exchange.util.JsonUtil;
 import jakarta.annotation.PostConstruct;
@@ -39,23 +39,29 @@ import java.util.concurrent.ConcurrentHashMap;
 public class TradingApiController extends LoggerSupport {
     
     Map<String, DeferredResult<ResponseEntity<String>>> deferredResultMap = new ConcurrentHashMap<>();
-    @Autowired
-    private HistoryService historyService;
-    @Autowired
-    private SendEventService sendEventService;
-    @Autowired
-    private RedisService redisService;
-    @Autowired
-    private ObjectMapper objectMapper;
-    @Autowired
-    private TradingEngineApiProxyService tradingEngineApiProxyService;
-    private Long syncTimeout = Long.valueOf(500);
-    private String timeoutJson = null;
     
-    private String getTimeoutJson() throws JsonProcessingException {
+    @Autowired
+    HistoryService historyService;
+    
+    @Autowired
+    SendEventService sendEventService;
+    
+    @Autowired
+    RedisService redisService;
+    
+    @Autowired
+    ObjectMapper objectMapper;
+    
+    @Autowired
+    TradingEngineApiProxyService tradingEngineApiProxyService;
+    
+    Long syncTimeout = Long.valueOf(500);
+    
+    String timeoutJson = null;
+    
+    String getTimeoutJson() throws JsonProcessingException {
         if (timeoutJson == null) {
-            timeoutJson = this.objectMapper
-                    .writeValueAsString(new ApiErrorResponse(ApiError.OPERATION_TIMEOUT, null, ""));
+            timeoutJson = this.objectMapper.writeValueAsString(new ApiErrorResponse(ApiError.OPERATION_TIMEOUT, null, ""));
         }
         return timeoutJson;
     }
@@ -142,7 +148,7 @@ public class TradingApiController extends LoggerSupport {
         return getBars(RedisCache.Key.SEC_BARS, start, end);
     }
     
-    private String getBars(String key, long start, long end) {
+    String getBars(String key, long start, long end) {
         List<String> data = redisService.zrangebyscore(key, start, end);
         if (data == null || data.isEmpty()) {
             return "[]";
@@ -179,11 +185,6 @@ public class TradingApiController extends LoggerSupport {
         return this.historyService.getHistoryMatchDetails(orderId);
     }
     
-    /**
-     * Cancel an order.
-     *
-     * @param orderId The order id.
-     */
     @PostMapping(value = "/orders/{orderId}/cancel", produces = "application/json")
     @ResponseBody
     public DeferredResult<ResponseEntity<String>> cancelOrder(@PathVariable("orderId") Long orderId) throws Exception {
@@ -211,9 +212,6 @@ public class TradingApiController extends LoggerSupport {
         return deferred;
     }
     
-    /**
-     * Create a new order.
-     */
     @PostMapping(value = "/orders", produces = "application/json")
     @ResponseBody
     public DeferredResult<ResponseEntity<String>> createOrder(@RequestBody OrderRequestBean orderRequest)
@@ -260,7 +258,7 @@ public class TradingApiController extends LoggerSupport {
                 }
             }
         } catch (Exception e) {
-            logger.error("Invalid ApiResultMessage: " + msg, e);
+            logger.error("Invalid ApiResultMessage: {}", msg, e);
         }
     }
 }

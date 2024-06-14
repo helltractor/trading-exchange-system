@@ -42,7 +42,7 @@
         </dependency>
         <dependency>
             <groupId>io.vertx</groupId>
-            <artifactId>vertx-redis-client</artifactId>
+            <artifactId>vertx-redis-okHttpClient</artifactId>
             <version>${vertx.version}</version>
         </dependency>
     </dependencies>

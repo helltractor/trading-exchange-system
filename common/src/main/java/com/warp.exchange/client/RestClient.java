@@ -5,6 +5,7 @@ import com.fasterxml.jackson.databind.ObjectMapper;
 import com.warp.exchange.api.ApiErrorResponse;
 import com.warp.exchange.api.ApiException;
 import com.warp.exchange.enums.ApiError;
+import com.warp.exchange.support.LoggerSupport;
 import okhttp3.*;
 import org.slf4j.Logger;
 import org.slf4j.LoggerFactory;
@@ -20,24 +21,27 @@ import java.util.Objects;
 import java.util.concurrent.TimeUnit;
 
 /**
- * Http client for accessing exchange REST APIs.
+ * Http okHttpClient for accessing exchange REST APIs.
  */
-public class RestClient {
+public class RestClient extends LoggerSupport {
     
     static final MediaType JSON = MediaType.parse("application/json; charset=utf-8");
-    static final ApiException ERROR_UNKNOWN = new ApiException(ApiError.INTERNAL_SERVER_ERROR, "api",
-            "Api failed without error code.");
-    final Logger logger = LoggerFactory.getLogger(getClass());
-    final String endpoint;
-    final String host;
-    final ObjectMapper objectMapper;
-    OkHttpClient client;
     
-    RestClient(String endpoint, String host, ObjectMapper objectMapper, OkHttpClient client) {
+    static final ApiException ERROR_UNKNOWN = new ApiException(ApiError.INTERNAL_SERVER_ERROR, "api", "Api failed without error code.");
+    
+    final String endpoint;
+    
+    final String host;
+    
+    final ObjectMapper objectMapper;
+    
+    OkHttpClient okHttpClient;
+    
+    RestClient(String endpoint, String host, ObjectMapper objectMapper, OkHttpClient okHttpClient) {
         this.endpoint = endpoint;
         this.host = host;
         this.objectMapper = objectMapper;
-        this.client = client;
+        this.okHttpClient = okHttpClient;
     }
     
     public <T> T get(Class<T> clazz, String path, String authHeader, Map<String, String> query) {
@@ -60,12 +64,11 @@ public class RestClient {
         return request(null, ref, "POST", path, authHeader, null, body);
     }
     
-    <T> T request(Class<T> clazz, TypeReference<T> ref, String method, String path, String authHeader,
-                  Map<String, String> query, Object body) {
+    <T> T request(Class<T> clazz, TypeReference<T> ref, String method, String path, String authHeader, Map<String, String> query, Object body) {
         if (!path.startsWith("/")) {
             throw new IllegalArgumentException("Invalid path: " + path);
         }
-        // query:
+        // query
         String queryString = null;
         if (query != null) {
             List<String> paramList = new ArrayList<>();
@@ -80,7 +83,7 @@ public class RestClient {
         }
         final String url = urlBuilder.toString();
         
-        // json body:
+        // json body
         String jsonBody;
         try {
             jsonBody = body == null ? ""
@@ -109,7 +112,7 @@ public class RestClient {
     @SuppressWarnings("unchecked")
     <T> T execute(Class<T> clazz, TypeReference<T> ref, Request request) throws IOException {
         logger.info("request: {}...", request.url().url());
-        try (Response response = this.client.newCall(request).execute()) {
+        try (Response response = this.okHttpClient.newCall(request).execute()) {
             if (response.code() == 200) {
                 try (ResponseBody body = response.body()) {
                     String json = body.string();

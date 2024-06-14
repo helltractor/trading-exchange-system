@@ -12,7 +12,7 @@ public enum UserType {
     /**
      * User id
      */
-    private final long userId;
+    final long userId;
     
     UserType(long userId) {
         this.userId = userId;

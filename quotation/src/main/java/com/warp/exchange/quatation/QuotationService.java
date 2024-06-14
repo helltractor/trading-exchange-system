@@ -30,28 +30,28 @@ import java.util.function.Supplier;
 @Component
 public class QuotationService extends LoggerSupport {
     
-    private static final TypeReference<Map<BarType, BigDecimal[]>> TYPE_BARS = new TypeReference<>() {
+    static final TypeReference<Map<BarType, BigDecimal[]>> TYPE_BARS = new TypeReference<>() {
     };
     
     @Autowired
-    private ZoneId zoneId;
+    ZoneId zoneId;
     
     @Autowired
-    private RedisService redisService;
+    RedisService redisService;
     
     @Autowired
-    private QuotationDbService quotationDbService;
+    QuotationDbService quotationDbService;
     
     @Autowired
-    private MessagingFactory messagingFactory;
+    MessagingFactory messagingFactory;
     
-    private MessageConsumer tickConsumer;
+    MessageConsumer tickConsumer;
     
-    private String shaUpdateRecentTicksLua = null;
+    String shaUpdateRecentTicksLua = null;
     
-    private String shaUpdateBarLua = null;
+    String shaUpdateBarLua = null;
     
-    private long sequenceId;
+    long sequenceId;
     
     // TODO
     static <T extends AbstractBarEntity> T createBar(Supplier<T> fn, BigDecimal[] data) {
@@ -86,13 +86,13 @@ public class QuotationService extends LoggerSupport {
         }
     }
     
-    private void processMessages(List<AbstractMessage> messages) {
+    void processMessages(List<AbstractMessage> messages) {
         for (AbstractMessage message : messages) {
             processMessage((TickMessage) message);
         }
     }
     
-    private void processMessage(TickMessage message) {
+    void processMessage(TickMessage message) {
         if (message.sequenceId < this.sequenceId) {
             return;
         }

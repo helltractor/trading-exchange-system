@@ -1,8 +1,9 @@
-package com.warp.exchange.asset;
+package com.warp.exchange.service;
 
 import com.warp.exchange.enums.AssetEnum;
 import com.warp.exchange.enums.Transfer;
 import com.warp.exchange.support.LoggerSupport;
+import com.warp.exchange.trade.asset.Asset;
 import org.springframework.stereotype.Component;
 
 import java.math.BigDecimal;
@@ -21,10 +22,6 @@ public class AssetService extends LoggerSupport {
 
     /**
      * 获取用户资产
-     *
-     * @param userId
-     * @param assetId
-     * @return
      */
     public Asset getAsset(Long userId, AssetEnum assetId) {
         ConcurrentMap<AssetEnum, Asset> assets = userAssets.get(userId);
@@ -36,9 +33,6 @@ public class AssetService extends LoggerSupport {
 
     /**
      * 获取用户所有资产
-     *
-     * @param userId
-     * @return
      */
     public Map<AssetEnum, Asset> getAssets(Long userId) {
         Map<AssetEnum, Asset> assets = userAssets.get(userId);
@@ -50,8 +44,6 @@ public class AssetService extends LoggerSupport {
 
     /**
      * 获取所有用户资产
-     *
-     * @return
      */
     public ConcurrentMap<Long, ConcurrentMap<AssetEnum, Asset>> getUserAssets() {
         return this.userAssets;
@@ -59,10 +51,6 @@ public class AssetService extends LoggerSupport {
 
     /**
      * 初始化资产
-     *
-     * @param userId
-     * @param assetId
-     * @return
      */
     public Asset initAssets(Long userId, AssetEnum assetId) {
         ConcurrentMap<AssetEnum, Asset> assets = userAssets.get(userId);
@@ -77,14 +65,6 @@ public class AssetService extends LoggerSupport {
 
     /**
      * 转账
-     *
-     * @param type
-     * @param fromUserId
-     * @param toUserId
-     * @param assetId
-     * @param amount
-     * @param checkBalance
-     * @return
      */
     public boolean tryTransfer(Transfer type, Long fromUserId, Long toUserId, AssetEnum assetId,
                                BigDecimal amount, boolean checkBalance) {
@@ -134,12 +114,6 @@ public class AssetService extends LoggerSupport {
 
     /**
      * 检查是否可以转账
-     *
-     * @param type
-     * @param fromUserId
-     * @param toUserId
-     * @param assetId
-     * @param amount
      */
     public void transfer(Transfer type, Long fromUserId, Long toUserId, AssetEnum assetId, BigDecimal amount) {
         if (!tryTransfer(type, fromUserId, toUserId, assetId, amount, true)) {
@@ -153,11 +127,6 @@ public class AssetService extends LoggerSupport {
 
     /**
      * 冻结资产
-     *
-     * @param userId
-     * @param assetId
-     * @param amount
-     * @return
      */
     public boolean tryFreeze(Long userId, AssetEnum assetId, BigDecimal amount) {
         boolean ok = tryTransfer(Transfer.AVAILABLE_TO_FROZEN, userId, userId, assetId, amount, true);
@@ -169,10 +138,6 @@ public class AssetService extends LoggerSupport {
 
     /**
      * 解结资产
-     *
-     * @param userId
-     * @param assetId
-     * @param amount
      */
     public void unfreeze(Long userId, AssetEnum assetId, BigDecimal amount) {
         if (!tryTransfer(Transfer.FROZEN_TO_AVAILABLE, userId, userId, assetId, amount, true)) {

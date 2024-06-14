@@ -40,12 +40,12 @@ public class IpUtil {
         return HOST_ID;
     }
     
-    private static String doGetHostId() {
+    static String doGetHostId() {
         String id = getIpAddress();
         return id.replace(".", "_").replace("-", "_");
     }
     
-    private static String doGetIpAddress() {
+    static String doGetIpAddress() {
         List<InetAddress> ipList = new ArrayList<>();
         try {
             Enumeration<NetworkInterface> iterInterface = NetworkInterface.getNetworkInterfaces();

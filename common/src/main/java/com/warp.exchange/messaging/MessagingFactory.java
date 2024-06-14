@@ -33,16 +33,16 @@ import java.util.regex.Pattern;
 public class MessagingFactory extends LoggerSupport {
     
     @Autowired
-    private MessageTypes messageTypes;
+    MessageTypes messageTypes;
     
     @Autowired
-    private KafkaTemplate<String, String> kafkaTemplate;
+    KafkaTemplate<String, String> kafkaTemplate;
     
     @Autowired
-    private ConcurrentKafkaListenerContainerFactory<String, String> listenerContainerFactory;
+    ConcurrentKafkaListenerContainerFactory<String, String> listenerContainerFactory;
     
     @Autowired
-    private KafkaAdmin kafkaAdmin;
+    KafkaAdmin kafkaAdmin;
     
     @PostConstruct
     public void init() throws InterruptedException, ExecutionException {

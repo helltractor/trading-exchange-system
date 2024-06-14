@@ -22,7 +22,7 @@ import java.util.*;
 @Component
 public class MessageTypes {
     
-    private static final char SEP = '#';
+    static final char SEP = '#';
     final Logger logger = LoggerFactory.getLogger(getClass());
     final String messagePackage = AbstractMessage.class.getPackageName();
     final Map<String, Class<? extends AbstractMessage>> messageTypes = new HashMap<>();

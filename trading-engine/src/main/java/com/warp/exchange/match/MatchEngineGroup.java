@@ -9,7 +9,7 @@ import java.util.Map;
  * 订单撮合引擎组
  */
 public class MatchEngineGroup {
-    private final Map<Long, MatchEngine> engines = new HashMap<>();
+    final Map<Long, MatchEngine> engines = new HashMap<>();
     
     public MatchResult processOrder(long sequenceId, OrderEntity order) {
         Long symbolId = order.symbolId;

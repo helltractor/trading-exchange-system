@@ -30,9 +30,9 @@ import java.util.stream.Stream;
 public class DataBaseTemplate {
     
     final JdbcTemplate jdbcTemplate;
-    private final Logger logger = LoggerFactory.getLogger(getClass());
+    final Logger logger = LoggerFactory.getLogger(getClass());
     // class -> Mapper:
-    private Map<Class<?>, Mapper<?>> classMapping;
+    Map<Class<?>, Mapper<?>> classMapping;
     
     public DataBaseTemplate(@Autowired JdbcTemplate jdbcTemplate) {
         this.jdbcTemplate = jdbcTemplate;
@@ -55,7 +55,7 @@ public class DataBaseTemplate {
         this.classMapping = classMapping;
     }
     
-    private static List<Class<?>> scanEntities(String basePackage) {
+    static List<Class<?>> scanEntities(String basePackage) {
         ClassPathScanningCandidateComponentProvider provider = new ClassPathScanningCandidateComponentProvider(false);
         provider.addIncludeFilter(new AnnotationTypeFilter(Entity.class));
         List<Class<?>> classes = new ArrayList<>();

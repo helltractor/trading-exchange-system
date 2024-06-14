@@ -20,23 +20,26 @@ import java.util.function.Supplier;
 
 public class PushVerticle extends AbstractVerticle {
     
-    private final Logger logger = LoggerFactory.getLogger(getClass());
+    final Logger logger = LoggerFactory.getLogger(getClass());
     
-    private final String hmacKey;
+    final String hmacKey;
     
-    private final int serverPort;
+    final int serverPort;
+    
     /**
      * All handlers.
      */
-    private final Map<String, Boolean> handlersSet = new ConcurrentHashMap<>(1000);
+    final Map<String, Boolean> handlersSet = new ConcurrentHashMap<>(1000);
+    
     /**
      * userId -> set of handlers.
      */
-    private final Map<Long, Set<String>> userToHandlersMap = new ConcurrentHashMap<>(1000);
+    final Map<Long, Set<String>> userToHandlersMap = new ConcurrentHashMap<>(1000);
+    
     /**
      * handler -> userId.
      */
-    private final Map<String, Long> handlerToUserMap = new ConcurrentHashMap<>(1000);
+    final Map<String, Long> handlerToUserMap = new ConcurrentHashMap<>(1000);
     
     public PushVerticle(String hmacKey, int serverPort) {
         this.hmacKey = hmacKey;
@@ -93,12 +96,12 @@ public class PushVerticle extends AbstractVerticle {
         });
     }
     
-    private void initWebSocket(ServerWebSocket websocket, Long userId) {
+    void initWebSocket(ServerWebSocket websocket, Long userId) {
         String handlerId = websocket.textHandlerID();
-        logger.info("websocket accept userId: " + userId + ", handlerId: " + handlerId);
+        logger.info("websocket accept userId: {}, handlerId: {}", userId, handlerId);
         // 处理文本消息
         websocket.textMessageHandler(message -> {
-            logger.info("received message: " + message);
+            logger.info("received message: {}", message);
         });
         websocket.exceptionHandler(err -> {
             logger.error("websocket error", err);
@@ -122,15 +125,15 @@ public class PushVerticle extends AbstractVerticle {
         }
     }
     
-    private void subscribeClient(String handlerId) {
+    void subscribeClient(String handlerId) {
         this.handlersSet.put(handlerId, Boolean.TRUE);
     }
     
-    private void unsubscribeClient(String handlerId) {
+    void unsubscribeClient(String handlerId) {
         this.handlersSet.remove(handlerId);
     }
     
-    private void subscribeUser(Long userId, String handlerId) {
+    void subscribeUser(Long userId, String handlerId) {
         if (userId == null) {
             return;
         }
@@ -144,7 +147,7 @@ public class PushVerticle extends AbstractVerticle {
         logger.info("subscribe user {} {} ok.", userId, handlerId);
     }
     
-    private void unsubscribeUser(Long userId, String handlerId) {
+    void unsubscribeUser(Long userId, String handlerId) {
         if (userId == null) {
             return;
         }

@@ -49,7 +49,7 @@ class AccessibleProperty {
     // table column definition:
     final String columnDefinition;
     // Field:
-    private final Field field;
+    final Field field;
     
     @SuppressWarnings({"unchecked", "rawtypes"})
     public AccessibleProperty(Field f) {
@@ -63,7 +63,7 @@ class AccessibleProperty {
                 : null;
     }
     
-    private static String getDefaultColumnType(Class<?> type, Column col) {
+    static String getDefaultColumnType(Class<?> type, Column col) {
         String ddl = DEFAULT_COLUMN_TYPES.get(type);
         if (ddl.equals("VARCHAR($1)")) {
             ddl = ddl.replace("$1", String.valueOf(col == null ? 255 : col.length()));
@@ -127,7 +127,7 @@ class AccessibleProperty {
         return col == null || col.updatable();
     }
     
-    private String getColumnDefinition(Class<?> type) {
+    String getColumnDefinition(Class<?> type) {
         Column col = this.field.getAnnotation(Column.class);
         if (col == null) {
             throw new IllegalArgumentException("@Column not found on: " + this.field.toString());

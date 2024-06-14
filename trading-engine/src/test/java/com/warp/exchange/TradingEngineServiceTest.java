@@ -1,7 +1,5 @@
 package com.warp.exchange;
 
-import com.warp.exchange.asset.AssetService;
-import com.warp.exchange.clearing.ClearingService;
 import com.warp.exchange.enums.AssetEnum;
 import com.warp.exchange.enums.Direction;
 import com.warp.exchange.enums.UserType;
@@ -10,7 +8,9 @@ import com.warp.exchange.message.event.AbstractEvent;
 import com.warp.exchange.message.event.OrderCancelEvent;
 import com.warp.exchange.message.event.OrderRequestEvent;
 import com.warp.exchange.message.event.TransferEvent;
-import com.warp.exchange.order.OrderService;
+import com.warp.exchange.service.AssetService;
+import com.warp.exchange.service.ClearingService;
+import com.warp.exchange.service.OrderService;
 import org.junit.jupiter.api.Test;
 
 import java.math.BigDecimal;
@@ -26,7 +26,7 @@ public class TradingEngineServiceTest {
     static final Long USER_C = 33333L;
     static final Long USER_D = 44444L;
     static final Long[] USERS = {USER_A, USER_B, USER_C, USER_D};
-    private long currentSequenceId = 0;
+    long currentSequenceId = 0;
     
     @Test
     public void testTradingEngine() {

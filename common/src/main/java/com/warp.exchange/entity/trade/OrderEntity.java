@@ -82,8 +82,8 @@ public class OrderEntity implements EntitySupport, Comparable<OrderEntity> {
      */
     @Column(nullable = false)
     public long updateTime; // 更新时间
-
-    private int version;
+    
+    int version;
 
     @Transient
     @JsonIgnore

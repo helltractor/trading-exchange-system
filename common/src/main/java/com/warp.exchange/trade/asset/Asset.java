@@ -1,4 +1,4 @@
-package com.warp.exchange.asset;
+package com.warp.exchange.trade.asset;
 
 import com.fasterxml.jackson.annotation.JsonIgnore;
 

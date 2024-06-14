@@ -30,32 +30,30 @@ def main():
                         help='output debug information')
 
     args = parser.parse_args()
-    client = ApiClient(args.email, args.password, args.host,
+    okHttpClient = ApiClient(args.email, args.password, args.host,
                        args.https, args.timeout, args.debug)
 
     log('start bot...')
     while True:
         try:
             world_price = get_world_price()
-            active_orders = client.get('/api/orders')
-            buy_orders = [
-                order for order in active_orders if order.direction == 'BUY']
-            sell_orders = [
-                order for order in active_orders if order.direction == 'SELL']
+            active_orders = okHttpClient.get('/api/orders')
+            buy_orders = [order for order in active_orders if order.direction == 'BUY']
+            sell_orders = [order for order in active_orders if order.direction == 'SELL']
+            print(buy_orders, sell_orders)
             if len(buy_orders) > 10:
                 buy_orders.sort(key=lambda order: order.price)
-                client.post(f'/api/orders/{buy_orders[0].id}/cancel')
+                okHttpClient.post(f'/api/orders/{buy_orders[0].id}/cancel')
                 time.sleep(PAUSE_TIME)
             if len(sell_orders) > 10:
                 sell_orders.sort(key=lambda order: order.price, reverse=True)
-                client.post(f'/api/orders/{sell_orders[0].id}/cancel')
+                okHttpClient.post(f'/api/orders/{sell_orders[0].id}/cancel')
                 time.sleep(PAUSE_TIME)
-
-            client.post('/api/orders', dict(price=randomPrice(world_price,
+            okHttpClient.post('/api/orders', dict(price=randomPrice(world_price,
                         'BUY'), quantity=randomQuantity(), direction='BUY'))
             time.sleep(PAUSE_TIME)
 
-            client.post('/api/orders', dict(price=randomPrice(world_price,
+            okHttpClient.post('/api/orders', dict(price=randomPrice(world_price,
                         'SELL'), quantity=randomQuantity(), direction='SELL'))
             time.sleep(PAUSE_TIME)
         except Exception as e:

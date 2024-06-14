@@ -9,9 +9,9 @@ import com.warp.exchange.enums.ApiError;
  */
 public class ApiResultMessage extends AbstractMessage {
     
-    private static ApiErrorResponse CREATE_ORDER_FAILED = new ApiErrorResponse(ApiError.NO_ENOUGH_ASSET, null,
+    static ApiErrorResponse CREATE_ORDER_FAILED = new ApiErrorResponse(ApiError.NO_ENOUGH_ASSET, null,
             "No enough available asset");
-    private static ApiErrorResponse CANCEL_ORDER_FAILED = new ApiErrorResponse(ApiError.ORDER_NOT_FOUND, null,
+    static ApiErrorResponse CANCEL_ORDER_FAILED = new ApiErrorResponse(ApiError.ORDER_NOT_FOUND, null,
             "Order not found..");
     public ApiErrorResponse error;
     public Object result;

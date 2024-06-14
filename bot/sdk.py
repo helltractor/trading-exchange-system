@@ -35,6 +35,7 @@ class ApiClient(object):
         return self._http('GET', path, params, None)
     
     def post(self, path, obj=None):
+        print(obj)
         data = json.dumps(obj) if obj is not None else None
         return self._http('POST', path, {}, data)
     
@@ -47,8 +48,7 @@ class ApiClient(object):
             headers['Content-Type'] = 'application/json'
         else:
             data = None
-        url = '%s://%s%s?%s' % (self._protocol, self._host,
-                                path, parse.urlencode(params))
+        url = '%s://%s%s?%s' % (self._protocol, self._host, path, parse.urlencode(params))
         req = request.Request(url, data=data, method=method)
         for k, v in headers.items():
             req.add_header(k, v)

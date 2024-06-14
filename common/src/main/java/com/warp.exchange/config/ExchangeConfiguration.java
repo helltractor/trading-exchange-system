@@ -8,15 +8,15 @@ import java.time.Duration;
 import java.time.ZoneId;
 
 @Configuration
-@ConfigurationProperties(prefix = "exchange.config")
+@ConfigurationProperties(prefix = "exchange.config")    // @ConfigurationProperties注解：创建配置类，指定配置项的前缀，批量提取配置内容
 public class ExchangeConfiguration {
     
-    private int orderBookDepth = 50;
-    private boolean debugMode = false;
-    private String timeZone = ZoneId.systemDefault().getId();
-    private String hmacKey;
-    private Duration sessionTimeout;
-    private ApiEndpoints apiEndpoints;
+    int orderBookDepth = 50;
+    boolean debugMode = false;
+    String timeZone = ZoneId.systemDefault().getId();
+    String hmacKey;
+    Duration sessionTimeout;
+    ApiEndpoints apiEndpoints;
     
     @Bean
     public ZoneId createZoneId() {
@@ -72,8 +72,9 @@ public class ExchangeConfiguration {
     }
     
     public static class ApiEndpoints {
-        private String tradingApi;
-        private String tradingEngineApi;
+        
+        String tradingApi;
+        String tradingEngineApi;
         
         public String getTradingApi() {
             return tradingApi;

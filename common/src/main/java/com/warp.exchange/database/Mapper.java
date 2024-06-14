@@ -122,14 +122,14 @@ final class Mapper<T> {
         return map;
     }
     
-    private String numOfQuestions(int n) {
+    String numOfQuestions(int n) {
         String[] qs = new String[n];
         return String.join(", ", Arrays.stream(qs).map((s) -> {
             return "?";
         }).toArray(String[]::new));
     }
     
-    private String getTableName(Class<?> clazz) {
+    String getTableName(Class<?> clazz) {
         Table table = clazz.getAnnotation(Table.class);
         if (table != null && !table.name().isEmpty()) {
             return table.name();
@@ -138,7 +138,7 @@ final class Mapper<T> {
         return Character.toLowerCase(name.charAt(0)) + name.substring(1);
     }
     
-    private List<AccessibleProperty> getProperties(Class<?> clazz) throws Exception {
+    List<AccessibleProperty> getProperties(Class<?> clazz) throws Exception {
         List<AccessibleProperty> properties = new ArrayList<>();
         for (Field f : clazz.getFields()) {
             if (Modifier.isStatic(f.getModifiers())) {

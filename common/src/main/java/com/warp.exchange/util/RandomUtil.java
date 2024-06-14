@@ -27,9 +27,9 @@ public class RandomUtil {
      * Holds words "A~Z a~z 0~9"
      */
     public static final String WORDS = ALPHABET_UPPER + ALPHABET_LOWER + DIGITS;
-    private static final SecureRandom SECURE_RANDOM = createSecureRandom();
+    static final SecureRandom SECURE_RANDOM = createSecureRandom();
     
-    private static SecureRandom createSecureRandom() {
+    static SecureRandom createSecureRandom() {
         return new SecureRandom();
     }
     

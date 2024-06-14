@@ -1,9 +1,6 @@
 package com.warp.exchange;
 
-import com.warp.exchange.asset.Asset;
-import com.warp.exchange.asset.AssetService;
 import com.warp.exchange.bean.OrderBookBean;
-import com.warp.exchange.clearing.ClearingService;
 import com.warp.exchange.entity.quatation.TickEntity;
 import com.warp.exchange.entity.trade.MatchDetailEntity;
 import com.warp.exchange.entity.trade.OrderEntity;
@@ -22,11 +19,14 @@ import com.warp.exchange.messaging.MessageConsumer;
 import com.warp.exchange.messaging.MessageProducer;
 import com.warp.exchange.messaging.Messaging;
 import com.warp.exchange.messaging.MessagingFactory;
-import com.warp.exchange.order.OrderService;
 import com.warp.exchange.redis.RedisCache;
 import com.warp.exchange.redis.RedisService;
-import com.warp.exchange.store.StoreService;
+import com.warp.exchange.service.AssetService;
+import com.warp.exchange.service.ClearingService;
+import com.warp.exchange.service.OrderService;
+import com.warp.exchange.service.StoreService;
 import com.warp.exchange.support.LoggerSupport;
+import com.warp.exchange.trade.asset.Asset;
 import com.warp.exchange.util.IpUtil;
 import com.warp.exchange.util.JsonUtil;
 import jakarta.annotation.PostConstruct;
@@ -79,28 +79,28 @@ public class TradingEngineService extends LoggerSupport {
     @Autowired
     MessagingFactory messagingFactory;
     
-    private MessageConsumer consumer;
+    MessageConsumer consumer;
     
-    private MessageProducer<TickMessage> producer;
+    MessageProducer<TickMessage> producer;
     
-    private long lastSequenceId = 0;
+    long lastSequenceId = 0;
     
-    private boolean orderBookChanged = false;
+    boolean orderBookChanged = false;
     
-    private String shaUpdateOrderBookLua;
+    String shaUpdateOrderBookLua;
     
-    private Thread tickThread;
-    private Thread notifyThread;
-    private Thread apiResultThread;
-    private Thread orderBookThread;
-    private Thread dbThread;
+    Thread tickThread;
+    Thread notifyThread;
+    Thread apiResultThread;
+    Thread orderBookThread;
+    Thread dbThread;
     
-    private OrderBookBean lastedOrderBook = null;
-    private Queue<List<OrderEntity>> orderQueue = new ConcurrentLinkedQueue<>();
-    private Queue<List<MatchDetailEntity>> matchQueue = new ConcurrentLinkedQueue<>();
-    private Queue<TickMessage> tickQueue = new ConcurrentLinkedQueue<>();
-    private Queue<ApiResultMessage> apiResultQueue = new ConcurrentLinkedQueue<>();
-    private Queue<NotificationMessage> notificationQueue = new ConcurrentLinkedQueue<>();
+    OrderBookBean lastedOrderBook = null;
+    Queue<List<OrderEntity>> orderQueue = new ConcurrentLinkedQueue<>();
+    Queue<List<MatchDetailEntity>> matchQueue = new ConcurrentLinkedQueue<>();
+    Queue<TickMessage> tickQueue = new ConcurrentLinkedQueue<>();
+    Queue<ApiResultMessage> apiResultQueue = new ConcurrentLinkedQueue<>();
+    Queue<NotificationMessage> notificationQueue = new ConcurrentLinkedQueue<>();
     
     @PostConstruct
     public void init() {
@@ -370,7 +370,7 @@ public class TradingEngineService extends LoggerSupport {
         }
     }
     
-    private NotificationMessage createNotification(long ts, String type, Long userId, Object data) {
+    NotificationMessage createNotification(long ts, String type, Long userId, Object data) {
         NotificationMessage msg = new NotificationMessage();
         msg.createTime = ts;
         msg.type = type;

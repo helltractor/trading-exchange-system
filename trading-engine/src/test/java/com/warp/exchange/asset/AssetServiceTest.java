@@ -2,6 +2,7 @@ package com.warp.exchange.asset;
 
 import com.warp.exchange.enums.AssetEnum;
 import com.warp.exchange.enums.Transfer;
+import com.warp.exchange.service.AssetService;
 import org.junit.jupiter.api.AfterEach;
 import org.junit.jupiter.api.BeforeEach;
 import org.junit.jupiter.api.Test;

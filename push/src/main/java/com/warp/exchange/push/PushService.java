@@ -15,20 +15,20 @@ public class PushService extends LoggerSupport {
     @Value("${exchange.config.hmac-key}")
     String hmacKey;
     @Value("${server.port}")
-    private int serverPort;
+    int serverPort;
     @Value("${spring.redis.standalone.host:localhost}")
-    private String redisHost;
+    String redisHost;
     
     @Value("${spring.redis.standalone.port:6379}")
-    private int redisPort;
+    int redisPort;
     
     @Value("${spring.redis.standalone.password:}")
-    private String redisPassword;
+    String redisPassword;
     
     @Value("${spring.redis.standalone.database:0}")
-    private int redisDatabase = 0;
+    int redisDatabase = 0;
     
-    private Vertx vertx;
+    Vertx vertx;
     
     @PostConstruct
     public void startVertx() {

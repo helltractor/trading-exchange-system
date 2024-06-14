@@ -14,7 +14,7 @@ public class AbstractApiController extends LoggerSupport {
     @ResponseStatus(HttpStatus.BAD_REQUEST)
     @ExceptionHandler(ApiException.class)
     @ResponseBody
-    public ApiErrorResponse handleApiException(HttpServletResponse response, Exception e) throws Exception {
+    public ApiErrorResponse handleApiException(HttpServletResponse response, Exception e) {
         response.setContentType("application/json;charset=UTF-8");
         ApiException apiException = null;
         if (e instanceof ApiException) {

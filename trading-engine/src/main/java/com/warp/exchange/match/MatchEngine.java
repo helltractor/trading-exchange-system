@@ -4,7 +4,7 @@ import com.warp.exchange.bean.OrderBookBean;
 import com.warp.exchange.entity.trade.OrderEntity;
 import com.warp.exchange.enums.Direction;
 import com.warp.exchange.enums.OrderStatus;
-import com.warp.exchange.order.OrderBook;
+import com.warp.exchange.trade.order.OrderBook;
 import org.springframework.stereotype.Component;
 
 import java.math.BigDecimal;
@@ -17,7 +17,7 @@ public class MatchEngine {
     public final OrderBook buyBook = new OrderBook(Direction.BUY);
     public final OrderBook sellBook = new OrderBook(Direction.SELL);
     public BigDecimal marketPrice = BigDecimal.ZERO;
-    private long sequenceId;
+    long sequenceId;
     
     public MatchResult processOrder(long sequenceId, OrderEntity order) {
         switch (order.direction) {
@@ -52,7 +52,7 @@ public class MatchEngine {
      * @param anotherBook 未能完全成交后挂单的OrderBook
      * @return 成交结果
      */
-    private MatchResult processOrder(long sequenceId, OrderEntity takerOrder, OrderBook makerBook, OrderBook anotherBook) {
+    MatchResult processOrder(long sequenceId, OrderEntity takerOrder, OrderBook makerBook, OrderBook anotherBook) {
         this.sequenceId = sequenceId;
         long timeStamp = takerOrder.createTime;
         MatchResult matchResult = new MatchResult(takerOrder);

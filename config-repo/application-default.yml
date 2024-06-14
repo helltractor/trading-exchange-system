@@ -7,4 +7,4 @@ exchange:
 
 logging:
   level:
-    com.warp.exchange: ${LOGGING_EXCHANGE_LEVEL:DEBUG}
+    com.helltractor.exchange: ${LOGGING_EXCHANGE_LEVEL:DEBUG}

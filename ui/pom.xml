@@ -3,19 +3,15 @@
          xmlns:xsi="http://www.w3.org/2001/XMLSchema-instance"
          xsi:schemaLocation="http://maven.apache.org/POM/4.0.0 http://maven.apache.org/xsd/maven-4.0.0.xsd">
     <modelVersion>4.0.0</modelVersion>
+
     <parent>
-        <groupId>com.warp.exchange</groupId>
-        <artifactId>Warp-exchange</artifactId>
-        <version>1.0</version>
+        <groupId>com.helltractor.exchange</groupId>
+        <artifactId>parent</artifactId>
+        <version>1.0-dev</version>
+        <relativePath>../parent/pom.xml</relativePath>
     </parent>
 
     <artifactId>ui</artifactId>
-
-    <properties>
-        <maven.compiler.source>21</maven.compiler.source>
-        <maven.compiler.target>21</maven.compiler.target>
-        <project.build.sourceEncoding>UTF-8</project.build.sourceEncoding>
-    </properties>
 
     <dependencies>
         <!-- 依赖SpringCloud Config客户端 -->
@@ -24,17 +20,17 @@
             <artifactId>spring-cloud-starter-config</artifactId>
         </dependency>
 
+        <!-- 依赖Common模块 -->
+        <dependency>
+            <groupId>com.helltractor.exchange</groupId>
+            <artifactId>common</artifactId>
+            <version>${project.version}</version>
+        </dependency>
+
         <!-- 依赖SpringBoot Actuator -->
         <dependency>
             <groupId>org.springframework.boot</groupId>
             <artifactId>spring-boot-starter-actuator</artifactId>
-        </dependency>
-
-        <!-- 依赖Common模块 -->
-        <dependency>
-            <groupId>com.warp.exchange</groupId>
-            <artifactId>common</artifactId>
-            <version>${project.version}</version>
         </dependency>
 
         <!-- 依赖第三方模块 -->
@@ -46,9 +42,7 @@
     </dependencies>
 
     <build>
-        <!-- 指定输出文件名 -->
         <finalName>${project.artifactId}</finalName>
-        <!-- 创建SpringBoot可执行jar -->
         <plugins>
             <plugin>
                 <groupId>org.springframework.boot</groupId>

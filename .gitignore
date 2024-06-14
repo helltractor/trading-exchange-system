@@ -1,9 +1,10 @@
 target/
-!.mvn/warpper/maven-warpper.jar
+docker/
 !**/src/main/**/target/
 !**/src/test/**/target/
 
 ### IntelliJ IDEA ###
+.idea/
 .idea/modules.xml
 .idea/jarRepositories.xml
 .idea/compiler.xml
@@ -27,7 +28,7 @@ target/
 /dist/
 /nbdist/
 /.nb-gradle/
-build/
+builds/
 !**/src/main/**/build/
 !**/src/test/**/build/
 
@@ -36,5 +37,3 @@ build/
 
 ### Mac OS ###
 .DS_Store
-
-/docker/**

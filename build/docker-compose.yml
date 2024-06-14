@@ -1,0 +1,55 @@
+version: '3'
+services:
+  zookeeper:
+    image: bitnami/zookeeper:3.5
+    user: "root"
+    container_name: zookeeper-trade
+    ports:
+      - "2181:2181"
+    environment:
+      - ALLOW_ANONYMOUS_LOGIN=yes
+    volumes:
+      - ./docker/zookeeper-data:/bitnami
+
+  kafka:
+    image: bitnami/kafka:3.0
+    user: "root"
+    container_name: kafka-trade
+    ports:
+      - "9092:9092"
+    depends_on:
+      - zookeeper
+    environment:
+      - KAFKA_BROKER_ID=1
+      - KAFKA_CFG_LISTENERS=PLAINTEXT://:9092
+      - KAFKA_CFG_ADVERTISED_LISTENERS=PLAINTEXT://127.0.0.1:9092
+      - KAFKA_CFG_ZOOKEEPER_CONNECT=zookeeper:2181
+      - KAFKA_CFG_AUTO_CREATE_TOPICS_ENABLE=true
+      - ALLOW_PLAINTEXT_LISTENER=yes
+    volumes:
+      - ./docker/kafka-data:/bitnami
+
+  redis:
+    image: redis:6.2
+    container_name: redis-trade
+    ports:
+      - "6379:6379"
+    volumes:
+      - ./docker/redis-data:/data
+
+  mysql:
+    image: mysql:8.0
+    container_name: mysql-trade
+    ports:
+      - "3306:3306"
+    restart: always
+    command: --default-authentication-plugin=mysql_native_password
+    environment:
+      - MYSQL_ROOT_PASSWORD=password
+      # MySQL:latest 已经弃用--default-authentication-plugin参数，使用MYSQL_AUTH_PLUGIN参数，才能够连接到数据库
+      - MYSQL_AUTH_PLUGIN=caching_sha2_password
+    volumes:
+      - ./mysql/schema.sql:/docker-entrypoint-initdb.d/exchange-schema.sql:ro
+      - ./mysql/conf/my.cnf:/etc/mysql/my.cnf
+      - ./docker/mysql-data:/var/lib/mysql
+      - ./docker/mysql-logs:/var/log/mysql

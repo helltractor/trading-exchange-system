@@ -4,12 +4,10 @@ import com.warp.exchange.asset.Asset;
 import com.warp.exchange.asset.AssetService;
 import com.warp.exchange.bean.OrderBookBean;
 import com.warp.exchange.clearing.ClearingService;
+import com.warp.exchange.entity.quatation.TickEntity;
 import com.warp.exchange.entity.trade.MatchDetailEntity;
 import com.warp.exchange.entity.trade.OrderEntity;
-import com.warp.exchange.enums.AssetEnum;
-import com.warp.exchange.enums.MatchType;
-import com.warp.exchange.enums.Transfer;
-import com.warp.exchange.enums.UserType;
+import com.warp.exchange.enums.*;
 import com.warp.exchange.match.MatchDetailRecord;
 import com.warp.exchange.match.MatchEngine;
 import com.warp.exchange.match.MatchResult;
@@ -325,14 +323,14 @@ public class TradingEngineService extends LoggerSupport {
         // 推送成功结果,注意必须复制一份OrderEntity,因为将异步序列化
         this.apiResultQueue.add(ApiResultMessage.orderSuccess(event.refId, order.copy(), event.createTime));
         this.orderBookChanged = true;
-        // TODO：收集Notification
-//        List<NotificationMessage> notifications = new ArrayList<>();
-//        notifications.add(createNotification(event.createTime, "order_matched", order.userId, order.copy()));
+        // 收集Notification
+        List<NotificationMessage> notifications = new ArrayList<>();
+        notifications.add(createNotification(event.createTime, "order_matched", order.userId, order.copy()));
         // TODO: 收集已完成的OrderEntity并生成MatchDetailEntity, TickEntity
         if (!result.matchDetails.isEmpty()) {
             List<OrderEntity> closedOrders = new ArrayList<>();
             List<MatchDetailEntity> matchDetails = new ArrayList<>();
-//            List<TickEntity> ticks = new ArrayList<>();
+            List<TickEntity> ticks = new ArrayList<>();
             if (result.takerOrder.status.isFinalStatus) {
                 closedOrders.add(result.takerOrder);
             }
@@ -347,29 +345,38 @@ public class TradingEngineService extends LoggerSupport {
                         false);
                 matchDetails.add(takerDetail);
                 matchDetails.add(makerDetail);
-//                TickEntity tick = new TickEntity();
-//                tick.sequenceId = event.sequenceId;
-//                tick.takerOrderId = detail.takerOrder().id;
-//                tick.makerOrderId = detail.makerOrder().id;
-//                tick.price = detail.price();
-//                tick.quantity = detail.quantity();
-//                tick.takerDirection = detail.takerOrder().direction == Direction.BUY;
-//                tick.createTime = event.createTime;
-//                ticks.add(tick);
+                TickEntity tick = new TickEntity();
+                tick.sequenceId = event.sequenceId;
+                tick.takerOrderId = detail.takerOrder().id;
+                tick.makerOrderId = detail.makerOrder().id;
+                tick.price = detail.price();
+                tick.quantity = detail.quantity();
+                tick.takerDirection = detail.takerOrder().direction == Direction.BUY;
+                tick.createTime = event.createTime;
+                ticks.add(tick);
             }
             this.orderQueue.add(closedOrders);
             // 异步写入数据库
             this.orderQueue.add(closedOrders);
             this.matchQueue.add(matchDetails);
             // 异步发送Tick消息
-//            TickMessage msg = new TickMessage();
-//            msg.sequenceId = event.sequenceId;
-//            msg.createTime = event.createTime;
-//            msg.ticks = ticks;
-//            this.tickQueue.add(msg);
-//            // 异步通知OrderMatch
-//            this.notificationQueue.addAll(notifications);
+            TickMessage msg = new TickMessage();
+            msg.sequenceId = event.sequenceId;
+            msg.createTime = event.createTime;
+            msg.ticks = ticks;
+            this.tickQueue.add(msg);
+            // 异步通知OrderMatch
+            this.notificationQueue.addAll(notifications);
         }
+    }
+    
+    private NotificationMessage createNotification(long ts, String type, Long userId, Object data) {
+        NotificationMessage msg = new NotificationMessage();
+        msg.createTime = ts;
+        msg.type = type;
+        msg.userId = userId;
+        msg.data = data;
+        return msg;
     }
     
     void cancelOrder(OrderCancelEvent event) {

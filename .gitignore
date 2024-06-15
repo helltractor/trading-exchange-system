@@ -27,7 +27,7 @@ target/
 /dist/
 /nbdist/
 /.nb-gradle/
-build/
+builds/
 !**/src/main/**/build/
 !**/src/test/**/build/
 
@@ -37,4 +37,4 @@ build/
 ### Mac OS ###
 .DS_Store
 
-/docker/**
+docker/

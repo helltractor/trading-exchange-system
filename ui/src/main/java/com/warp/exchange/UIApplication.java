@@ -25,8 +25,6 @@ public class UIApplication {
     
     /**
      * webMvcConfigurer用于自定义Spring MVC的配置。
-     *
-     * @return
      */
     @Bean
     public WebMvcConfigurer webMvcConfigurer() {

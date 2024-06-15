@@ -99,6 +99,10 @@ public class SequenceService extends LoggerSupport implements CommonErrorHandler
         panic();
     }
     
+    void sendMessages(List<AbstractEvent> messages) {
+        this.messageProducer.sendMessages(messages);
+    }
+    
     synchronized void processMessage(List<AbstractEvent> messages) {
         if (!running || crash) {
             panic();
@@ -107,6 +111,7 @@ public class SequenceService extends LoggerSupport implements CommonErrorHandler
         if (logger.isInfoEnabled()) {
             logger.info("do sequence for {} messages...", messages.size());
         }
+        long start = System.currentTimeMillis();
         List<AbstractEvent> sequenced = null;
         try {
             sequenced = this.sequenceHandler.sequenceMessages(this.messageTypes, this.sequence, messages);
@@ -116,11 +121,18 @@ public class SequenceService extends LoggerSupport implements CommonErrorHandler
             panic();
             throw new Error(e);
         }
+        
+        if (logger.isInfoEnabled()) {
+            long end = System.currentTimeMillis();
+            logger.info("sequenced {} messages in {} ms. current sequence id: {}", messages.size(), (end - start),
+                    this.sequence.get());
+        }
+        sendMessages(sequenced);
     }
     
     void panic() {
         this.crash = true;
-        this.running = true;
+        this.running = false;
         System.exit(1);
     }
 }

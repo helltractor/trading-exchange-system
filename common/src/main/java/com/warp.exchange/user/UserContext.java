@@ -4,7 +4,7 @@ import com.warp.exchange.api.ApiException;
 import com.warp.exchange.enums.ApiError;
 
 /**
- * Holds user context in thread-local.
+ * 在线程本地中保存用户上下文
  */
 public class UserContext implements AutoCloseable {
     
@@ -15,7 +15,7 @@ public class UserContext implements AutoCloseable {
     }
     
     /**
-     * Get current user id, or throw exception if no user.
+     * 获取当前用户ID，如果没有用户，则引发异常
      */
     public static Long getRequiredUserId() {
         Long userId = getUserId();
@@ -26,7 +26,7 @@ public class UserContext implements AutoCloseable {
     }
     
     /**
-     * Get current user id, or null if no user.
+     * 获取当前用户ID，如果没有用户则返回null
      */
     public static Long getUserId() {
         return THREAD_LOCAL_CTX.get();

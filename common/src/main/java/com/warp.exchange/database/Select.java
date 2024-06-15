@@ -26,6 +26,6 @@ public final class Select extends CriteriaQuery {
      */
     @SuppressWarnings("unchecked")
     public <T> From<T> from(Class<T> entityClass) {
-        return new From<T>(this.criteria, this.criteria.db.getMapper(entityClass));
+        return new From<T>(this.criteria, this.criteria.dataBase.getMapper(entityClass));
     }
 }

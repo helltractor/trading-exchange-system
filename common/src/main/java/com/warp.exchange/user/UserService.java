@@ -17,15 +17,12 @@ import org.springframework.transaction.annotation.Transactional;
 @Transactional
 public class UserService extends AbstractDbService {
     
-    public UserProfileEntity getUserProfile(String userId) {
+    public UserProfileEntity getUserProfile(Long userId) {
         return dataBase.get(UserProfileEntity.class, userId);
     }
     
     /**
      * 通过邮件从数据库查找用户信息
-     *
-     * @param email
-     * @return
      */
     @Nullable
     public UserProfileEntity fetchUserProfileByEmail(String email) {
@@ -34,9 +31,6 @@ public class UserService extends AbstractDbService {
     
     /**
      * 通过邮件查找用户信息
-     *
-     * @param email
-     * @return
      */
     public UserProfileEntity getUserProfileByEmail(String email) {
         UserProfileEntity userProfile = fetchUserProfileByEmail(email);
@@ -48,11 +42,6 @@ public class UserService extends AbstractDbService {
     
     /**
      * 通过邮箱，名字和密码注册用户
-     *
-     * @param email
-     * @param name
-     * @param password
-     * @return
      */
     public UserProfileEntity signup(String email, String name, String password) {
         final long timestamp = System.currentTimeMillis();
@@ -79,10 +68,6 @@ public class UserService extends AbstractDbService {
     
     /**
      * 使用邮箱，密码进行登录
-     *
-     * @param email
-     * @param passwd
-     * @return
      */
     public UserProfileEntity signin(String email, String passwd) {
         UserProfileEntity userProfile = getUserProfileByEmail(email);

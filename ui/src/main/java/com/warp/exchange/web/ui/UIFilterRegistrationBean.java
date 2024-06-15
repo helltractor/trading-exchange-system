@@ -1,4 +1,4 @@
-package com.warp.exchange.ui.web;
+package com.warp.exchange.web.ui;
 
 import com.warp.exchange.bean.AuthToken;
 import com.warp.exchange.support.AbstractFilter;

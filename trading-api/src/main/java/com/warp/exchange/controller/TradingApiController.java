@@ -55,7 +55,7 @@ public class TradingApiController extends LoggerSupport {
     @Autowired
     TradingEngineApiProxyService tradingEngineApiProxyService;
     
-    Long syncTimeout = Long.valueOf(500);
+    Long asyncTimeout = Long.valueOf(500);
     
     String timeoutJson = null;
     
@@ -200,7 +200,7 @@ public class TradingApiController extends LoggerSupport {
         message.userId = userId;
         message.createTime = System.currentTimeMillis();
         ResponseEntity<String> timeout = new ResponseEntity<>(getTimeoutJson(), HttpStatus.BAD_REQUEST);
-        DeferredResult<ResponseEntity<String>> deferred = new DeferredResult<>(this.syncTimeout, timeout);
+        DeferredResult<ResponseEntity<String>> deferred = new DeferredResult<>(this.asyncTimeout, timeout);
         deferred.onTimeout(() -> {
             logger.warn("deferred order {} cancel request refId={} timeout.", orderId, refId);
             this.deferredResultMap.remove(refId);
@@ -228,12 +228,12 @@ public class TradingApiController extends LoggerSupport {
         event.createTime = System.currentTimeMillis();
         
         ResponseEntity<String> timeout = new ResponseEntity<>(getTimeoutJson(), HttpStatus.BAD_REQUEST);
-        DeferredResult<ResponseEntity<String>> deferred = new DeferredResult<>(this.syncTimeout, timeout);
+        DeferredResult<ResponseEntity<String>> deferred = new DeferredResult<>(this.asyncTimeout, timeout);
         deferred.onTimeout(() -> {
             logger.warn("deferred order request refId = {} timeout.", event.refId);
             this.deferredResultMap.remove(event.refId);
         });
-        // track deferred:
+        // track deferred
         this.deferredResultMap.put(event.refId, deferred);
         this.sendEventService.sendMessage(event);
         return deferred;

@@ -14,8 +14,10 @@ public class PushService extends LoggerSupport {
     
     @Value("${exchange.config.hmac-key}")
     String hmacKey;
+    
     @Value("${server.port}")
     int serverPort;
+    
     @Value("${spring.redis.standalone.host:localhost}")
     String redisHost;
     
@@ -65,17 +67,12 @@ public class PushService extends LoggerSupport {
             conn.send(Request.cmd(Command.SUBSCRIBE).arg(RedisCache.Topic.NOTIFICATION)).onSuccess(res -> {
                 logger.info("subscribe success.");
             }).onFailure(err -> {
-                logger.error("subscribe failed.", err);
+                logger.error("subscribe failed.");
                 System.exit(1);
             });
         }).onFailure(err -> {
-            logger.error("connect to redis failed.", err);
+            logger.error("connect to redis failed.");
             System.exit(1);
         });
-    }
-    
-    void exit(int exitCode) {
-        this.vertx.close();
-        System.exit(exitCode);
     }
 }

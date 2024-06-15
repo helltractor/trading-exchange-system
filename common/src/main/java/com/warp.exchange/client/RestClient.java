@@ -5,7 +5,6 @@ import com.fasterxml.jackson.databind.ObjectMapper;
 import com.warp.exchange.api.ApiErrorResponse;
 import com.warp.exchange.api.ApiException;
 import com.warp.exchange.enums.ApiError;
-import com.warp.exchange.support.LoggerSupport;
 import okhttp3.*;
 import org.slf4j.Logger;
 import org.slf4j.LoggerFactory;
@@ -21,13 +20,15 @@ import java.util.Objects;
 import java.util.concurrent.TimeUnit;
 
 /**
- * Http okHttpClient for accessing exchange REST APIs.
+ * Http client for accessing exchange REST APIs.
  */
-public class RestClient extends LoggerSupport {
+public class RestClient {
     
     static final MediaType JSON = MediaType.parse("application/json; charset=utf-8");
     
     static final ApiException ERROR_UNKNOWN = new ApiException(ApiError.INTERNAL_SERVER_ERROR, "api", "Api failed without error code.");
+    
+    final Logger logger = LoggerFactory.getLogger(getClass());
     
     final String endpoint;
     

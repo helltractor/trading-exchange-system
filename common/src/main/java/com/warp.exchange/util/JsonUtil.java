@@ -21,12 +21,16 @@ public final class JsonUtil {
     
     public static final TypeReference<Map<String, Object>> TYPE_MAP_STRING_OBJECT = new TypeReference<>() {
     };
+    
     public static final TypeReference<Map<String, String>> TYPE_MAP_STRING_STRING = new TypeReference<>() {
     };
+    
     public static final TypeReference<Map<String, Integer>> TYPE_MAP_STRING_INTEGER = new TypeReference<>() {
     };
+    
     public static final TypeReference<Map<String, Boolean>> TYPE_MAP_STRING_BOOLEAN = new TypeReference<>() {
     };
+    
     static final Logger logger = LoggerFactory.getLogger(JsonUtil.class);
     /**
      * Holds ObjectMapper for internal use: NEVER modify!
@@ -79,7 +83,7 @@ public final class JsonUtil {
         try {
             return OBJECT_MAPPER.readValue(str, clazz);
         } catch (JsonProcessingException e) {
-            logger.warn("cannot read json: " + str, e);
+            logger.warn("cannot read json: {}", str, e);
             throw new RuntimeException(e);
         }
     }
@@ -120,7 +124,7 @@ public final class JsonUtil {
         try {
             return OBJECT_MAPPER.readValue(str, ref);
         } catch (JsonProcessingException e) {
-            logger.warn("cannot read json: " + str, e);
+            logger.warn("cannot read json: {}", str, e);
             throw new UncheckedIOException(e);
         }
     }
@@ -129,7 +133,7 @@ public final class JsonUtil {
         try {
             return OBJECT_MAPPER.readValue(src, ref);
         } catch (JsonProcessingException e) {
-            logger.warn("cannot read json from bytes: " + ByteUtil.toHexString(src), e);
+            logger.warn("cannot read json from bytes: {}", ByteUtil.toHexString(src), e);
             throw new UncheckedIOException(e);
         } catch (IOException e) {
             throw new UncheckedIOException(e);
@@ -140,7 +144,7 @@ public final class JsonUtil {
         try {
             return OBJECT_MAPPER.readValue(src, clazz);
         } catch (JsonProcessingException e) {
-            logger.warn("cannot read json from bytes: " + ByteUtil.toHexString(src), e);
+            logger.warn("cannot read json from bytes: {}", ByteUtil.toHexString(src), e);
             throw new UncheckedIOException(e);
         } catch (IOException e) {
             throw new UncheckedIOException(e);

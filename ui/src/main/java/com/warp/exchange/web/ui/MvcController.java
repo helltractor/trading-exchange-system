@@ -1,4 +1,4 @@
-package com.warp.exchange.ui.web;
+package com.warp.exchange.web.ui;
 
 import com.warp.exchange.api.ApiException;
 import com.warp.exchange.bean.AuthToken;
@@ -29,6 +29,7 @@ import java.util.Arrays;
 import java.util.Map;
 import java.util.Random;
 import java.util.regex.Pattern;
+
 
 @Controller
 public class MvcController extends LoggerSupport {
@@ -72,7 +73,7 @@ public class MvcController extends LoggerSupport {
     @GetMapping("/")
     public ModelAndView index() {
         if (UserContext.getUserId() == null) {
-            return redirect("/signup");
+            return redirect("/signin");
         }
         return prepareModelAndView("index");
     }
@@ -114,7 +115,7 @@ public class MvcController extends LoggerSupport {
             return prepareModelAndView("signup", Map.of("email", email, "name", name, "error", "Invalid password."));
         }
         doSignup(email, name, password);
-        return redirect("/signup");
+        return redirect("/signin");
     }
     
     @PostMapping(value = "/websocket/token", produces = "application/json")
@@ -128,7 +129,7 @@ public class MvcController extends LoggerSupport {
         // 1分钟后过期
         AuthToken token = new AuthToken(userId, System.currentTimeMillis() + 60_000);
         String strToken = token.toSecureString(hmacKey);
-        // 返回JSON字符串"xxx":
+        // 返回JSON字符串"xxx"
         return "\"" + strToken + "\"";
     }
     
@@ -240,7 +241,7 @@ public class MvcController extends LoggerSupport {
     void addGlobalModel(ModelAndView mv) {
         final Long userId = UserContext.getUserId();
         mv.addObject("__userId__", userId);
-        mv.addObject("__profile__", userId == null ? null : userService.getUserProfile(String.valueOf(userId)));
+        mv.addObject("__profile__", userId == null ? null : userService.getUserProfile(userId));
         mv.addObject("__time__", Long.valueOf(System.currentTimeMillis()));
     }
     

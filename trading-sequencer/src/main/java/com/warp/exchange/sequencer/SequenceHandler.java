@@ -1,7 +1,7 @@
 package com.warp.exchange.sequencer;
 
-import com.warp.exchange.entity.sequencer.UniqueEventEntity;
 import com.warp.exchange.entity.trade.EventEntity;
+import com.warp.exchange.entity.trade.UniqueEventEntity;
 import com.warp.exchange.message.event.AbstractEvent;
 import com.warp.exchange.messaging.MessageTypes;
 import com.warp.exchange.support.AbstractDbService;
@@ -63,7 +63,7 @@ public class SequenceHandler extends AbstractDbService {
                 }
                 unique = new UniqueEventEntity();
                 unique.uniqueId = uniqueId;
-                unique.createTime = this.lastTimestamp;
+                unique.createTime = message.createTime;
                 if (uniques == null) {
                     uniques = new ArrayList<>();
                 }
@@ -85,7 +85,7 @@ public class SequenceHandler extends AbstractDbService {
             if (unique != null) {
                 unique.sequenceId = message.sequenceId;
             }
-            // create AbstractEvent and save to db later:
+            // create AbstractEvent and save to db later
             EventEntity event = new EventEntity();
             event.previousId = previousId;
             event.sequenceId = currentId;

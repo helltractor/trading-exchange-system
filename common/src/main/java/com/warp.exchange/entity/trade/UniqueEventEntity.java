@@ -1,4 +1,4 @@
-package com.warp.exchange.entity.sequencer;
+package com.warp.exchange.entity.trade;
 
 import com.warp.exchange.support.EntitySupport;
 import jakarta.persistence.Column;

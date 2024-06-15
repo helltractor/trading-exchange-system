@@ -1,4 +1,4 @@
-package com.warp.exchange.ui.web;
+package com.warp.exchange.web.ui;
 
 import com.warp.exchange.bean.AuthToken;
 import com.warp.exchange.support.LoggerSupport;
@@ -68,7 +68,7 @@ public class CookieService extends LoggerSupport {
         cookie.setSecure(HttpUtil.isSecure(request));
         String host = request.getServerName();
         if (host != null && host.startsWith("www.")) {
-            // set cookie for domain "domain.com":
+            // set cookie for domain "domain.com"
             String domain = host.substring(4);
             cookie.setDomain(domain);
         }

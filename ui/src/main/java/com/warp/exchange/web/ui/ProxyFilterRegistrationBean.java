@@ -1,4 +1,4 @@
-package com.warp.exchange.ui.web;
+package com.warp.exchange.web.ui;
 
 import com.fasterxml.jackson.databind.ObjectMapper;
 import com.warp.exchange.api.ApiException;

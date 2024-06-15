@@ -30,7 +30,9 @@ import java.util.stream.Stream;
 public class DataBaseTemplate {
     
     final JdbcTemplate jdbcTemplate;
+    
     final Logger logger = LoggerFactory.getLogger(getClass());
+    
     // class -> Mapper:
     Map<Class<?>, Mapper<?>> classMapping;
     
@@ -57,6 +59,7 @@ public class DataBaseTemplate {
     
     static List<Class<?>> scanEntities(String basePackage) {
         ClassPathScanningCandidateComponentProvider provider = new ClassPathScanningCandidateComponentProvider(false);
+        // 通过注解过滤器，只扫描带有@Entity注解的类
         provider.addIncludeFilter(new AnnotationTypeFilter(Entity.class));
         List<Class<?>> classes = new ArrayList<>();
         Set<BeanDefinition> beans = provider.findCandidateComponents(basePackage);
@@ -83,7 +86,7 @@ public class DataBaseTemplate {
     }
     
     /**
-     * Get a model instance by class type and id. EntityNotFoundException is thrown if not found.
+     * 按类类型和 id 获取模型实例。如果未找到，则引发 EntityNotFoundException
      *
      * @param <T>   Generic type.
      * @param clazz Entity class.
@@ -99,7 +102,7 @@ public class DataBaseTemplate {
     }
     
     /**
-     * Get a model instance by class type and id. Return null if not found.
+     * 按类类型和 id 获取模型实例。如果未找到，则返回 null
      *
      * @param <T>   Generic type.
      * @param clazz Entity class.
@@ -119,7 +122,7 @@ public class DataBaseTemplate {
     }
     
     /**
-     * Remove bean by id.
+     * 删除 bean
      *
      * @param bean The entity.
      */
@@ -133,9 +136,9 @@ public class DataBaseTemplate {
     }
     
     /**
-     * Remove bean by id.
+     * 按 id 删除 bean
      *
-     * @param bean The entity.
+     * @param id The entity.
      */
     public <T> void delete(Class<T> clazz, Object id) {
         Mapper<?> mapper = getMapper(clazz);
@@ -156,7 +159,7 @@ public class DataBaseTemplate {
     }
     
     /**
-     * Update entity's updatable properties by id.
+     * 按 id 更新实体的可更新属性
      *
      * @param <T>  Generic type.
      * @param bean Entity object.
@@ -226,7 +229,7 @@ public class DataBaseTemplate {
                 logger.debug("SQL: {}", isIgnore ? mapper.insertIgnoreSQL : mapper.insertSQL);
             }
             if (mapper.id.isIdentityId()) {
-                // using identityId:
+                // using identityId
                 KeyHolder keyHolder = new GeneratedKeyHolder();
                 rows = jdbcTemplate.update(new PreparedStatementCreator() {
                     public PreparedStatement createPreparedStatement(Connection connection) throws SQLException {
@@ -246,7 +249,7 @@ public class DataBaseTemplate {
                     mapper.id.set(bean, key);
                 }
             } else {
-                // id is specified:
+                // id is specified
                 rows = jdbcTemplate.update(isIgnore ? mapper.insertIgnoreSQL : mapper.insertSQL, args);
             }
         } catch (ReflectiveOperationException e) {
@@ -254,7 +257,13 @@ public class DataBaseTemplate {
         }
     }
     
-    // get mapper by class:
+    /**
+     * 获取指定类的 Mapper
+     *
+     * @param <T>   Generic type.
+     * @param clazz Entity class.
+     * @return Mapper instance.
+     */
     @SuppressWarnings("unchecked")
     <T> Mapper<T> getMapper(Class<T> clazz) {
         Mapper<T> mapper = (Mapper<T>) this.classMapping.get(clazz);

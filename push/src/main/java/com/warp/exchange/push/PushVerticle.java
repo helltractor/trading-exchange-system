@@ -104,7 +104,7 @@ public class PushVerticle extends AbstractVerticle {
             logger.info("received message: {}", message);
         });
         websocket.exceptionHandler(err -> {
-            logger.error("websocket error", err);
+            logger.error("websocket error: {}", err.getMessage(), err);
         });
         // 关闭连接
         websocket.closeHandler(error -> {

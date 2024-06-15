@@ -17,6 +17,7 @@
         <module>trading-sequencer</module>
         <module>ui</module>
         <module>common</module>
+        <module>build</module>
     </modules>
 
     <parent>

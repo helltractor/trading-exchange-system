@@ -17,10 +17,6 @@ public class HistoryService extends AbstractDbService {
     
     /**
      * 获取历史订单列表
-     *
-     * @param userId
-     * @param maxResults
-     * @return
      */
     public List<OrderEntity> getHistoryOrders(Long userId, int maxResults) {
         return dataBase.from(OrderEntity.class)
@@ -33,10 +29,6 @@ public class HistoryService extends AbstractDbService {
     
     /**
      * 获取历史订单详情
-     *
-     * @param userId
-     * @param orderId
-     * @return
      */
     public OrderEntity getHistoryOrder(Long userId, Long orderId) {
         OrderEntity entity = dataBase.fetch(OrderEntity.class, orderId);
@@ -48,9 +40,6 @@ public class HistoryService extends AbstractDbService {
     
     /**
      * 获取历史订单的撮合明细
-     *
-     * @param orderId
-     * @return
      */
     public List<SimpleMatchDetailRecord> getHistoryMatchDetails(Long orderId) {
         List<MatchDetailEntity> details = dataBase.select("price", "quantity", "type")
@@ -58,6 +47,8 @@ public class HistoryService extends AbstractDbService {
                 .where("orderId = ?", orderId)
                 .orderBy("id")
                 .list();
-        return details.stream().map(e -> new SimpleMatchDetailRecord(e.price, e.quantity, e.type)).collect(Collectors.toList());
+        return details.stream().map(e ->
+                        new SimpleMatchDetailRecord(e.price, e.quantity, e.type))
+                .collect(Collectors.toList());
     }
 }

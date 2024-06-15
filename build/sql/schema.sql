@@ -19,7 +19,7 @@ CREATE TABLE clearings (
   id BIGINT NOT NULL AUTO_INCREMENT,
   counterOrderId BIGINT NOT NULL,
   counterUserId BIGINT NOT NULL,
-  createTime BIGINT NOT NULL,
+  createdAt BIGINT NOT NULL,
   direction VARCHAR(32) NOT NULL,
   matchPrice DECIMAL(36,18) NOT NULL,
   matchQuantity DECIMAL(36,18) NOT NULL,
@@ -34,7 +34,7 @@ CREATE TABLE clearings (
 ) CHARACTER SET utf8 COLLATE utf8_general_ci AUTO_INCREMENT = 1000;
 
 
-CREATE TABLE day_bars (
+CREATE TABLE day_bar (
   startTime BIGINT NOT NULL,
   closePrice DECIMAL(36,18) NOT NULL,
   highPrice DECIMAL(36,18) NOT NULL,
@@ -55,7 +55,7 @@ CREATE TABLE events (
 ) CHARACTER SET utf8 COLLATE utf8_general_ci AUTO_INCREMENT = 1000;
 
 
-CREATE TABLE hour_bars (
+CREATE TABLE hours_bar (
   startTime BIGINT NOT NULL,
   closePrice DECIMAL(36,18) NOT NULL,
   highPrice DECIMAL(36,18) NOT NULL,
@@ -78,13 +78,13 @@ CREATE TABLE match_details (
   sequenceId BIGINT NOT NULL,
   type VARCHAR(32) NOT NULL,
   userId BIGINT NOT NULL,
-  CONSTRAINT UNI_OID_COID UNIQUE (orderId, counterOrderId),
-  INDEX IDX_OID_CT (orderId,createTime),
+  CONSTRAINT UNI_OID_COID UNIQUE (id, counterOrderId),
+  INDEX IDX_OID_CT (id,createTime),
   PRIMARY KEY(id)
 ) CHARACTER SET utf8 COLLATE utf8_general_ci AUTO_INCREMENT = 1000;
 
 
-CREATE TABLE min_bars (
+CREATE TABLE min_bar (
   startTime BIGINT NOT NULL,
   closePrice DECIMAL(36,18) NOT NULL,
   highPrice DECIMAL(36,18) NOT NULL,
@@ -103,6 +103,7 @@ CREATE TABLE orders (
   quantity DECIMAL(36,18) NOT NULL,
   sequenceId BIGINT NOT NULL,
   status VARCHAR(32) NOT NULL,
+  symbolId BIGINT NOT NULL,
   unfilledQuantity DECIMAL(36,18) NOT NULL,
   updateTime BIGINT NOT NULL,
   userId BIGINT NOT NULL,
@@ -118,7 +119,7 @@ CREATE TABLE password_auths (
 ) CHARACTER SET utf8 COLLATE utf8_general_ci AUTO_INCREMENT = 1000;
 
 
-CREATE TABLE sec_bars (
+CREATE TABLE sec_bar (
   startTime BIGINT NOT NULL,
   closePrice DECIMAL(36,18) NOT NULL,
   highPrice DECIMAL(36,18) NOT NULL,
@@ -148,7 +149,7 @@ CREATE TABLE transfer_logs (
   transferId VARCHAR(32) NOT NULL,
   amount DECIMAL(36,18) NOT NULL,
   asset VARCHAR(32) NOT NULL,
-  createTime BIGINT NOT NULL,
+  createdAt BIGINT NOT NULL,
   status VARCHAR(32) NOT NULL,
   type VARCHAR(32) NOT NULL,
   userId BIGINT NOT NULL,

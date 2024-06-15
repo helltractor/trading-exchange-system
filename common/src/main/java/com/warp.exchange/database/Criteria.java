@@ -7,13 +7,13 @@ import java.util.ArrayList;
 import java.util.List;
 
 /**
- * Hold criteria query information.
+ * 保留条件查询信息
  *
  * @param <T> Entity type.
  */
 final class Criteria<T> {
     
-    DataBaseTemplate db;
+    DataBaseTemplate dataBase;
     Mapper<T> mapper;
     Class<T> clazz;
     List<String> select = null;
@@ -25,8 +25,8 @@ final class Criteria<T> {
     int offset = 0;
     int maxResults = 0;
     
-    Criteria(DataBaseTemplate db) {
-        this.db = db;
+    Criteria(DataBaseTemplate dataBase) {
+        this.dataBase = dataBase;
     }
     
     String sql() {
@@ -68,7 +68,7 @@ final class Criteria<T> {
     List<T> list() {
         String selectSql = sql();
         Object[] selectParams = params();
-        return db.jdbcTemplate.query(selectSql, mapper.resultSetExtractor, selectParams);
+        return dataBase.jdbcTemplate.query(selectSql, mapper.resultSetExtractor, selectParams);
     }
     
     T first() {
@@ -76,7 +76,7 @@ final class Criteria<T> {
         this.maxResults = 1;
         String selectSql = sql();
         Object[] selectParams = params();
-        List<T> list = db.jdbcTemplate.query(selectSql, mapper.resultSetExtractor, selectParams);
+        List<T> list = dataBase.jdbcTemplate.query(selectSql, mapper.resultSetExtractor, selectParams);
         if (list.isEmpty()) {
             return null;
         }
@@ -88,7 +88,7 @@ final class Criteria<T> {
         this.maxResults = 2;
         String selectSql = sql();
         Object[] selectParams = params();
-        List<T> list = db.jdbcTemplate.query(selectSql, mapper.resultSetExtractor, selectParams);
+        List<T> list = dataBase.jdbcTemplate.query(selectSql, mapper.resultSetExtractor, selectParams);
         if (list.isEmpty()) {
             throw new NoResultException("Expected unique row but nothing found.");
         }

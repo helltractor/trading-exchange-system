@@ -18,6 +18,7 @@ public class OrderService {
     final AssetService assetService;
     
     final ConcurrentMap<Long, OrderEntity> activeOrders = new ConcurrentHashMap<>();  // 跟踪所有活动订单
+    
     final ConcurrentMap<Long, ConcurrentHashMap<Long, OrderEntity>> userOrders = new ConcurrentHashMap<>();    // 跟踪用户活动订单
 
     public OrderService(@Autowired AssetService assetService) {
@@ -38,17 +39,8 @@ public class OrderService {
 
     /**
      * 创建订单
-     *
-     * @param sequenceId
-     * @param timeStamp
-     * @param id
-     * @param userId
-     * @param direction
-     * @param price
-     * @param quantity
-     * @return
      */
-    public OrderEntity createOrder(long sequenceId, long timeStamp, Long id, Long userId, Direction direction, BigDecimal price, BigDecimal quantity) {
+    public OrderEntity createOrder(long sequenceId, long timeStamp, Long orderId, Long userId, Direction direction, BigDecimal price, BigDecimal quantity) {
         switch (direction) {
             case BUY -> {
                 // 买入，需冻结USD：
@@ -65,7 +57,7 @@ public class OrderService {
             default -> throw new IllegalArgumentException("Invalid direction: " + direction);
         }
         OrderEntity order = new OrderEntity();
-        order.id = id;
+        order.id = orderId;
         order.userId = userId;
         order.sequenceId = sequenceId;
         order.price = price;
@@ -74,20 +66,18 @@ public class OrderService {
         order.unfilledQuantity = quantity;
         order.createTime = order.updateTime = timeStamp;
         
-        this.activeOrders.put(id, order);
+        this.activeOrders.put(order.id, order);
         ConcurrentHashMap<Long, OrderEntity> tmpUserOrders = this.userOrders.get(userId);
         if (tmpUserOrders == null) {
             tmpUserOrders = new ConcurrentHashMap<>();
             userOrders.put(userId, tmpUserOrders);
         }
-        tmpUserOrders.put(id, order);
+        tmpUserOrders.put(order.id, order);
         return order;
     }
 
     /**
      * 删除订单
-     *
-     * @param orderId
      */
     public void removeOrder(long orderId) {
         OrderEntity removed = this.activeOrders.remove(orderId);

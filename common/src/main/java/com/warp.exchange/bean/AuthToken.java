@@ -23,15 +23,15 @@ public record AuthToken(Long userId, long expireTime) {
     }
     
     public boolean isExpired() {
-        return System.currentTimeMillis() > expireTime;
-    }
-    
-    public boolean isAboutToExpire() {
-        return expireTime - System.currentTimeMillis() < 1800_000;
+        return System.currentTimeMillis() > expireTime();
     }
     
     public AuthToken refresh() {
         return new AuthToken(userId, System.currentTimeMillis() + 3600_000);
+    }
+    
+    public boolean isAboutToExpire() {
+        return expireTime() - System.currentTimeMillis() < 1800_000;
     }
     
     /**
@@ -40,7 +40,7 @@ public record AuthToken(Long userId, long expireTime) {
      * secureString = userId : expireTime : hash
      */
     public String toSecureString(String hmacKey) {
-        String payload = userId() + ":" + expireTime;
+        String payload = userId() + ":" + expireTime();
         String hash = HashUtil.hmacSha256(payload, hmacKey);
         String token = payload + ":" + hash;
         return Base64.getUrlEncoder().encodeToString(token.getBytes(StandardCharsets.UTF_8));

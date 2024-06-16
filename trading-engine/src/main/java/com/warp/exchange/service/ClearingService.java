@@ -14,7 +14,9 @@ import java.math.BigDecimal;
 
 @Component
 public class ClearingService extends LoggerSupport {
+    
     final AssetService assetService;
+    
     final OrderService orderService;
     
     @Value("${exchange.fee-rate:0.0005}")
@@ -27,18 +29,23 @@ public class ClearingService extends LoggerSupport {
     
     /**
      * 清算撮合结果
-     *
-     * @param result
      */
     public void clearMatchResult(MatchResult result) {
         OrderEntity taker = result.takerOrder;
         switch (taker.direction) {
             case BUY -> {
+                // 买入时，按Maker的价格成交
                 for (MatchDetailRecord detail : result.matchDetails) {
+                    if (logger.isDebugEnabled()) {
+                        logger.debug(
+                                "clear buy matched detail: price = {}, quantity = {}, takerOrderId = {}, makerOrderId = {}, takerUserId = {}, makerUserId = {}",
+                                detail.price(), detail.quantity(), detail.takerOrder().id, detail.makerOrder().id,
+                                detail.takerOrder().userId, detail.makerOrder().userId);
+                    }
                     OrderEntity maker = detail.makerOrder();
                     BigDecimal matched = detail.quantity();
                     if (taker.price.compareTo(maker.price) > 0) {
-                        // 实际买入价比报价低，部分USD退回账户:
+                        // 实际买入价比报价低，部分USD退回账户
                         BigDecimal unfreezeQuote = taker.price.subtract(maker.price).multiply(matched);
                         logger.debug("unfree extra unused quote {} back to taker user {}", unfreezeQuote, taker.userId);
                         assetService.unfreeze(taker.userId, AssetEnum.USD, unfreezeQuote);
@@ -57,6 +64,12 @@ public class ClearingService extends LoggerSupport {
             }
             case SELL -> {
                 for (MatchDetailRecord detail : result.matchDetails) {
+                    if (logger.isDebugEnabled()) {
+                        logger.debug(
+                                "clear sell matched detail: price = {}, quantity = {}, takerOrderId = {}, makerOrderId = {}, takerUserId = {}, makerUserId = {}",
+                                detail.price(), detail.quantity(), detail.takerOrder().id, detail.makerOrder().id,
+                                detail.takerOrder().userId, detail.makerOrder().userId);
+                    }
                     OrderEntity maker = detail.makerOrder();
                     BigDecimal matched = detail.quantity();
                     assetService.transfer(Transfer.FROZEN_TO_AVAILABLE, taker.userId, maker.userId, AssetEnum.BTC, matched);
@@ -77,8 +90,6 @@ public class ClearingService extends LoggerSupport {
     
     /**
      * 清算取消订单
-     *
-     * @param order
      */
     public void clearCancelOrder(OrderEntity order) {
         switch (order.direction) {
@@ -92,5 +103,7 @@ public class ClearingService extends LoggerSupport {
             }
             default -> throw new IllegalArgumentException("Invalid direction: " + order.direction);
         }
+        // 从OrderService中删除订单:
+        orderService.removeOrder(order.id);
     }
 }

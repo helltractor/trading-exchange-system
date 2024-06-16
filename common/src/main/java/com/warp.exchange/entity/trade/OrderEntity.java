@@ -32,8 +32,8 @@ public class OrderEntity implements EntitySupport, Comparable<OrderEntity> {
     /**
      * 交易对ID
      */
-    @Column(nullable = false, updatable = false)
-    public Long symbolId;
+//    @Column(nullable = false, updatable = false)
+//    public Long symbolId;
 
     /**
      * 序列ID
@@ -80,15 +80,15 @@ public class OrderEntity implements EntitySupport, Comparable<OrderEntity> {
     /**
      * 更新时间
      */
-    @Column(nullable = false)
-    public long updateTime; // 更新时间
+    @Column(nullable = false, updatable = false)
+    public long updateTime;
     
-    int version;
+    private int version;
 
     @Transient
     @JsonIgnore
     public int getVersion() {
-        return version;
+        return this.version;
     }
 
     public void updateOrder(BigDecimal unfilledQuantity, OrderStatus status, long timeStamp) {
@@ -137,26 +137,14 @@ public class OrderEntity implements EntitySupport, Comparable<OrderEntity> {
 
     @Override
     public String toString() {
-        return "OrderEntity{" +
-                "id=" + id +
-                ", userId=" + userId +
-                ", sequenceId=" + sequenceId +
-                ", price=" + price +
-                ", direction=" + direction +
-                ", status=" + status +
-                ", quantity=" + quantity +
-                ", unfilledQuantity=" + unfilledQuantity +
-                ", createTime=" + createTime +
-                ", updateTime=" + updateTime +
-                ", version=" + version +
-                '}';
+        return "OrderEntity [id=" + id + ", sequenceId=" + sequenceId + ", direction=" + direction + ", userId="
+                + userId + ", status=" + status + ", price=" + price + ", createTime=" + createTime + ", updateTime="
+                + updateTime + ", version=" + version + ", quantity=" + quantity + ", unfilledQuantity="
+                + unfilledQuantity + "]";
     }
 
     /**
      * 按订单ID排序
-     *
-     * @param o the object to be compared.
-     * @return
      */
     @Override
     public int compareTo(OrderEntity o) {

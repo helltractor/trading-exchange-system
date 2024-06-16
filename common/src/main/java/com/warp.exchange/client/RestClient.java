@@ -65,7 +65,8 @@ public class RestClient {
         return request(null, ref, "POST", path, authHeader, null, body);
     }
     
-    <T> T request(Class<T> clazz, TypeReference<T> ref, String method, String path, String authHeader, Map<String, String> query, Object body) {
+    <T> T request(Class<T> clazz, TypeReference<T> ref, String method, String path, String authHeader,
+                  Map<String, String> query, Object body) {
         if (!path.startsWith("/")) {
             throw new IllegalArgumentException("Invalid path: " + path);
         }
@@ -196,13 +197,13 @@ public class RestClient {
         
         public RestClient build(ObjectMapper objectMapper) {
             OkHttpClient client = new OkHttpClient.Builder()
-                    // set connect timeout:
+                    // set connect timeout
                     .connectTimeout(this.connectTimeout, TimeUnit.SECONDS)
-                    // set read timeout:
+                    // set read timeout
                     .readTimeout(this.readTimeout, TimeUnit.SECONDS)
-                    // set connection pool:
+                    // set connection pool
                     .connectionPool(new ConnectionPool(0, this.keepAlive, TimeUnit.SECONDS))
-                    // do not retry:
+                    // do not retry
                     .retryOnConnectionFailure(false).build();
             String endpoint = this.scheme + "://" + this.host;
             if (this.port != (-1)) {
@@ -211,5 +212,4 @@ public class RestClient {
             return new RestClient(endpoint, this.host, objectMapper, client);
         }
     }
-    
 }

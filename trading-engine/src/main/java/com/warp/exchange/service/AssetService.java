@@ -52,7 +52,7 @@ public class AssetService extends LoggerSupport {
     /**
      * 初始化资产
      */
-    public Asset initAssets(Long userId, AssetEnum assetId) {
+    Asset initAssets(Long userId, AssetEnum assetId) {
         ConcurrentMap<AssetEnum, Asset> assets = userAssets.get(userId);
         if (assets == null) {
             assets = new ConcurrentHashMap<>();

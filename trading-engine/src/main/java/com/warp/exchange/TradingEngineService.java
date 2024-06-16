@@ -79,28 +79,28 @@ public class TradingEngineService extends LoggerSupport {
     @Autowired
     MessagingFactory messagingFactory;
     
-    MessageConsumer consumer;
+    private MessageConsumer consumer;
     
-    MessageProducer<TickMessage> producer;
+    private MessageProducer<TickMessage> producer;
     
-    long lastSequenceId = 0;
+    private long lastSequenceId = 0;
     
-    boolean orderBookChanged = false;
+    private boolean orderBookChanged = false;
     
-    String shaUpdateOrderBookLua;
+    private String shaUpdateOrderBookLua;
     
-    Thread tickThread;
-    Thread notifyThread;
-    Thread apiResultThread;
-    Thread orderBookThread;
-    Thread dbThread;
+    private Thread tickThread;
+    private Thread notifyThread;
+    private Thread apiResultThread;
+    private Thread orderBookThread;
+    private Thread dbThread;
     
-    OrderBookBean lastedOrderBook = null;
-    Queue<List<OrderEntity>> orderQueue = new ConcurrentLinkedQueue<>();
-    Queue<List<MatchDetailEntity>> matchQueue = new ConcurrentLinkedQueue<>();
-    Queue<TickMessage> tickQueue = new ConcurrentLinkedQueue<>();
-    Queue<ApiResultMessage> apiResultQueue = new ConcurrentLinkedQueue<>();
-    Queue<NotificationMessage> notificationQueue = new ConcurrentLinkedQueue<>();
+    private OrderBookBean latestOrderBook = null;
+    private Queue<List<OrderEntity>> orderQueue = new ConcurrentLinkedQueue<>();
+    private Queue<List<MatchDetailEntity>> matchQueue = new ConcurrentLinkedQueue<>();
+    private Queue<TickMessage> tickQueue = new ConcurrentLinkedQueue<>();
+    private Queue<ApiResultMessage> apiResultQueue = new ConcurrentLinkedQueue<>();
+    private Queue<NotificationMessage> notificationQueue = new ConcurrentLinkedQueue<>();
     
     @PostConstruct
     public void init() {
@@ -127,7 +127,7 @@ public class TradingEngineService extends LoggerSupport {
         this.dbThread.interrupt();
     }
     
-    void runTickThread() {
+    private void runTickThread() {
         logger.info("start tick thread...");
         for (; ; ) {
             List<TickMessage> messages = new ArrayList<>();
@@ -148,7 +148,7 @@ public class TradingEngineService extends LoggerSupport {
                 }
                 this.producer.sendMessages(messages);
             } else {
-                // 无TickMessage时，暂停1ms:
+                // 无推送时，暂停1ms
                 try {
                     Thread.sleep(1);
                 } catch (InterruptedException e) {
@@ -159,14 +159,14 @@ public class TradingEngineService extends LoggerSupport {
         }
     }
     
-    void runNotifyThread() {
-        logger.info("start notify thread...");
+    private void runNotifyThread() {
+        logger.info("start publish notify to redis...");
         for (; ; ) {
             NotificationMessage message = this.notificationQueue.poll();
             if (message != null) {
                 redisService.publish(RedisCache.Topic.NOTIFICATION, JsonUtil.writeJson(message));
             } else {
-                // 无NotificationMessage时，暂停1ms:
+                // 无推送时，暂停1ms:
                 try {
                     Thread.sleep(1);
                 } catch (InterruptedException e) {
@@ -177,12 +177,12 @@ public class TradingEngineService extends LoggerSupport {
         }
     }
     
-    void runOrderBookThread() {
+    private void runOrderBookThread() {
         logger.info("start update orderbook snapshot to redis...");
         long lastSequenceId = 0;
         for (; ; ) {
             // 获取OrderBookBean的引用，确保后续操作针对局部变量而非成员变量
-            final OrderBookBean orderBook = this.lastedOrderBook;
+            final OrderBookBean orderBook = this.latestOrderBook;
             // 仅在OrderBookBean更新后刷新Redis
             if (orderBook != null && orderBook.sequenceId > lastSequenceId) {
                 if (logger.isDebugEnabled()) {
@@ -206,7 +206,7 @@ public class TradingEngineService extends LoggerSupport {
         }
     }
     
-    void runApiResultThread() {
+    private void runApiResultThread() {
         logger.info("start publish api result to redis...");
         for (; ; ) {
             ApiResultMessage result = this.apiResultQueue.poll();
@@ -223,7 +223,7 @@ public class TradingEngineService extends LoggerSupport {
         }
     }
     
-    void runDbThread() {
+    private void runDbThread() {
         logger.info("start batch insert to database...");
         for (; ; ) {
             try {
@@ -235,23 +235,23 @@ public class TradingEngineService extends LoggerSupport {
         }
     }
     
-    void processMessages(List<AbstractEvent> messages) {
+    public void processMessages(List<AbstractEvent> messages) {
         for (AbstractEvent message : messages) {
             processEvent(message);
         }
         if (this.orderBookChanged) {
             // 获取最新的OrderBook快照
-            this.lastedOrderBook = this.matchEngine.getOrderBook(this.orderBookDepth);
+            this.latestOrderBook = this.matchEngine.getOrderBook(this.orderBookDepth);
         }
     }
     
-    void processEvent(AbstractEvent event) {
-        if (fatalError) {
+    public void processEvent(AbstractEvent event) {
+        if (this.fatalError) {
             return;
         }
         // 判断是否重复消息
         if (event.sequenceId <= this.lastSequenceId) {
-            logger.warn("duplicated event: {}", event);
+            logger.warn("skip duplicated event: {}", event);
             return;
         }
         // 判断是否丢失了消息
@@ -300,6 +300,7 @@ public class TradingEngineService extends LoggerSupport {
         }
         if (debugMode) {
             this.validate();
+            this.debug();
         }
     }
     
@@ -326,7 +327,7 @@ public class TradingEngineService extends LoggerSupport {
         // 收集Notification
         List<NotificationMessage> notifications = new ArrayList<>();
         notifications.add(createNotification(event.createTime, "order_matched", order.userId, order.copy()));
-        // TODO: 收集已完成的OrderEntity并生成MatchDetailEntity, TickEntity
+        // 收集已完成的OrderEntity并生成MatchDetailEntity, TickEntity
         if (!result.matchDetails.isEmpty()) {
             List<OrderEntity> closedOrders = new ArrayList<>();
             List<MatchDetailEntity> matchDetails = new ArrayList<>();
@@ -336,6 +337,7 @@ public class TradingEngineService extends LoggerSupport {
             }
             for (MatchDetailRecord detail : result.matchDetails) {
                 OrderEntity makerOrder = detail.makerOrder();
+                notifications.add(createNotification(event.createTime, "order_matched", makerOrder.userId, makerOrder.copy()));
                 if (makerOrder.status.isFinalStatus) {
                     closedOrders.add(makerOrder);
                 }
@@ -355,7 +357,6 @@ public class TradingEngineService extends LoggerSupport {
                 tick.createTime = event.createTime;
                 ticks.add(tick);
             }
-            this.orderQueue.add(closedOrders);
             // 异步写入数据库
             this.orderQueue.add(closedOrders);
             this.matchQueue.add(matchDetails);
@@ -370,7 +371,7 @@ public class TradingEngineService extends LoggerSupport {
         }
     }
     
-    NotificationMessage createNotification(long ts, String type, Long userId, Object data) {
+    private NotificationMessage createNotification(long ts, String type, Long userId, Object data) {
         NotificationMessage msg = new NotificationMessage();
         msg.createTime = ts;
         msg.type = type;
@@ -392,7 +393,7 @@ public class TradingEngineService extends LoggerSupport {
         this.orderBookChanged = true;
         // 发送成功消息
         this.apiResultQueue.add(ApiResultMessage.orderSuccess(event.refId, order, event.createTime));
-//        this.notificationQueue.add(createNotification(event.createTime, "order_canceled", order.userId, order));
+        this.notificationQueue.add(createNotification(event.createTime, "order_canceled", order.userId, order));
     }
     
     boolean transfer(TransferEvent event) {
@@ -400,7 +401,7 @@ public class TradingEngineService extends LoggerSupport {
         return ok;
     }
     
-    void saveToDb() throws InterruptedException {
+    private void saveToDb() throws InterruptedException {
         if (!matchQueue.isEmpty()) {
             List<MatchDetailEntity> batch = new ArrayList<>(1000);
             for (; ; ) {
@@ -435,8 +436,10 @@ public class TradingEngineService extends LoggerSupport {
             }
             batch.sort(OrderEntity::compareTo);
             if (logger.isDebugEnabled()) {
-                logger.debug("batch update {} orders...", batch.size());
+                logger.debug("batch insert {} orders...", batch.size());
             }
+            // 序列化
+            this.storeService.insertIgnore(batch);
         }
         if (matchQueue.isEmpty()) {
             Thread.sleep(1);
@@ -506,9 +509,9 @@ public class TradingEngineService extends LoggerSupport {
             require(order.unfilledQuantity.signum() > 0, "Active order must have positive unfilled amount: " + order);
             switch (order.direction) {
                 case BUY -> {
-                    // 订单必须在MatchEngine中:
+                    // 订单必须在MatchEngine中
                     require(this.matchEngine.buyBook.exist(order), "order not found in buy book: " + order);
-                    // 累计冻结的USD:
+                    // 累计冻结的USD
                     userOrderFrozen.putIfAbsent(order.userId, new HashMap<>());
                     Map<AssetEnum, BigDecimal> frozenAssets = userOrderFrozen.get(order.userId);
                     frozenAssets.putIfAbsent(AssetEnum.USD, BigDecimal.ZERO);
@@ -516,9 +519,9 @@ public class TradingEngineService extends LoggerSupport {
                     frozenAssets.put(AssetEnum.USD, frozen.add(order.price.multiply(order.unfilledQuantity)));
                 }
                 case SELL -> {
-                    // 订单必须在MatchEngine中:
+                    // 订单必须在MatchEngine中
                     require(this.matchEngine.sellBook.exist(order), "order not found in sell book: " + order);
-                    // 累计冻结的BTC:
+                    // 累计冻结的BTC
                     userOrderFrozen.putIfAbsent(order.userId, new HashMap<>());
                     Map<AssetEnum, BigDecimal> frozenAssets = userOrderFrozen.get(order.userId);
                     frozenAssets.putIfAbsent(AssetEnum.BTC, BigDecimal.ZERO);
@@ -528,7 +531,7 @@ public class TradingEngineService extends LoggerSupport {
                 default -> require(false, "Unexpected order direction: " + order.direction);
             }
         }
-        // 订单冻结的累计金额必须和Asset冻结一致:
+        // 订单冻结的累计金额必须和Asset冻结一致
         for (Entry<Long, ConcurrentMap<AssetEnum, Asset>> userEntry : this.assetService.getUserAssets().entrySet()) {
             Long userId = userEntry.getKey();
             ConcurrentMap<AssetEnum, Asset> assets = userEntry.getValue();
@@ -542,7 +545,7 @@ public class TradingEngineService extends LoggerSupport {
                     require(frozen != null, "No order frozen found for asset: " + asset);
                     require(frozen.compareTo(asset.getFrozen()) == 0,
                             "Order frozen " + frozen + " is not equals to asset frozen: " + asset);
-                    // 从userOrderFrozen中删除已验证的Asset数据:
+                    // 从userOrderFrozen中删除已验证的Asset数据
                     orderFrozen.remove(assetId);
                 }
             }
@@ -556,7 +559,7 @@ public class TradingEngineService extends LoggerSupport {
     }
     
     void validateMatchEngine() {
-        // OrderBook的Order必须在ActiveOrders中:
+        // OrderBook的Order必须在ActiveOrders中
         Map<Long, OrderEntity> copyOfActiveOrders = new HashMap<>(this.orderService.getActiveOrders());
         for (OrderEntity order : this.matchEngine.buyBook.book.values()) {
             require(copyOfActiveOrders.remove(order.id) == order,
@@ -578,7 +581,7 @@ public class TradingEngineService extends LoggerSupport {
         System.out.println("========== // trading engine ==========");
     }
     
-    void panic() {
+    private void panic() {
         logger.error("Application panic. Exit now...");
         this.fatalError = true;
         System.exit(1);

@@ -48,9 +48,9 @@ public class MessagingFactory extends LoggerSupport {
     public void init() throws InterruptedException, ExecutionException {
         logger.info("init kafka admin...");
         try (AdminClient client = AdminClient.create(kafkaAdmin.getConfigurationProperties())) {
-            // 查询当前所有topic:
+            // 查询当前所有topic
             Set<String> allTopics = client.listTopics().names().get();
-            // 自动创建不存在的topic:
+            // 自动创建不存在的topic
             List<NewTopic> newTopics = new ArrayList<>();
             for (Messaging.Topic topic : Messaging.Topic.values()) {
                 if (!allTopics.contains(topic.name())) {

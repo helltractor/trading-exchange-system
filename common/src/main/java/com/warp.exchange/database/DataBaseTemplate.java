@@ -31,10 +31,10 @@ public class DataBaseTemplate {
     
     final JdbcTemplate jdbcTemplate;
     
-    final Logger logger = LoggerFactory.getLogger(getClass());
+    private final Logger logger = LoggerFactory.getLogger(getClass());
     
     // class -> Mapper:
-    Map<Class<?>, Mapper<?>> classMapping;
+    private Map<Class<?>, Mapper<?>> classMapping;
     
     public DataBaseTemplate(@Autowired JdbcTemplate jdbcTemplate) {
         this.jdbcTemplate = jdbcTemplate;
@@ -57,7 +57,7 @@ public class DataBaseTemplate {
         this.classMapping = classMapping;
     }
     
-    static List<Class<?>> scanEntities(String basePackage) {
+    private static List<Class<?>> scanEntities(String basePackage) {
         ClassPathScanningCandidateComponentProvider provider = new ClassPathScanningCandidateComponentProvider(false);
         // 通过注解过滤器，只扫描带有@Entity注解的类
         provider.addIncludeFilter(new AnnotationTypeFilter(Entity.class));

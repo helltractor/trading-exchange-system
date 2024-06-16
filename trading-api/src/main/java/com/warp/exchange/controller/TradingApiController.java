@@ -41,25 +41,25 @@ public class TradingApiController extends LoggerSupport {
     Map<String, DeferredResult<ResponseEntity<String>>> deferredResultMap = new ConcurrentHashMap<>();
     
     @Autowired
-    HistoryService historyService;
+    private HistoryService historyService;
     
     @Autowired
-    SendEventService sendEventService;
+    private SendEventService sendEventService;
     
     @Autowired
-    RedisService redisService;
+    private RedisService redisService;
     
     @Autowired
-    ObjectMapper objectMapper;
+    private ObjectMapper objectMapper;
     
     @Autowired
-    TradingEngineApiProxyService tradingEngineApiProxyService;
+    private TradingEngineApiProxyService tradingEngineApiProxyService;
     
-    Long asyncTimeout = Long.valueOf(500);
+    private Long asyncTimeout = Long.valueOf(500);
     
-    String timeoutJson = null;
+    private String timeoutJson = null;
     
-    String getTimeoutJson() throws JsonProcessingException {
+    private String getTimeoutJson() throws JsonProcessingException {
         if (timeoutJson == null) {
             timeoutJson = this.objectMapper.writeValueAsString(new ApiErrorResponse(ApiError.OPERATION_TIMEOUT, null, ""));
         }
@@ -67,7 +67,7 @@ public class TradingApiController extends LoggerSupport {
     }
     
     @PostConstruct
-    void init() {
+    public void init() {
         this.redisService.subscribe(RedisCache.Topic.TRADING_API_RESULT, this::onTradingApiResult);
     }
     
@@ -148,7 +148,7 @@ public class TradingApiController extends LoggerSupport {
         return getBars(RedisCache.Key.SEC_BARS, start, end);
     }
     
-    String getBars(String key, long start, long end) {
+    private String getBars(String key, long start, long end) {
         List<String> data = redisService.zrangebyscore(key, start, end);
         if (data == null || data.isEmpty()) {
             return "[]";
@@ -205,7 +205,7 @@ public class TradingApiController extends LoggerSupport {
             logger.warn("deferred order {} cancel request refId={} timeout.", orderId, refId);
             this.deferredResultMap.remove(refId);
         });
-        // track deferred:
+        // track deferred
         this.deferredResultMap.put(refId, deferred);
         logger.info("cancel order message created: {}", message);
         this.sendEventService.sendMessage(message);
@@ -240,7 +240,7 @@ public class TradingApiController extends LoggerSupport {
     }
     
     
-    void onTradingApiResult(String msg) {
+    public void onTradingApiResult(String msg) {
         logger.info("on subscribed msg: {}", msg);
         try {
             ApiResultMessage message = this.objectMapper.readValue(msg, ApiResultMessage.class);

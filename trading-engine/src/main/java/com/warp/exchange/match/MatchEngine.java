@@ -14,28 +14,22 @@ import java.math.BigDecimal;
  */
 @Component
 public class MatchEngine {
+    
     public final OrderBook buyBook = new OrderBook(Direction.BUY);
+    
     public final OrderBook sellBook = new OrderBook(Direction.SELL);
+    
     public BigDecimal marketPrice = BigDecimal.ZERO;
-    long sequenceId;
+    
+    private long sequenceId;
     
     public MatchResult processOrder(long sequenceId, OrderEntity order) {
         switch (order.direction) {
             case BUY -> {
-                return processOrder(
-                        sequenceId,
-                        order,
-                        this.sellBook,
-                        this.buyBook
-                );
+                return processOrder(sequenceId, order, this.sellBook, this.buyBook);
             }
             case SELL -> {
-                return processOrder(
-                        sequenceId,
-                        order,
-                        this.buyBook,
-                        this.sellBook
-                );
+                return processOrder(sequenceId, order, this.buyBook, this.sellBook);
             }
             default -> {
                 throw new IllegalArgumentException("Invalid direction: " + order.direction);
@@ -52,7 +46,7 @@ public class MatchEngine {
      * @param anotherBook 未能完全成交后挂单的OrderBook
      * @return 成交结果
      */
-    MatchResult processOrder(long sequenceId, OrderEntity takerOrder, OrderBook makerBook, OrderBook anotherBook) {
+    private MatchResult processOrder(long sequenceId, OrderEntity takerOrder, OrderBook makerBook, OrderBook anotherBook) {
         this.sequenceId = sequenceId;
         long timeStamp = takerOrder.createTime;
         MatchResult matchResult = new MatchResult(takerOrder);
@@ -60,7 +54,7 @@ public class MatchEngine {
         for (;;) {
             OrderEntity makerOrder = makerBook.getFirst();
             if (makerOrder == null) {
-                // 没有匹配的订单
+                // 对手盘不存在
                 break;
             }
             if (takerOrder.direction == Direction.BUY && makerOrder.price.compareTo(takerOrder.price) > 0) {
@@ -98,8 +92,8 @@ public class MatchEngine {
         // Taker未完全成交，放入对应的订单簿
         if (takerUnfilledQuantity.signum() > 0) {
             takerOrder.updateOrder(takerUnfilledQuantity,
-                    takerUnfilledQuantity.compareTo(takerOrder.quantity) == 0 ? OrderStatus.PENDING : OrderStatus.PARTIAL_FILLED,
-                    timeStamp);
+                    takerUnfilledQuantity.compareTo(takerOrder.quantity) == 0 ? OrderStatus.PENDING
+                            : OrderStatus.PARTIAL_FILLED, timeStamp);
             anotherBook.add(takerOrder);
         }
         return matchResult;
@@ -107,9 +101,6 @@ public class MatchEngine {
 
     /**
      * 撤单，查询订单状态
-     *
-     * @param timeStamp
-     * @param order
      */
     public void cancel(long timeStamp, OrderEntity order) {
         OrderBook book = order.direction == Direction.BUY ? this.buyBook : this.sellBook;
@@ -121,12 +112,7 @@ public class MatchEngine {
     }
     
     public OrderBookBean getOrderBook(int maxDepth) {
-        return new OrderBookBean(
-                this.sequenceId,
-                this.marketPrice,
-                this.buyBook.getOrderBook(maxDepth),
-                this.sellBook.getOrderBook(maxDepth)
-        );
+        return new OrderBookBean(this.sequenceId, this.marketPrice, this.buyBook.getOrderBook(maxDepth), this.sellBook.getOrderBook(maxDepth));
     }
     
     public void debug() {

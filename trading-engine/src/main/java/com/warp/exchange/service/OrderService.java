@@ -54,7 +54,7 @@ public class OrderService {
                     return null;
                 }
             }
-            default -> throw new IllegalArgumentException("Invalid direction: " + direction);
+            default -> throw new IllegalArgumentException("Invalid direction.");
         }
         OrderEntity order = new OrderEntity();
         order.id = orderId;
@@ -82,14 +82,14 @@ public class OrderService {
     public void removeOrder(long orderId) {
         OrderEntity removed = this.activeOrders.remove(orderId);
         if (removed == null) {
-            throw new IllegalArgumentException("OrderEntity not found: " + orderId);
+            throw new IllegalArgumentException("OrderEntity not found by orderId in active orders: " + orderId);
         }
         ConcurrentHashMap<Long, OrderEntity> tmpUserOrders = this.userOrders.get(removed.userId);
         if (tmpUserOrders == null) {
-            throw new IllegalArgumentException("User removed not found: " + removed.userId);
+            throw new IllegalArgumentException("User orders not found by userId: " + removed.userId);
         }
         if (tmpUserOrders.remove(orderId) == null) {
-            throw new IllegalArgumentException("OrderEntity not found in user orders: " + removed.userId);
+            throw new IllegalArgumentException("Order not found by orderId in user orders: " + orderId);
         }
     }
     

@@ -11,29 +11,8 @@ import java.util.*;
  */
 public class OrderBook {
     
-    /**
-     * 卖单排序
-     * 价格低在前，价格相同时间早在前
-     */
-    public static final Comparator<OrderKey> SORT_SELL = new Comparator<>() {
-        @Override
-        public int compare(OrderKey o1, OrderKey o2) {
-            int cmp = o1.price().compareTo(o2.price());
-            return cmp == 0 ? Long.compare(o1.sequenceId(), o2.sequenceId()) : cmp;
-        }
-    };
-    /**
-     * 买单排序
-     * 价格高在前，价格相同时间早在前
-     */
-    public static final Comparator<OrderKey> SORT_BUY = new Comparator<>() {
-        @Override
-        public int compare(OrderKey o1, OrderKey o2) {
-            int cmp = o2.price().compareTo(o1.price());
-            return cmp == 0 ? Long.compare(o1.sequenceId(), o2.sequenceId()) : cmp;
-        }
-    };
     public final Direction direction;
+    
     public final TreeMap<OrderKey, OrderEntity> book;
     
     public OrderBook(Direction direction, TreeMap<OrderKey, OrderEntity> book) {
@@ -44,7 +23,6 @@ public class OrderBook {
     public OrderBook(Direction direction) {
         this.direction = direction;
         this.book = new TreeMap<>(direction == Direction.BUY ? SORT_BUY : SORT_SELL);
-        
     }
     
     /**
@@ -122,4 +100,28 @@ public class OrderBook {
         }
         return String.join("\n", orders);
     }
+    
+    /**
+     * 卖单排序
+     * 价格低在前，价格相同时间早在前
+     */
+    private static final Comparator<OrderKey> SORT_SELL = new Comparator<>() {
+        @Override
+        public int compare(OrderKey o1, OrderKey o2) {
+            int cmp = o1.price().compareTo(o2.price());
+            return cmp == 0 ? Long.compare(o1.sequenceId(), o2.sequenceId()) : cmp;
+        }
+    };
+    
+    /**
+     * 买单排序
+     * 价格高在前，价格相同时间早在前
+     */
+    private static final Comparator<OrderKey> SORT_BUY = new Comparator<>() {
+        @Override
+        public int compare(OrderKey o1, OrderKey o2) {
+            int cmp = o2.price().compareTo(o1.price());
+            return cmp == 0 ? Long.compare(o1.sequenceId(), o2.sequenceId()) : cmp;
+        }
+    };
 }

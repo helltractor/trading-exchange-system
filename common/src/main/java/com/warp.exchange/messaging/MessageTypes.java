@@ -15,7 +15,6 @@ import org.springframework.stereotype.Component;
 
 import java.io.IOException;
 import java.util.*;
-
 /**
  * Holds message types.
  */
@@ -23,8 +22,11 @@ import java.util.*;
 public class MessageTypes {
     
     static final char SEP = '#';
+    
     final Logger logger = LoggerFactory.getLogger(getClass());
+    
     final String messagePackage = AbstractMessage.class.getPackageName();
+    
     final Map<String, Class<? extends AbstractMessage>> messageTypes = new HashMap<>();
     
     @SuppressWarnings("unchecked")

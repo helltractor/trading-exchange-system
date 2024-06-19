@@ -7,7 +7,3 @@ command:
 ```
 bot.py --email=user0@example.com --password=password0
 ```
-
-```
-C:\Python310\python.exe D:\Java\Warp-exchange\build\bot\bot.py --email=user0@example.com --password=password0
-```

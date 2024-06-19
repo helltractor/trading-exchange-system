@@ -3,7 +3,7 @@ services:
   zookeeper:
     image: bitnami/zookeeper:3.5
     user: "root"
-    container_name: zookeeper3.5
+    container_name: zookeeper
     ports:
       - "2181:2181"
     environment:
@@ -14,7 +14,7 @@ services:
   kafka:
     image: bitnami/kafka:3.0
     user: "root"
-    container_name: kafka3.0
+    container_name: kafka
     ports:
       - "9092:9092"
     depends_on:
@@ -31,7 +31,7 @@ services:
 
   redis:
     image: redis:6.2
-    container_name: redis6.2
+    container_name: redis
     ports:
       - "6379:6379"
     volumes:
@@ -39,7 +39,7 @@ services:
 
   mysql:
     image: mysql:8.0
-    container_name: mysql8.0
+    container_name: mysql
     ports:
       - "3306:3306"
     restart: always

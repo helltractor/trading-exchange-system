@@ -9,7 +9,7 @@ USE exchange;
 CREATE TABLE api_key_auths (
   apiKey VARCHAR(32) NOT NULL,
   apiSecret VARCHAR(32) NOT NULL,
-  expiresAt BIGINT NOT NULL,
+  expiresAt BIGINT NOT NULL
   userId BIGINT NOT NULL,
   PRIMARY KEY(apiKey)
 ) CHARACTER SET utf8 COLLATE utf8_general_ci AUTO_INCREMENT = 1000;
@@ -34,7 +34,7 @@ CREATE TABLE clearings (
 ) CHARACTER SET utf8 COLLATE utf8_general_ci AUTO_INCREMENT = 1000;
 
 
-CREATE TABLE day_bar (
+CREATE TABLE day_bars (
   startTime BIGINT NOT NULL,
   closePrice DECIMAL(36,18) NOT NULL,
   highPrice DECIMAL(36,18) NOT NULL,
@@ -55,7 +55,7 @@ CREATE TABLE events (
 ) CHARACTER SET utf8 COLLATE utf8_general_ci AUTO_INCREMENT = 1000;
 
 
-CREATE TABLE hours_bar (
+CREATE TABLE hours_bars (
   startTime BIGINT NOT NULL,
   closePrice DECIMAL(36,18) NOT NULL,
   highPrice DECIMAL(36,18) NOT NULL,
@@ -84,7 +84,7 @@ CREATE TABLE match_details (
 ) CHARACTER SET utf8 COLLATE utf8_general_ci AUTO_INCREMENT = 1000;
 
 
-CREATE TABLE min_bar (
+CREATE TABLE min_bars (
   startTime BIGINT NOT NULL,
   closePrice DECIMAL(36,18) NOT NULL,
   highPrice DECIMAL(36,18) NOT NULL,
@@ -119,7 +119,7 @@ CREATE TABLE password_auths (
 ) CHARACTER SET utf8 COLLATE utf8_general_ci AUTO_INCREMENT = 1000;
 
 
-CREATE TABLE sec_bar (
+CREATE TABLE sec_bars (
   startTime BIGINT NOT NULL,
   closePrice DECIMAL(36,18) NOT NULL,
   highPrice DECIMAL(36,18) NOT NULL,

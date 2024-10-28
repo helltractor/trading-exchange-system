@@ -10,9 +10,7 @@ on:
 
 jobs:
   build:
-
     runs-on: ubuntu-latest
-    working-directory: build
 
     steps:
       - name: Checkout code
@@ -24,11 +22,9 @@ jobs:
           java-version: '21'
           distribution: 'adopt'
 
-      - name: Build with Maven
-        run: mvn clean install
-
-      - name: Run tests
-        run: mvn test
-
-      - name: Package
-        run: mvn package
+      - name: Build, Test and Package with Maven
+        run: |
+          mvn clean install
+          mvn test
+          mvn package
+        working-directory: build

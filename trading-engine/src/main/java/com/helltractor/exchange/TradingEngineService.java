@@ -492,7 +492,7 @@ public class TradingEngineService extends LoggerSupport {
                 switch (assetId) {
                     case USD -> totalUSD = totalUSD.add(asset.getTotal());
                     case BTC -> totalBTC = totalBTC.add(asset.getTotal());
-                    default -> require(false, "Unexpected asset id: " + assetId);
+                    default -> require(false, "Unexpected assets id: " + assetId);
                 }
             }
         }
@@ -540,11 +540,11 @@ public class TradingEngineService extends LoggerSupport {
                 Asset asset = entry.getValue();
                 if (asset.getFrozen().signum() > 0) {
                     Map<AssetEnum, BigDecimal> orderFrozen = userOrderFrozen.get(userId);
-                    require(orderFrozen != null, "No order frozen found for user: " + userId + ", asset: " + asset);
+                    require(orderFrozen != null, "No order frozen found for user: " + userId + ", assets: " + asset);
                     BigDecimal frozen = orderFrozen.get(assetId);
-                    require(frozen != null, "No order frozen found for asset: " + asset);
+                    require(frozen != null, "No order frozen found for assets: " + asset);
                     require(frozen.compareTo(asset.getFrozen()) == 0,
-                            "Order frozen " + frozen + " is not equals to asset frozen: " + asset);
+                            "Order frozen " + frozen + " is not equals to assets frozen: " + asset);
                     // 从userOrderFrozen中删除已验证的Asset数据
                     orderFrozen.remove(assetId);
                 }

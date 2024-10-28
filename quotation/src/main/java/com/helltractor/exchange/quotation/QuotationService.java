@@ -1,4 +1,4 @@
-package com.helltractor.exchange.service;
+package com.helltractor.exchange.quotation;
 
 import com.fasterxml.jackson.core.type.TypeReference;
 import com.helltractor.exchange.entity.quatation.*;

@@ -1,6 +1,5 @@
-package com.helltractor.exchange.asset;
+package com.helltractor.exchange.assets;
 
-import com.helltractor.exchange.assets.AssetService;
 import com.helltractor.exchange.enums.AssetEnum;
 import com.helltractor.exchange.enums.Transfer;
 import org.junit.jupiter.api.AfterEach;
@@ -123,7 +122,7 @@ public class AssetServiceTest {
     void verify() {
         BigDecimal totalUSD = BigDecimal.ZERO;
         BigDecimal totalBTC = BigDecimal.ZERO;
-        for (Long userId : service.getUserAssets().keySet()) {
+        for (Long userId : service.userAssets.keySet()) {
             var assetUSD = service.getAsset(userId, AssetEnum.USD);
             if (assetUSD != null) {
                 totalUSD = totalUSD.add(assetUSD.available).add(assetUSD.frozen);

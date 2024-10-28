@@ -4,7 +4,7 @@
          xsi:schemaLocation="http://maven.apache.org/POM/4.0.0 http://maven.apache.org/xsd/maven-4.0.0.xsd">
     <modelVersion>4.0.0</modelVersion>
     <groupId>com.helltractor.exchange</groupId>
-    <artifactId>trading-exchange-system</artifactId>
+    <artifactId>parent</artifactId>
     <version>1.0-dev</version>
     <packaging>pom</packaging>
 
@@ -14,19 +14,8 @@
         <version>3.2.0</version>
     </parent>
 
-    <modules>
-        <module>build</module>
-        <module>common</module>
-        <module>config</module>
-        <module>push</module>
-        <module>quotation</module>
-        <module>trading-api</module>
-        <module>trading-engine</module>
-        <module>trading-sequencer</module>
-        <module>ui</module>
-    </modules>
-
     <properties>
+        <project.version>1.0-dev</project.version>
         <project.build.sourceEncoding>UTF-8</project.build.sourceEncoding>
         <project.reporting.outputEncoding>UTF-8</project.reporting.outputEncoding>
         <maven.compiler.source>21</maven.compiler.source>

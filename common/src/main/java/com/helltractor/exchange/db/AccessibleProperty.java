@@ -1,4 +1,4 @@
-package com.helltractor.exchange.database;
+package com.helltractor.exchange.db;
 
 import jakarta.persistence.Column;
 import jakarta.persistence.GeneratedValue;

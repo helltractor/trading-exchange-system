@@ -27,14 +27,12 @@
     </a>
 </p>
 
-# Build container and compile dependencies（in Terminal）
+# Build application
+1. `cd ./build`
+2. `docker-compose up --d`
+3. `mvn clean package`
 
-1. `mvn clean compile`
-2. `cd ./build`
-3. `docker-compose up --d`
-
-# Run application（in IntelliJ IDEA）
-
+# Run application
 1. run `ConfigApplication.java`
 2. run `TradingEngineApplication.java`
 3. run `TradingSequencerApplication.java`
@@ -45,7 +43,6 @@
 8. open `http://localhost:8080` in browser
 
 # Test application
-
 > Mind: More details in [bot](./build/bot/README.md)
 
 # Reference

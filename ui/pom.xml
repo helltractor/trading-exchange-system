@@ -6,8 +6,9 @@
 
     <parent>
         <groupId>com.helltractor.exchange</groupId>
-        <artifactId>trading-exchange-system</artifactId>
+        <artifactId>parent</artifactId>
         <version>1.0-dev</version>
+        <relativePath>../parent/pom.xml</relativePath>
     </parent>
 
     <artifactId>ui</artifactId>
@@ -41,9 +42,7 @@
     </dependencies>
 
     <build>
-        <!-- 指定输出文件名 -->
         <finalName>${project.artifactId}</finalName>
-        <!-- 创建SpringBoot可执行jar -->
         <plugins>
             <plugin>
                 <groupId>org.springframework.boot</groupId>

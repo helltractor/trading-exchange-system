@@ -25,7 +25,7 @@ public class TradingInternalApiController extends AbstractApiController {
      */
     @PostMapping("/transfer")
     public Map<String, Boolean> transferIn(@RequestBody TransferRequestBean transferRequest) {
-        logger.info("transfer request: transferId={}, fromUserId={}, toUserId={}, asset={}, amount={}",
+        logger.info("transfer request: transferId={}, fromUserId={}, toUserId={}, assets={}, amount={}",
                 transferRequest.transferId,
                 transferRequest.fromUserId,
                 transferRequest.toUserId,

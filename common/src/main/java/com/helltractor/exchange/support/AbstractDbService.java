@@ -1,6 +1,6 @@
 package com.helltractor.exchange.support;
 
-import com.helltractor.exchange.database.DataBaseTemplate;
+import com.helltractor.exchange.db.DataBaseTemplate;
 import org.springframework.beans.factory.annotation.Autowired;
 
 /**

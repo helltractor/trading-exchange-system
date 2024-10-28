@@ -6,8 +6,9 @@
 
     <parent>
         <groupId>com.helltractor.exchange</groupId>
-        <artifactId>trading-exchange-system</artifactId>
+        <artifactId>parent</artifactId>
         <version>1.0-dev</version>
+        <relativePath>../parent/pom.xml</relativePath>
     </parent>
 
     <artifactId>config</artifactId>
@@ -18,14 +19,4 @@
             <artifactId>spring-cloud-config-server</artifactId>
         </dependency>
     </dependencies>
-
-    <build>
-        <finalName>${project.artifactId}</finalName>
-        <plugins>
-            <plugin>
-                <groupId>org.springframework.boot</groupId>
-                <artifactId>spring-boot-maven-plugin</artifactId>
-            </plugin>
-        </plugins>
-    </build>
 </project>

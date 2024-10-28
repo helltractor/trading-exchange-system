@@ -1,4 +1,4 @@
-package com.helltractor.exchange.user;
+package com.helltractor.exchange.ctx;
 
 import com.helltractor.exchange.api.ApiException;
 import com.helltractor.exchange.enums.ApiError;

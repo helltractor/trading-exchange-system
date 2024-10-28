@@ -19,6 +19,6 @@ public class TransferEvent extends AbstractEvent {
     public String toString() {
         return "TransferEvent [sequenceId=" + sequenceId + ", previousId=" + previousId + ", uniqueId=" + uniqueId
                 + ", refId=" + refId + ", createTime=" + createTime + ", fromUserId=" + fromUserId + ", toUserId="
-                + toUserId + ", asset=" + asset + ", amount=" + amount + ", sufficient=" + sufficient + "]";
+                + toUserId + ", assets=" + asset + ", amount=" + amount + ", sufficient=" + sufficient + "]";
     }
 }

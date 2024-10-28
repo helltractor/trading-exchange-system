@@ -33,7 +33,7 @@ public class TransferRequestBean implements ValidatableBean {
             throw new ApiException(ApiError.PARAMETER_INVALID, "toUserId", "Must be different with fromUserId.");
         }
         if (asset == null) {
-            throw new ApiException(ApiError.PARAMETER_INVALID, "asset", "Must specify asset.");
+            throw new ApiException(ApiError.PARAMETER_INVALID, "assets", "Must specify assets.");
         }
         if (amount == null) {
             throw new ApiException(ApiError.PARAMETER_INVALID, "amount", "Must specify amount.");

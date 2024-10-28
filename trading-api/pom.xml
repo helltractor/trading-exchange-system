@@ -6,8 +6,9 @@
 
     <parent>
         <groupId>com.helltractor.exchange</groupId>
-        <artifactId>trading-exchange-system</artifactId>
+        <artifactId>parent</artifactId>
         <version>1.0-dev</version>
+        <relativePath>../parent/pom.xml</relativePath>
     </parent>
 
     <artifactId>trading-api</artifactId>
@@ -24,15 +25,15 @@
         </dependency>
 
         <dependency>
-            <groupId>org.springdoc</groupId>
-            <artifactId>springdoc-openapi-starter-webmvc-ui</artifactId>
-            <version>${springdoc.version}</version>
-        </dependency>
-
-        <dependency>
             <groupId>com.helltractor.exchange</groupId>
             <artifactId>common</artifactId>
             <version>${project.version}</version>
+        </dependency>
+
+        <dependency>
+            <groupId>org.springdoc</groupId>
+            <artifactId>springdoc-openapi-starter-webmvc-ui</artifactId>
+            <version>${springdoc.version}</version>
         </dependency>
     </dependencies>
 

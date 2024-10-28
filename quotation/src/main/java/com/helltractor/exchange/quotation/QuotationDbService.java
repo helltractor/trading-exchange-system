@@ -1,4 +1,4 @@
-package com.helltractor.exchange.service;
+package com.helltractor.exchange.quotation;
 
 import com.helltractor.exchange.entity.quatation.*;
 import com.helltractor.exchange.support.AbstractDbService;

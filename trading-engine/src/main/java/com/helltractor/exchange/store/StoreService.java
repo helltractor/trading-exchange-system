@@ -1,6 +1,6 @@
 package com.helltractor.exchange.store;
 
-import com.helltractor.exchange.database.DataBaseTemplate;
+import com.helltractor.exchange.db.DataBaseTemplate;
 import com.helltractor.exchange.entity.trade.EventEntity;
 import com.helltractor.exchange.message.event.AbstractEvent;
 import com.helltractor.exchange.messaging.MessageTypes;

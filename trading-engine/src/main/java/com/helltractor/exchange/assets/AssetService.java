@@ -118,10 +118,10 @@ public class AssetService extends LoggerSupport {
     public void transfer(Transfer type, Long fromUserId, Long toUserId, AssetEnum assetId, BigDecimal amount) {
         if (!tryTransfer(type, fromUserId, toUserId, assetId, amount, true)) {
             throw new RuntimeException("Transfer failed for " + type + ", from user " + fromUserId + " to user " + toUserId
-                    + ", asset = " + assetId + ", amount = " + amount);
+                    + ", assets = " + assetId + ", amount = " + amount);
         }
         if (logger.isDebugEnabled()) {
-            logger.debug("transfer asset {}, from {} => {}, amount {}", assetId, fromUserId, toUserId, amount);
+            logger.debug("transfer assets {}, from {} => {}, amount {}", assetId, fromUserId, toUserId, amount);
         }
     }
 
@@ -131,7 +131,7 @@ public class AssetService extends LoggerSupport {
     public boolean tryFreeze(Long userId, AssetEnum assetId, BigDecimal amount) {
         boolean ok = tryTransfer(Transfer.AVAILABLE_TO_FROZEN, userId, userId, assetId, amount, true);
         if (ok && logger.isDebugEnabled()) {
-            logger.debug("freezed user {}, asset {}, amount {}", userId, assetId, amount);
+            logger.debug("freezed user {}, assets {}, amount {}", userId, assetId, amount);
         }
         return ok;
     }
@@ -142,10 +142,10 @@ public class AssetService extends LoggerSupport {
     public void unfreeze(Long userId, AssetEnum assetId, BigDecimal amount) {
         if (!tryTransfer(Transfer.FROZEN_TO_AVAILABLE, userId, userId, assetId, amount, true)) {
             throw new RuntimeException(
-                    "Unfreeze failed for user " + userId + ", asset = " + assetId + ", amount = " + amount);
+                    "Unfreeze failed for user " + userId + ", assets = " + assetId + ", amount = " + amount);
         }
         if (logger.isDebugEnabled()) {
-            logger.debug("unfreezed user {}, asset {}, amount {}", userId, assetId, amount);
+            logger.debug("unfreezed user {}, assets {}, amount {}", userId, assetId, amount);
         }
     }
     

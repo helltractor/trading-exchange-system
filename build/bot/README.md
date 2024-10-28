@@ -10,5 +10,5 @@ bot.py --email=user0@example.com --password=password0
 batch command:
 
 ```
-command.py
+batch.py
 ```

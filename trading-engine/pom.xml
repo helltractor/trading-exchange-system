@@ -6,29 +6,23 @@
 
     <parent>
         <groupId>com.helltractor.exchange</groupId>
-        <artifactId>trading-exchange-system</artifactId>
+        <artifactId>parent</artifactId>
         <version>1.0-dev</version>
+        <relativePath>../parent/pom.xml</relativePath>
     </parent>
 
     <artifactId>trading-engine</artifactId>
 
     <dependencies>
-        <!-- 依赖SpringCloud Config客户端 -->
         <dependency>
             <groupId>org.springframework.cloud</groupId>
             <artifactId>spring-cloud-starter-config</artifactId>
         </dependency>
 
-        <!-- 依赖Common模块 -->
         <dependency>
             <groupId>com.helltractor.exchange</groupId>
             <artifactId>common</artifactId>
             <version>${project.version}</version>
-        </dependency>
-
-        <dependency>
-            <groupId>io.lettuce</groupId>
-            <artifactId>lettuce-core</artifactId>
         </dependency>
     </dependencies>
 
@@ -38,9 +32,6 @@
             <plugin>
                 <groupId>org.springframework.boot</groupId>
                 <artifactId>spring-boot-maven-plugin</artifactId>
-                <configuration>
-                    <skip>true</skip>
-                </configuration>
             </plugin>
         </plugins>
     </build>

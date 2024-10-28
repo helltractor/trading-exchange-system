@@ -1,6 +1,6 @@
 package com.helltractor.exchange;
 
-import com.helltractor.exchange.database.DataBaseTemplate;
+import com.helltractor.exchange.db.DataBaseTemplate;
 
 import java.io.IOException;
 import java.nio.file.Files;

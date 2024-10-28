@@ -1,8 +1,8 @@
 package com.helltractor.exchange.web;
 
 import com.helltractor.exchange.bean.AuthToken;
+import com.helltractor.exchange.ctx.UserContext;
 import com.helltractor.exchange.support.AbstractFilter;
-import com.helltractor.exchange.user.UserContext;
 import com.helltractor.exchange.user.UserService;
 import jakarta.annotation.PostConstruct;
 import jakarta.servlet.*;

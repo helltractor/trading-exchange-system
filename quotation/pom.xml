@@ -6,20 +6,19 @@
 
     <parent>
         <groupId>com.helltractor.exchange</groupId>
-        <artifactId>trading-exchange-system</artifactId>
+        <artifactId>parent</artifactId>
         <version>1.0-dev</version>
+        <relativePath>../parent/pom.xml</relativePath>
     </parent>
 
     <artifactId>quotation</artifactId>
 
     <dependencies>
-        <!-- 依赖SpringCloud Config客户端 -->
         <dependency>
             <groupId>org.springframework.cloud</groupId>
             <artifactId>spring-cloud-starter-config</artifactId>
         </dependency>
 
-        <!-- 依赖Common模块 -->
         <dependency>
             <groupId>com.helltractor.exchange</groupId>
             <artifactId>common</artifactId>
@@ -28,6 +27,7 @@
     </dependencies>
 
     <build>
+        <finalName>${project.artifactId}</finalName>
         <plugins>
             <plugin>
                 <groupId>org.springframework.boot</groupId>

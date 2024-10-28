@@ -1,4 +1,4 @@
-package com.helltractor.exchange.database;
+package com.helltractor.exchange.db;
 
 import jakarta.persistence.NoResultException;
 import jakarta.persistence.NonUniqueResultException;

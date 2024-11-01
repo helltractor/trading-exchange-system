@@ -38,7 +38,7 @@
 3. run `TradingSequencerApplication.java`
 4. run `TradingAPIApplication.java`
 5. run `QuotationApplication.java`
-6. run` PushApplication.java`
+6. run `PushApplication.java`
 7. run `UIApplication.java`
 8. open `http://localhost:8080` in browser
 

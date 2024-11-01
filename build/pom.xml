@@ -7,7 +7,6 @@
     <artifactId>build</artifactId>
     <version>1.0-dev</version>
     <packaging>pom</packaging>
-    <name>Trading Exchange System</name>
 
     <modules>
         <module>../common</module>

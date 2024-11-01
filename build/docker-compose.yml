@@ -53,3 +53,4 @@ services:
       - ./mysql/conf/my.cnf:/etc/mysql/my.cnf
       - ./docker/mysql-data:/var/lib/mysql
       - ./docker/mysql-logs:/var/log/mysql
+    entrypoint: bash -c "chmod 644 /etc/mysql/my.cnf && exec /usr/local/bin/docker-entrypoint.sh mysqld"

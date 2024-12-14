@@ -29,12 +29,10 @@ import java.util.stream.Stream;
 @Component
 public class DbTemplate {
     
-    private final Logger logger = LoggerFactory.getLogger(getClass());
-    
     final JdbcTemplate jdbcTemplate;
-    
+    private final Logger logger = LoggerFactory.getLogger(getClass());
     // class -> Mapper
-    private Map<Class<?>, Mapper<?>> classMapping;
+    private final Map<Class<?>, Mapper<?>> classMapping;
     
     public DbTemplate(@Autowired JdbcTemplate jdbcTemplate) {
         this.jdbcTemplate = jdbcTemplate;

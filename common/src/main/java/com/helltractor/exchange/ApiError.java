@@ -19,5 +19,5 @@ public enum ApiError {
     
     OPERATION_TIMEOUT,
     
-    INTERNAL_SERVER_ERROR;
+    INTERNAL_SERVER_ERROR
 }

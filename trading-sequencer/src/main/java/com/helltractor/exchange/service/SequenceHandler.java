@@ -1,9 +1,9 @@
 package com.helltractor.exchange.service;
 
-import com.helltractor.exchange.model.trade.EventEntity;
-import com.helltractor.exchange.model.trade.UniqueEventEntity;
 import com.helltractor.exchange.message.event.AbstractEvent;
 import com.helltractor.exchange.messaging.MessageTypes;
+import com.helltractor.exchange.model.trade.EventEntity;
+import com.helltractor.exchange.model.trade.UniqueEventEntity;
 import com.helltractor.exchange.support.AbstractDbService;
 import org.springframework.stereotype.Component;
 import org.springframework.transaction.annotation.Transactional;

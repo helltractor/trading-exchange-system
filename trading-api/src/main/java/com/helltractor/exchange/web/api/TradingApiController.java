@@ -2,17 +2,17 @@ package com.helltractor.exchange.web.api;
 
 import com.fasterxml.jackson.core.JsonProcessingException;
 import com.fasterxml.jackson.databind.ObjectMapper;
+import com.helltractor.exchange.ApiError;
 import com.helltractor.exchange.ApiErrorResponse;
 import com.helltractor.exchange.ApiException;
 import com.helltractor.exchange.bean.OrderBookBean;
 import com.helltractor.exchange.bean.OrderRequestBean;
 import com.helltractor.exchange.bean.SimpleMatchDetailRecord;
 import com.helltractor.exchange.ctx.UserContext;
-import com.helltractor.exchange.model.trade.OrderEntity;
-import com.helltractor.exchange.ApiError;
 import com.helltractor.exchange.message.ApiResultMessage;
 import com.helltractor.exchange.message.event.OrderCancelEvent;
 import com.helltractor.exchange.message.event.OrderRequestEvent;
+import com.helltractor.exchange.model.trade.OrderEntity;
 import com.helltractor.exchange.redis.RedisCache;
 import com.helltractor.exchange.redis.RedisService;
 import com.helltractor.exchange.service.HistoryService;
@@ -55,7 +55,7 @@ public class TradingApiController extends LoggerSupport {
     @Autowired
     TradingEngineApiProxyService tradingEngineApiProxyService;
     
-    private Long asyncTimeout = Long.valueOf(500);
+    private final Long asyncTimeout = Long.valueOf(500);
     
     private String timeoutJson = null;
     
@@ -120,7 +120,7 @@ public class TradingApiController extends LoggerSupport {
     @GetMapping(value = "/bars/day", produces = "application/json")
     public String getDayBars() {
         long end = System.currentTimeMillis();
-        long start = end - 366 * 86400_000;
+        long start = end - 366L * 86400_000;
         return getBars(RedisCache.Key.DAY_BARS, start, end);
     }
     
@@ -128,7 +128,7 @@ public class TradingApiController extends LoggerSupport {
     @GetMapping(value = "/bars/hour", produces = "application/json")
     public String getHourBars() {
         long end = System.currentTimeMillis();
-        long start = end - 720 * 3600_000;
+        long start = end - 720L * 3600_000;
         return getBars(RedisCache.Key.HOUR_BARS, start, end);
     }
     

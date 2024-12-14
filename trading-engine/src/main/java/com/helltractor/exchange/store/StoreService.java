@@ -1,10 +1,10 @@
 package com.helltractor.exchange.store;
 
 import com.helltractor.exchange.db.DbTemplate;
-import com.helltractor.exchange.model.trade.EventEntity;
 import com.helltractor.exchange.message.event.AbstractEvent;
 import com.helltractor.exchange.messaging.MessageTypes;
 import com.helltractor.exchange.model.support.EntitySupport;
+import com.helltractor.exchange.model.trade.EventEntity;
 import com.helltractor.exchange.support.LoggerSupport;
 import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.stereotype.Component;

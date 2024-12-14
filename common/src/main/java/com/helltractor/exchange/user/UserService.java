@@ -1,11 +1,11 @@
 package com.helltractor.exchange.user;
 
+import com.helltractor.exchange.ApiError;
 import com.helltractor.exchange.ApiException;
+import com.helltractor.exchange.enums.UserType;
 import com.helltractor.exchange.model.ui.PasswordAuthEntity;
 import com.helltractor.exchange.model.ui.UserEntity;
 import com.helltractor.exchange.model.ui.UserProfileEntity;
-import com.helltractor.exchange.ApiError;
-import com.helltractor.exchange.enums.UserType;
 import com.helltractor.exchange.support.AbstractDbService;
 import com.helltractor.exchange.util.HashUtil;
 import com.helltractor.exchange.util.RandomUtil;

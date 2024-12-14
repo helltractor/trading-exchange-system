@@ -1,16 +1,16 @@
 package com.helltractor.exchange.quotation;
 
 import com.fasterxml.jackson.core.type.TypeReference;
-import com.helltractor.exchange.model.quatation.*;
 import com.helltractor.exchange.enums.BarType;
 import com.helltractor.exchange.message.AbstractMessage;
 import com.helltractor.exchange.message.TickMessage;
 import com.helltractor.exchange.messaging.MessageConsumer;
 import com.helltractor.exchange.messaging.Messaging;
 import com.helltractor.exchange.messaging.MessagingFactory;
+import com.helltractor.exchange.model.quatation.*;
+import com.helltractor.exchange.model.support.AbstractBarEntity;
 import com.helltractor.exchange.redis.RedisCache;
 import com.helltractor.exchange.redis.RedisService;
-import com.helltractor.exchange.model.support.AbstractBarEntity;
 import com.helltractor.exchange.support.LoggerSupport;
 import com.helltractor.exchange.util.IpUtil;
 import com.helltractor.exchange.util.JsonUtil;

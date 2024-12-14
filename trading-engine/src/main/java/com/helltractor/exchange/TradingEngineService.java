@@ -1,14 +1,14 @@
 package com.helltractor.exchange;
 
+import com.helltractor.exchange.assets.Asset;
 import com.helltractor.exchange.assets.AssetService;
 import com.helltractor.exchange.assets.Transfer;
 import com.helltractor.exchange.bean.OrderBookBean;
 import com.helltractor.exchange.clearing.ClearingService;
-import com.helltractor.exchange.model.quatation.TickEntity;
-import com.helltractor.exchange.model.trade.MatchDetailEntity;
-import com.helltractor.exchange.assets.Asset;
-import com.helltractor.exchange.model.trade.OrderEntity;
-import com.helltractor.exchange.enums.*;
+import com.helltractor.exchange.enums.AssetEnum;
+import com.helltractor.exchange.enums.Direction;
+import com.helltractor.exchange.enums.MatchType;
+import com.helltractor.exchange.enums.UserType;
 import com.helltractor.exchange.match.MatchDetailRecord;
 import com.helltractor.exchange.match.MatchEngine;
 import com.helltractor.exchange.match.MatchResult;
@@ -23,6 +23,9 @@ import com.helltractor.exchange.messaging.MessageConsumer;
 import com.helltractor.exchange.messaging.MessageProducer;
 import com.helltractor.exchange.messaging.Messaging;
 import com.helltractor.exchange.messaging.MessagingFactory;
+import com.helltractor.exchange.model.quatation.TickEntity;
+import com.helltractor.exchange.model.trade.MatchDetailEntity;
+import com.helltractor.exchange.model.trade.OrderEntity;
 import com.helltractor.exchange.order.OrderService;
 import com.helltractor.exchange.redis.RedisCache;
 import com.helltractor.exchange.redis.RedisService;
@@ -97,11 +100,11 @@ public class TradingEngineService extends LoggerSupport {
     private Thread dbThread;
     
     private OrderBookBean latestOrderBook = null;
-    private Queue<List<OrderEntity>> orderQueue = new ConcurrentLinkedQueue<>();
-    private Queue<List<MatchDetailEntity>> matchQueue = new ConcurrentLinkedQueue<>();
-    private Queue<TickMessage> tickQueue = new ConcurrentLinkedQueue<>();
-    private Queue<ApiResultMessage> apiResultQueue = new ConcurrentLinkedQueue<>();
-    private Queue<NotificationMessage> notificationQueue = new ConcurrentLinkedQueue<>();
+    private final Queue<List<OrderEntity>> orderQueue = new ConcurrentLinkedQueue<>();
+    private final Queue<List<MatchDetailEntity>> matchQueue = new ConcurrentLinkedQueue<>();
+    private final Queue<TickMessage> tickQueue = new ConcurrentLinkedQueue<>();
+    private final Queue<ApiResultMessage> apiResultQueue = new ConcurrentLinkedQueue<>();
+    private final Queue<NotificationMessage> notificationQueue = new ConcurrentLinkedQueue<>();
     
     @PostConstruct
     public void init() {
@@ -310,7 +313,7 @@ public class TradingEngineService extends LoggerSupport {
         ZonedDateTime zonedDateTime = ZonedDateTime.ofInstant(Instant.ofEpochMilli(event.createTime), zoneId);
         int year = zonedDateTime.getYear();
         int month = zonedDateTime.getMonthValue();
-        long orderId = event.sequenceId * 10000 + (year * 100 + month);
+        long orderId = event.sequenceId * 10000 + (year * 100L + month);
         // 创建订单
         OrderEntity order = orderService.createOrder(event.sequenceId, event.createTime, orderId, event.userId, event.direction, event.price, event.quantity);
         if (order == null) {

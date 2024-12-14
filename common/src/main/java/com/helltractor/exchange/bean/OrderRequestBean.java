@@ -1,7 +1,7 @@
 package com.helltractor.exchange.bean;
 
-import com.helltractor.exchange.ApiException;
 import com.helltractor.exchange.ApiError;
+import com.helltractor.exchange.ApiException;
 import com.helltractor.exchange.enums.Direction;
 
 import java.math.BigDecimal;

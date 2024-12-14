@@ -1,9 +1,9 @@
 package com.helltractor.exchange.order;
 
 import com.helltractor.exchange.assets.AssetService;
-import com.helltractor.exchange.model.trade.OrderEntity;
 import com.helltractor.exchange.enums.AssetEnum;
 import com.helltractor.exchange.enums.Direction;
+import com.helltractor.exchange.model.trade.OrderEntity;
 import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.stereotype.Component;
 
@@ -24,7 +24,7 @@ public class OrderService {
     
     // user orders
     final ConcurrentMap<Long, ConcurrentHashMap<Long, OrderEntity>> userOrders = new ConcurrentHashMap<>();
-
+    
     public OrderService(@Autowired AssetService assetService) {
         this.assetService = assetService;
     }

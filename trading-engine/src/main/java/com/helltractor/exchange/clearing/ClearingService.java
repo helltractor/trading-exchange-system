@@ -1,11 +1,11 @@
 package com.helltractor.exchange.clearing;
 
 import com.helltractor.exchange.assets.AssetService;
-import com.helltractor.exchange.model.trade.OrderEntity;
-import com.helltractor.exchange.enums.AssetEnum;
 import com.helltractor.exchange.assets.Transfer;
+import com.helltractor.exchange.enums.AssetEnum;
 import com.helltractor.exchange.match.MatchDetailRecord;
 import com.helltractor.exchange.match.MatchResult;
+import com.helltractor.exchange.model.trade.OrderEntity;
 import com.helltractor.exchange.order.OrderService;
 import com.helltractor.exchange.support.LoggerSupport;
 import org.springframework.beans.factory.annotation.Autowired;

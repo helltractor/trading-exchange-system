@@ -18,7 +18,7 @@ public class MatchResult {
     public void add(BigDecimal price, BigDecimal quantity, OrderEntity makerOrder) {
         matchDetails.add(new MatchDetailRecord(price, quantity, this.takerOrder, makerOrder));
     }
-
+    
     @Override
     public String toString() {
         if (matchDetails.isEmpty()) {

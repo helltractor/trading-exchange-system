@@ -23,5 +23,5 @@ public enum BarType {
     /**
      * Type of 1 day.
      */
-    DAY;
+    DAY
 }

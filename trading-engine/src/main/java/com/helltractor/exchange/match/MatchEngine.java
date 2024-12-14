@@ -1,9 +1,9 @@
 package com.helltractor.exchange.match;
 
 import com.helltractor.exchange.bean.OrderBookBean;
-import com.helltractor.exchange.model.trade.OrderEntity;
 import com.helltractor.exchange.enums.Direction;
 import com.helltractor.exchange.enums.OrderStatus;
+import com.helltractor.exchange.model.trade.OrderEntity;
 import org.springframework.stereotype.Component;
 
 import java.math.BigDecimal;
@@ -32,7 +32,7 @@ public class MatchEngine {
             }
         }
     }
-
+    
     /**
      * 处理订单
      *
@@ -47,7 +47,7 @@ public class MatchEngine {
         long timeStamp = takerOrder.createTime;
         MatchResult matchResult = new MatchResult(takerOrder);
         BigDecimal takerUnfilledQuantity = takerOrder.quantity;
-        for (;;) {
+        for (; ; ) {
             OrderEntity makerOrder = makerBook.getFirst();
             if (makerOrder == null) {
                 // 对手盘不存在
@@ -69,7 +69,7 @@ public class MatchEngine {
             // 更新订单状态
             takerUnfilledQuantity = takerUnfilledQuantity.subtract(matchQuantity);
             BigDecimal makeUnfilledQuantity = makerOrder.unfilledQuantity.subtract(matchQuantity);
-
+            
             // 对手盘完全成交后，从订单簿中删除
             if (makeUnfilledQuantity.signum() == 0) {
                 makerOrder.updateOrder(makeUnfilledQuantity, OrderStatus.FULLY_FILLED, timeStamp);
@@ -78,7 +78,7 @@ public class MatchEngine {
                 // 对手盘部分成交后，更新订单状态
                 makerOrder.updateOrder(makeUnfilledQuantity, OrderStatus.PARTIAL_FILLED, timeStamp);
             }
-
+            
             // Taker完全成交后，退出循环
             if (takerUnfilledQuantity.signum() == 0) {
                 takerOrder.updateOrder(takerUnfilledQuantity, OrderStatus.FULLY_FILLED, timeStamp);
@@ -94,7 +94,7 @@ public class MatchEngine {
         }
         return matchResult;
     }
-
+    
     /**
      * 撤单，查询订单状态
      */

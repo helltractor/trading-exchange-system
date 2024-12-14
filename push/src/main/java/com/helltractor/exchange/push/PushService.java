@@ -17,25 +17,19 @@ import org.springframework.stereotype.Component;
 @Component
 public class PushService extends LoggerSupport {
     
+    Vertx vertx;
     @Value("${exchange.config.hmac-key}")
     private String hmacKey;
-    
     @Value("${server.port}")
     private int serverPort;
-    
     @Value("${spring.redis.standalone.host:localhost}")
     private String redisHost;
-    
     @Value("${spring.redis.standalone.port:6379}")
     private int redisPort;
-    
     @Value("${spring.redis.standalone.password:}")
     private String redisPassword;
-    
     @Value("${spring.redis.standalone.database:0}")
     private int redisDatabase;
-    
-    Vertx vertx;
     
     @PostConstruct
     public void startVertx() {

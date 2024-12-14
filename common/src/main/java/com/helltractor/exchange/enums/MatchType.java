@@ -13,5 +13,5 @@ public enum MatchType {
     /**
      * Match as maker.
      */
-    MAKER;
+    MAKER
 }

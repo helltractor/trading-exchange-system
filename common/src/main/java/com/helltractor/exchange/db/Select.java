@@ -4,12 +4,12 @@ import java.util.Arrays;
 
 /**
  * SELECT ... from ...
- * 
+ * <p>
  * Default to "*".
  */
 @SuppressWarnings("rawtypes")
 public final class Select extends CriteriaQuery {
-
+    
     @SuppressWarnings("unchecked")
     Select(Criteria criteria, String... selectFields) {
         super(criteria);
@@ -17,10 +17,10 @@ public final class Select extends CriteriaQuery {
             this.criteria.select = Arrays.asList(selectFields);
         }
     }
-
+    
     /**
      * Add from clause.
-     * 
+     *
      * @param entityClass The model class.
      * @return The criteria object.
      */

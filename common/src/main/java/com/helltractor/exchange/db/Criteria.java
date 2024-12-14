@@ -51,11 +51,7 @@ final class Criteria<T> {
         List<Object> params = new ArrayList<>();
         if (where != null) {
             for (Object obj : whereParams) {
-                if (obj == null) {
-                    params.add(null);
-                } else {
-                    params.add(obj);
-                }
+                params.add(obj);
             }
         }
         if (offset >= 0 && maxResults > 0) {

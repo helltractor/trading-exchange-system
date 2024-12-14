@@ -130,11 +130,11 @@ class AccessibleProperty {
     String getColumnDefinition(Class<?> type) {
         Column col = this.field.getAnnotation(Column.class);
         if (col == null) {
-            throw new IllegalArgumentException("@Column not found on: " + this.field.toString());
+            throw new IllegalArgumentException("@Column not found on: " + this.field);
         }
         if (!col.name().isEmpty()) {
             throw new IllegalArgumentException(
-                    "@Column(name=\"" + col.name() + "\") is not supported: " + this.field.toString());
+                    "@Column(name=\"" + col.name() + "\") is not supported: " + this.field);
         }
         String colDef = null;
         if (col == null || col.columnDefinition().isEmpty()) {
@@ -146,7 +146,7 @@ class AccessibleProperty {
         } else {
             colDef = col.columnDefinition().toUpperCase();
         }
-        boolean nullable = col == null ? true : col.nullable();
+        boolean nullable = col == null || col.nullable();
         colDef = colDef + " " + (nullable ? "NULL" : "NOT NULL");
         
         if (isIdentityId()) {

@@ -1,8 +1,8 @@
 package com.helltractor.exchange.match;
 
-import com.helltractor.exchange.model.trade.OrderEntity;
 import com.helltractor.exchange.enums.Direction;
 import com.helltractor.exchange.enums.OrderStatus;
+import com.helltractor.exchange.model.trade.OrderEntity;
 import org.junit.jupiter.api.BeforeEach;
 import org.junit.jupiter.api.Test;
 
@@ -10,20 +10,19 @@ import java.math.BigDecimal;
 import java.util.ArrayList;
 import java.util.List;
 
-import static org.junit.jupiter.api.Assertions.assertArrayEquals;
-import static org.junit.jupiter.api.Assertions.assertTrue;
+import static org.junit.jupiter.api.Assertions.*;
 
 public class MatchEngineTest {
-
+    
     static Long USER_A = 12345L;
     long sequenceId = 0;
     MatchEngine engine;
-
+    
     @BeforeEach
     void init() {
         this.engine = new MatchEngine();
     }
-
+    
     @Test
     void processOrders() {
         List<OrderEntity> orders = List.of(
@@ -41,7 +40,7 @@ public class MatchEngineTest {
             MatchResult mr = this.engine.processOrder(order.sequenceId, order);
             matches.addAll(mr.matchDetails);
         }
-        assertArrayEquals(new MatchDetailRecord[] {
+        assertArrayEquals(new MatchDetailRecord[]{
                 new MatchDetailRecord(bd("12305.39"), bd("0.11"), orders.get(2), orders.get(1)), //
                 new MatchDetailRecord(bd("12305.39"), bd("0.22"), orders.get(3), orders.get(1)), //
                 new MatchDetailRecord(bd("12300.21"), bd("0.11"), orders.get(3), orders.get(0)), //
@@ -49,7 +48,7 @@ public class MatchEngineTest {
                 new MatchDetailRecord(bd("12400.00"), bd("0.10"), orders.get(7), orders.get(4)), //
                 new MatchDetailRecord(bd("12400.00"), bd("0.20"), orders.get(7), orders.get(5)), //
         }, matches.toArray(MatchDetailRecord[]::new));
-        assertTrue(bd("12400.00").compareTo(engine.marketPrice) == 0);
+        assertEquals(0, bd("12400.00").compareTo(engine.marketPrice));
     }
     
     OrderEntity createOrder(Direction Direction, String price, String quantity) {
@@ -65,7 +64,7 @@ public class MatchEngineTest {
         order.createTime = order.updateTime = 1234567890000L + this.sequenceId;
         return order;
     }
-
+    
     BigDecimal bd(String s) {
         return new BigDecimal(s);
     }

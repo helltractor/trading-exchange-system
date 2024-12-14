@@ -18,5 +18,5 @@ public enum ClearingType {
     /**
      * A cancelled clearing record.
      */
-    CANCELLED;
+    CANCELLED
 }

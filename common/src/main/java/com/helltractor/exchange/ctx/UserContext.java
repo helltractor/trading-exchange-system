@@ -1,7 +1,7 @@
 package com.helltractor.exchange.ctx;
 
-import com.helltractor.exchange.ApiException;
 import com.helltractor.exchange.ApiError;
+import com.helltractor.exchange.ApiException;
 
 /**
  * store user context in thread local
@@ -21,7 +21,7 @@ public class UserContext implements AutoCloseable {
         }
         return userId;
     }
-
+    
     public static Long getUserId() {
         return THREAD_LOCAL_CTX.get();
     }

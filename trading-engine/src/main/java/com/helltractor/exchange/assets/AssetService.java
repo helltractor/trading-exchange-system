@@ -14,7 +14,7 @@ import java.util.concurrent.ConcurrentMap;
 
 @Component
 public class AssetService extends LoggerSupport {
-
+    
     // UserId -> Map(AssetEnum -> Assets[available/frozen])
     final ConcurrentMap<Long, ConcurrentMap<AssetEnum, Asset>> userAssets = new ConcurrentHashMap<>();
     
@@ -54,12 +54,12 @@ public class AssetService extends LoggerSupport {
         if (amount.signum() < 0) {
             throw new IllegalArgumentException("Amount must be positive");
         }
-
+        
         Asset fromAsset = getAsset(fromUserId, assetId);
         if (fromAsset == null) {
             fromAsset = initAssets(fromUserId, assetId);
         }
-
+        
         Asset toAsset = getAsset(toUserId, assetId);
         if (toAsset == null) {
             toAsset = initAssets(toUserId, assetId);

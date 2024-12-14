@@ -1,4 +1,4 @@
-# ui configuration
+# push configuration
 
 server:
   port: ${APP_PORT:8006}

@@ -1,16 +1,16 @@
-# 配置服务器的端口，通常设置为8888:
+# spring cloud config server properties
 server:
-  port: 8888
+  port: 8888 # default port
 
 spring:
   application:
     name: config-server
   profiles:
-    # 从文件读取配置时，Config Server激活的profile必须设定为native:
+    # must set active profile to native
     active: native
   cloud:
     config:
       server:
         native:
-          # 设置配置文件的搜索路径:
+          # search locations for config files
           search-locations: file:./config-repo, file:../config-repo, file:../../config-repo

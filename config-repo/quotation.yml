@@ -1,4 +1,4 @@
-# Quotation
+# quotation configuration
 
 server:
   port: ${APP_PORT:8005}

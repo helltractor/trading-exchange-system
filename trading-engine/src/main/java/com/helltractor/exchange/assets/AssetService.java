@@ -1,8 +1,6 @@
 package com.helltractor.exchange.assets;
 
-import com.helltractor.exchange.entity.trade.asset.Asset;
 import com.helltractor.exchange.enums.AssetEnum;
-import com.helltractor.exchange.enums.Transfer;
 import com.helltractor.exchange.support.LoggerSupport;
 import org.springframework.stereotype.Component;
 
@@ -19,10 +17,7 @@ public class AssetService extends LoggerSupport {
 
     // UserId -> Map(AssetEnum -> Assets[available/frozen])
     final ConcurrentMap<Long, ConcurrentMap<AssetEnum, Asset>> userAssets = new ConcurrentHashMap<>();
-
-    /**
-     * 获取用户资产
-     */
+    
     public Asset getAsset(Long userId, AssetEnum assetId) {
         ConcurrentMap<AssetEnum, Asset> assets = userAssets.get(userId);
         if (assets == null) {
@@ -30,10 +25,7 @@ public class AssetService extends LoggerSupport {
         }
         return assets.get(assetId);
     }
-
-    /**
-     * 获取用户所有资产
-     */
+    
     public Map<AssetEnum, Asset> getAssets(Long userId) {
         Map<AssetEnum, Asset> assets = userAssets.get(userId);
         if (assets == null) {
@@ -41,17 +33,11 @@ public class AssetService extends LoggerSupport {
         }
         return assets;
     }
-
-    /**
-     * 获取所有用户资产
-     */
+    
     public ConcurrentMap<Long, ConcurrentMap<AssetEnum, Asset>> getUserAssets() {
         return this.userAssets;
     }
-
-    /**
-     * 初始化资产
-     */
+    
     Asset initAssets(Long userId, AssetEnum assetId) {
         ConcurrentMap<AssetEnum, Asset> assets = userAssets.get(userId);
         if (assets == null) {
@@ -62,10 +48,7 @@ public class AssetService extends LoggerSupport {
         assets.put(assetId, zeroAsset);
         return zeroAsset;
     }
-
-    /**
-     * 转账
-     */
+    
     public boolean tryTransfer(Transfer type, Long fromUserId, Long toUserId, AssetEnum assetId,
                                BigDecimal amount, boolean checkBalance) {
         if (amount.signum() < 0) {
@@ -111,10 +94,7 @@ public class AssetService extends LoggerSupport {
             }
         };
     }
-
-    /**
-     * 检查是否可以转账
-     */
+    
     public void transfer(Transfer type, Long fromUserId, Long toUserId, AssetEnum assetId, BigDecimal amount) {
         if (!tryTransfer(type, fromUserId, toUserId, assetId, amount, true)) {
             throw new RuntimeException("Transfer failed for " + type + ", from user " + fromUserId + " to user " + toUserId
@@ -124,10 +104,7 @@ public class AssetService extends LoggerSupport {
             logger.debug("transfer assets {}, from {} => {}, amount {}", assetId, fromUserId, toUserId, amount);
         }
     }
-
-    /**
-     * 冻结资产
-     */
+    
     public boolean tryFreeze(Long userId, AssetEnum assetId, BigDecimal amount) {
         boolean ok = tryTransfer(Transfer.AVAILABLE_TO_FROZEN, userId, userId, assetId, amount, true);
         if (ok && logger.isDebugEnabled()) {
@@ -135,10 +112,7 @@ public class AssetService extends LoggerSupport {
         }
         return ok;
     }
-
-    /**
-     * 解结资产
-     */
+    
     public void unfreeze(Long userId, AssetEnum assetId, BigDecimal amount) {
         if (!tryTransfer(Transfer.FROZEN_TO_AVAILABLE, userId, userId, assetId, amount, true)) {
             throw new RuntimeException(

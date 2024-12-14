@@ -1,12 +1,13 @@
 package com.helltractor.exchange;
 
 import com.helltractor.exchange.assets.AssetService;
+import com.helltractor.exchange.assets.Transfer;
 import com.helltractor.exchange.bean.OrderBookBean;
 import com.helltractor.exchange.clearing.ClearingService;
-import com.helltractor.exchange.entity.quatation.TickEntity;
-import com.helltractor.exchange.entity.trade.MatchDetailEntity;
-import com.helltractor.exchange.entity.trade.asset.Asset;
-import com.helltractor.exchange.entity.trade.order.OrderEntity;
+import com.helltractor.exchange.model.quatation.TickEntity;
+import com.helltractor.exchange.model.trade.MatchDetailEntity;
+import com.helltractor.exchange.assets.Asset;
+import com.helltractor.exchange.model.trade.OrderEntity;
 import com.helltractor.exchange.enums.*;
 import com.helltractor.exchange.match.MatchDetailRecord;
 import com.helltractor.exchange.match.MatchEngine;
@@ -166,7 +167,7 @@ public class TradingEngineService extends LoggerSupport {
             if (message != null) {
                 redisService.publish(RedisCache.Topic.NOTIFICATION, JsonUtil.writeJson(message));
             } else {
-                // 无推送时，暂停1ms:
+                // 无推送时，暂停1ms
                 try {
                     Thread.sleep(1);
                 } catch (InterruptedException e) {
@@ -397,8 +398,7 @@ public class TradingEngineService extends LoggerSupport {
     }
     
     boolean transfer(TransferEvent event) {
-        boolean ok = this.assetService.tryTransfer(Transfer.AVAILABLE_TO_AVAILABLE, event.fromUserId, event.toUserId, event.asset, event.amount, event.sufficient);
-        return ok;
+        return this.assetService.tryTransfer(Transfer.AVAILABLE_TO_AVAILABLE, event.fromUserId, event.toUserId, event.asset, event.amount, event.sufficient);
     }
     
     private void saveToDb() throws InterruptedException {

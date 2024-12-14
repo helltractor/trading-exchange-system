@@ -1,10 +1,10 @@
 package com.helltractor.exchange.store;
 
-import com.helltractor.exchange.db.DataBaseTemplate;
-import com.helltractor.exchange.entity.trade.EventEntity;
+import com.helltractor.exchange.db.DbTemplate;
+import com.helltractor.exchange.model.trade.EventEntity;
 import com.helltractor.exchange.message.event.AbstractEvent;
 import com.helltractor.exchange.messaging.MessageTypes;
-import com.helltractor.exchange.support.EntitySupport;
+import com.helltractor.exchange.model.support.EntitySupport;
 import com.helltractor.exchange.support.LoggerSupport;
 import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.stereotype.Component;
@@ -21,10 +21,10 @@ public class StoreService extends LoggerSupport {
     MessageTypes messageTypes;
     
     @Autowired
-    DataBaseTemplate dataBaseTemplate;
+    DbTemplate dbTemplate;
     
     public List<AbstractEvent> loadEventFromDb(long lastEventId) {
-        List<EventEntity> events = this.dataBaseTemplate.from(EventEntity.class)
+        List<EventEntity> events = this.dbTemplate.from(EventEntity.class)
                 .where("sequenceId > ?", lastEventId)
                 .orderBy("sequenceId")
                 .limit(100000).list();
@@ -33,6 +33,6 @@ public class StoreService extends LoggerSupport {
     }
     
     public void insertIgnore(List<? extends EntitySupport> list) {
-        dataBaseTemplate.insertIgnore(list);
+        dbTemplate.insertIgnore(list);
     }
 }

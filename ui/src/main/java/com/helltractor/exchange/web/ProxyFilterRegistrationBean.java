@@ -1,11 +1,11 @@
 package com.helltractor.exchange.web;
 
 import com.fasterxml.jackson.databind.ObjectMapper;
-import com.helltractor.exchange.api.ApiException;
+import com.helltractor.exchange.ApiException;
 import com.helltractor.exchange.bean.AuthToken;
 import com.helltractor.exchange.client.RestClient;
 import com.helltractor.exchange.ctx.UserContext;
-import com.helltractor.exchange.enums.ApiError;
+import com.helltractor.exchange.ApiError;
 import com.helltractor.exchange.support.AbstractFilter;
 import jakarta.annotation.PostConstruct;
 import jakarta.servlet.*;
@@ -29,10 +29,10 @@ import java.util.Map;
 public class ProxyFilterRegistrationBean extends FilterRegistrationBean<Filter> {
     
     @Autowired
-    private RestClient tradingApiClient;
+    RestClient tradingApiClient;
     
     @Autowired
-    private ObjectMapper objectMapper;
+    ObjectMapper objectMapper;
     
     @Value("#{exchangeConfiguration.hmacKey}")
     String hmacKey;

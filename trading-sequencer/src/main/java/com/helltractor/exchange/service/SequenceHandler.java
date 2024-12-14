@@ -1,7 +1,7 @@
-package com.helltractor.exchange.handler;
+package com.helltractor.exchange.service;
 
-import com.helltractor.exchange.entity.trade.EventEntity;
-import com.helltractor.exchange.entity.trade.UniqueEventEntity;
+import com.helltractor.exchange.model.trade.EventEntity;
+import com.helltractor.exchange.model.trade.UniqueEventEntity;
 import com.helltractor.exchange.message.event.AbstractEvent;
 import com.helltractor.exchange.messaging.MessageTypes;
 import com.helltractor.exchange.support.AbstractDbService;
@@ -36,11 +36,9 @@ public class SequenceHandler extends AbstractDbService {
     
     /**
      * Set sequence for each message, persist into database as batch.
-     *
-     * @return Sequenced messages.
      */
     public List<AbstractEvent> sequenceMessages(final MessageTypes messageTypes, final AtomicLong sequence,
-                                                final List<AbstractEvent> messages) throws Exception {
+                                                final List<AbstractEvent> messages) {
         final long timestamp = System.currentTimeMillis();
         if (timestamp < this.lastTimestamp) {
             logger.warn("[Sequence] current time {} is turned back from {}!", timestamp, this.lastTimestamp);
@@ -92,7 +90,7 @@ public class SequenceHandler extends AbstractDbService {
             event.data = messageTypes.serialize(message);
             event.createTime = this.lastTimestamp; // same as message.createTime
             events.add(event);
-            // will send later:
+            // will send later
             sequenceMessages.add(message);
         }
         

@@ -1,6 +1,5 @@
 package com.helltractor.exchange.service;
 
-import com.helltractor.exchange.handler.SequenceHandler;
 import com.helltractor.exchange.message.event.AbstractEvent;
 import com.helltractor.exchange.messaging.*;
 import com.helltractor.exchange.support.LoggerSupport;
@@ -22,7 +21,7 @@ import java.util.concurrent.atomic.AtomicLong;
 @Component
 public class SequenceService extends LoggerSupport implements CommonErrorHandler {
     
-    static final String GROUP_ID = "SequenceGroup";
+    private static final String GROUP_ID = "SequenceGroup";
     
     @Autowired
     SequenceHandler sequenceHandler;
@@ -33,20 +32,20 @@ public class SequenceService extends LoggerSupport implements CommonErrorHandler
     @Autowired
     MessageTypes messageTypes;
     
-    MessageProducer<AbstractEvent> messageProducer;
+    private MessageProducer<AbstractEvent> messageProducer;
     
-    AtomicLong sequence;
+    private AtomicLong sequence;
     
-    Thread jobThread;
+    private Thread jobThread;
     
-    boolean crash = false;
-    boolean running;
+    private boolean crash = false;
+    private boolean running;
     
     @PostConstruct
-    void init() {
+    public void init() {
         Thread thread = new Thread(() -> {
             logger.info("start sequence service...");
-            // TODO: try get global DB lock:
+            // TODO: try get global DB lock
             // while (!hasLock()) { sleep(10000); }
             this.messageProducer = this.messagingFactory.createMessageProducer(Messaging.Topic.TRADE,
                     AbstractEvent.class);
@@ -91,7 +90,7 @@ public class SequenceService extends LoggerSupport implements CommonErrorHandler
     }
     
     /**
-     * Message consumer error handler
+     * Message consumer error handler.
      */
     @Override
     public void handleBatch(Exception thrownException, ConsumerRecords<?, ?> data, Consumer<?, ?> consumer,
@@ -100,11 +99,11 @@ public class SequenceService extends LoggerSupport implements CommonErrorHandler
         panic();
     }
     
-    void sendMessages(List<AbstractEvent> messages) {
+    private void sendMessages(List<AbstractEvent> messages) {
         this.messageProducer.sendMessages(messages);
     }
     
-    synchronized void processMessage(List<AbstractEvent> messages) {
+    private synchronized void processMessage(List<AbstractEvent> messages) {
         if (!running || crash) {
             panic();
             return;
@@ -131,7 +130,7 @@ public class SequenceService extends LoggerSupport implements CommonErrorHandler
         sendMessages(sequenced);
     }
     
-    void panic() {
+    private void panic() {
         this.crash = true;
         this.running = false;
         System.exit(1);

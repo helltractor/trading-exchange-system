@@ -21,10 +21,10 @@ import java.io.IOException;
 public class UIFilterRegistrationBean extends FilterRegistrationBean<Filter> {
     
     @Autowired
-    private UserService userService;
+    UserService userService;
     
     @Autowired
-    private CookieService cookieService;
+    CookieService cookieService;
     
     @PostConstruct
     public void init() {
@@ -46,11 +46,11 @@ public class UIFilterRegistrationBean extends FilterRegistrationBean<Filter> {
             if (logger.isDebugEnabled()) {
                 logger.debug("process {} {}...", request.getMethod(), path);
             }
-            // set default encoding:
+            // set default encoding
             request.setCharacterEncoding("UTF-8");
             response.setCharacterEncoding("UTF-8");
             response.setContentType("text/html;charset=UTF-8");
-            // try parse user:
+            // try parse user
             AuthToken auth = cookieService.findSessionCookie(request);
             if (auth != null && auth.isAboutToExpire()) {
                 logger.info("refresh session cookie...");

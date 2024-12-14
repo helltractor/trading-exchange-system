@@ -1,7 +1,7 @@
 package com.helltractor.exchange.service;
 
-import com.helltractor.exchange.api.ApiException;
-import com.helltractor.exchange.enums.ApiError;
+import com.helltractor.exchange.ApiException;
+import com.helltractor.exchange.ApiError;
 import com.helltractor.exchange.support.LoggerSupport;
 import okhttp3.*;
 import org.springframework.beans.factory.annotation.Value;
@@ -11,7 +11,7 @@ import java.io.IOException;
 import java.util.concurrent.TimeUnit;
 
 /**
- * 交易引擎API代理服务
+ * Trading engine API proxy service.
  */
 @Component
 public class TradingEngineApiProxyService extends LoggerSupport {
@@ -26,9 +26,6 @@ public class TradingEngineApiProxyService extends LoggerSupport {
             .retryOnConnectionFailure(false)
             .build();
     
-    /**
-     * 使用代理处理GET请求
-     */
     public String get(String url) throws IOException {
         Request request = new Request.Builder()
                 .url(tradingEngineInternalApiEndpoint + url)

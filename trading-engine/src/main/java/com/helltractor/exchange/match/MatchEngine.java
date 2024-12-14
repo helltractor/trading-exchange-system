@@ -1,17 +1,13 @@
 package com.helltractor.exchange.match;
 
 import com.helltractor.exchange.bean.OrderBookBean;
-import com.helltractor.exchange.entity.trade.order.OrderBook;
-import com.helltractor.exchange.entity.trade.order.OrderEntity;
+import com.helltractor.exchange.model.trade.OrderEntity;
 import com.helltractor.exchange.enums.Direction;
 import com.helltractor.exchange.enums.OrderStatus;
 import org.springframework.stereotype.Component;
 
 import java.math.BigDecimal;
 
-/**
- * 订单撮合引擎
- */
 @Component
 public class MatchEngine {
     

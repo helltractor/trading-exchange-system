@@ -1,7 +1,7 @@
 package com.helltractor.exchange.order;
 
 import com.helltractor.exchange.assets.AssetService;
-import com.helltractor.exchange.entity.trade.order.OrderEntity;
+import com.helltractor.exchange.model.trade.OrderEntity;
 import com.helltractor.exchange.enums.AssetEnum;
 import com.helltractor.exchange.enums.Direction;
 import org.springframework.beans.factory.annotation.Autowired;
@@ -16,11 +16,14 @@ import java.util.concurrent.ConcurrentMap;
 
 @Component
 public class OrderService {
+    
     final AssetService assetService;
     
-    final ConcurrentMap<Long, OrderEntity> activeOrders = new ConcurrentHashMap<>();  // 跟踪所有活动订单
+    // active orders
+    final ConcurrentMap<Long, OrderEntity> activeOrders = new ConcurrentHashMap<>();
     
-    final ConcurrentMap<Long, ConcurrentHashMap<Long, OrderEntity>> userOrders = new ConcurrentHashMap<>();    // 跟踪用户活动订单
+    // user orders
+    final ConcurrentMap<Long, ConcurrentHashMap<Long, OrderEntity>> userOrders = new ConcurrentHashMap<>();
 
     public OrderService(@Autowired AssetService assetService) {
         this.assetService = assetService;
@@ -37,20 +40,17 @@ public class OrderService {
     public ConcurrentMap<Long, OrderEntity> getUserOrders(Long userId) {
         return this.userOrders.get(userId);
     }
-
-    /**
-     * 创建订单
-     */
+    
     public OrderEntity createOrder(long sequenceId, long timeStamp, Long orderId, Long userId, Direction direction, BigDecimal price, BigDecimal quantity) {
         switch (direction) {
             case BUY -> {
-                // 买入，需冻结USD：
+                // 买入，需冻结USD
                 if (!assetService.tryFreeze(userId, AssetEnum.USD, price.multiply(quantity))) {
                     return null;
                 }
             }
             case SELL -> {
-                // 卖出，需冻结BTC：
+                // 卖出，需冻结BTC
                 if (!assetService.tryFreeze(userId, AssetEnum.BTC, quantity)) {
                     return null;
                 }
@@ -66,9 +66,10 @@ public class OrderService {
         order.quantity = quantity;
         order.unfilledQuantity = quantity;
         order.createTime = order.updateTime = timeStamp;
-        
+        // add to active orders
         this.activeOrders.put(order.id, order);
         ConcurrentHashMap<Long, OrderEntity> tmpUserOrders = this.userOrders.get(userId);
+        // add to user orders
         if (tmpUserOrders == null) {
             tmpUserOrders = new ConcurrentHashMap<>();
             userOrders.put(userId, tmpUserOrders);
@@ -76,15 +77,14 @@ public class OrderService {
         tmpUserOrders.put(order.id, order);
         return order;
     }
-
-    /**
-     * 删除订单
-     */
+    
     public void removeOrder(long orderId) {
+        // remove from active orders
         OrderEntity removed = this.activeOrders.remove(orderId);
         if (removed == null) {
             throw new IllegalArgumentException("OrderEntity not found by orderId in active orders: " + orderId);
         }
+        // remove from user orders
         ConcurrentHashMap<Long, OrderEntity> tmpUserOrders = this.userOrders.get(removed.userId);
         if (tmpUserOrders == null) {
             throw new IllegalArgumentException("User orders not found by userId: " + removed.userId);

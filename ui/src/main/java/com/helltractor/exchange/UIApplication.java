@@ -12,6 +12,7 @@ import org.springframework.web.servlet.config.annotation.WebMvcConfigurer;
 
 @SpringBootApplication
 public class UIApplication {
+    
     public static void main(String[] args) {
         SpringApplication.run(UIApplication.class, args);
     }

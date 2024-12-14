@@ -1,8 +1,8 @@
-package com.helltractor.exchange.web;
+package com.helltractor.exchange.web.api;
 
 import com.helltractor.exchange.assets.AssetService;
-import com.helltractor.exchange.entity.trade.asset.Asset;
-import com.helltractor.exchange.entity.trade.order.OrderEntity;
+import com.helltractor.exchange.assets.Asset;
+import com.helltractor.exchange.model.trade.OrderEntity;
 import com.helltractor.exchange.enums.AssetEnum;
 import com.helltractor.exchange.order.OrderService;
 import org.springframework.beans.factory.annotation.Autowired;

@@ -1,7 +1,7 @@
 package com.helltractor.exchange.quotation;
 
 import com.fasterxml.jackson.core.type.TypeReference;
-import com.helltractor.exchange.entity.quatation.*;
+import com.helltractor.exchange.model.quatation.*;
 import com.helltractor.exchange.enums.BarType;
 import com.helltractor.exchange.message.AbstractMessage;
 import com.helltractor.exchange.message.TickMessage;
@@ -10,7 +10,7 @@ import com.helltractor.exchange.messaging.Messaging;
 import com.helltractor.exchange.messaging.MessagingFactory;
 import com.helltractor.exchange.redis.RedisCache;
 import com.helltractor.exchange.redis.RedisService;
-import com.helltractor.exchange.support.AbstractBarEntity;
+import com.helltractor.exchange.model.support.AbstractBarEntity;
 import com.helltractor.exchange.support.LoggerSupport;
 import com.helltractor.exchange.util.IpUtil;
 import com.helltractor.exchange.util.JsonUtil;
@@ -27,6 +27,9 @@ import java.util.Map;
 import java.util.StringJoiner;
 import java.util.function.Supplier;
 
+/**
+ * Quotation service.
+ */
 @Component
 public class QuotationService extends LoggerSupport {
     
@@ -128,11 +131,11 @@ public class QuotationService extends LoggerSupport {
         long sec = createTime / 1000;
         long min = sec / 60;
         long hour = min / 60;
-        long secStartTime = sec * 1000; // 秒K的开始时间
-        long minStartTime = min * 60 * 1000; // 分钟K的开始时间
-        long hourStartTime = hour * 3600 * 1000; // 小时K的开始时间
+        long secStartTime = sec * 1000; // K seconds start time
+        long minStartTime = min * 60 * 1000; // K minutes start time
+        long hourStartTime = hour * 3600 * 1000; // K hours start time
         long dayStartTime = Instant.ofEpochMilli(hourStartTime).atZone(zoneId).withHour(0).toEpochSecond() * 1000; // 日K的开始时间，与TimeZone相关
-        // 更新Redis最近的Ticks缓存
+        // update recent ticks in Redis
         String ticksData = ticksJoiner.toString();
         if (logger.isDebugEnabled()) {
             logger.debug("generated ticks data: {}", ticksData);
@@ -143,9 +146,9 @@ public class QuotationService extends LoggerSupport {
         if (!tickOk.booleanValue()) {
             logger.warn("ticks are ignored by Redis.");
         }
-        // 保存Tick至数据库
+        // save ticks to database
         this.quotationDbService.saveTicks(message.ticks);
-        // 更新各种类型的K线
+        // update bars in Redis
         String strCreatedBars = redisService.executeScriptReturnString(this.shaUpdateBarLua,
                 new String[]{RedisCache.Key.SEC_BARS, RedisCache.Key.MIN_BARS, RedisCache.Key.HOUR_BARS,
                         RedisCache.Key.DAY_BARS},
@@ -161,8 +164,9 @@ public class QuotationService extends LoggerSupport {
                         String.valueOf(closePrice), // close
                         String.valueOf(quantity) // quantity
                 });
+        
         logger.info("returned created bars: {}", strCreatedBars);
-        // 将Redis返回的K线保存至数据库
+        // save bars to database from Redis
         Map<BarType, BigDecimal[]> barMap = JsonUtil.readJson(strCreatedBars, TYPE_BARS);
         if (!barMap.isEmpty()) {
             SecBarEntity secBar = createBar(SecBarEntity::new, barMap.get(BarType.SEC));

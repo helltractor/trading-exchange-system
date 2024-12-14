@@ -1,8 +1,8 @@
 package com.helltractor.exchange.service;
 
 import com.helltractor.exchange.bean.SimpleMatchDetailRecord;
-import com.helltractor.exchange.entity.trade.MatchDetailEntity;
-import com.helltractor.exchange.entity.trade.order.OrderEntity;
+import com.helltractor.exchange.model.trade.MatchDetailEntity;
+import com.helltractor.exchange.model.trade.OrderEntity;
 import com.helltractor.exchange.support.AbstractDbService;
 import org.springframework.stereotype.Component;
 
@@ -10,13 +10,13 @@ import java.util.List;
 import java.util.stream.Collectors;
 
 /**
- * 通过数据库查询用户的历史订单
+ * Find history details service.
  */
 @Component
 public class HistoryService extends AbstractDbService {
     
     /**
-     * 获取历史订单列表
+     * Get history orders by userId.
      */
     public List<OrderEntity> getHistoryOrders(Long userId, int maxResults) {
         return dataBase.from(OrderEntity.class)
@@ -28,7 +28,7 @@ public class HistoryService extends AbstractDbService {
     }
     
     /**
-     * 获取历史订单详情
+     * Get history order by userId and orderId.
      */
     public OrderEntity getHistoryOrder(Long userId, Long orderId) {
         OrderEntity entity = dataBase.fetch(OrderEntity.class, orderId);
@@ -39,7 +39,7 @@ public class HistoryService extends AbstractDbService {
     }
     
     /**
-     * 获取历史订单的撮合明细
+     * Get history match details by orderId.
      */
     public List<SimpleMatchDetailRecord> getHistoryMatchDetails(Long orderId) {
         List<MatchDetailEntity> details = dataBase.select("price", "quantity", "type")

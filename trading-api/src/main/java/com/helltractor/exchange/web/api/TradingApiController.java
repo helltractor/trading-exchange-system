@@ -1,15 +1,15 @@
-package com.helltractor.exchange.web;
+package com.helltractor.exchange.web.api;
 
 import com.fasterxml.jackson.core.JsonProcessingException;
 import com.fasterxml.jackson.databind.ObjectMapper;
-import com.helltractor.exchange.api.ApiErrorResponse;
-import com.helltractor.exchange.api.ApiException;
+import com.helltractor.exchange.ApiErrorResponse;
+import com.helltractor.exchange.ApiException;
 import com.helltractor.exchange.bean.OrderBookBean;
 import com.helltractor.exchange.bean.OrderRequestBean;
 import com.helltractor.exchange.bean.SimpleMatchDetailRecord;
 import com.helltractor.exchange.ctx.UserContext;
-import com.helltractor.exchange.entity.trade.order.OrderEntity;
-import com.helltractor.exchange.enums.ApiError;
+import com.helltractor.exchange.model.trade.OrderEntity;
+import com.helltractor.exchange.ApiError;
 import com.helltractor.exchange.message.ApiResultMessage;
 import com.helltractor.exchange.message.event.OrderCancelEvent;
 import com.helltractor.exchange.message.event.OrderRequestEvent;
@@ -41,19 +41,19 @@ public class TradingApiController extends LoggerSupport {
     Map<String, DeferredResult<ResponseEntity<String>>> deferredResultMap = new ConcurrentHashMap<>();
     
     @Autowired
-    private HistoryService historyService;
+    HistoryService historyService;
     
     @Autowired
-    private SendEventService sendEventService;
+    SendEventService sendEventService;
     
     @Autowired
-    private RedisService redisService;
+    RedisService redisService;
     
     @Autowired
-    private ObjectMapper objectMapper;
+    ObjectMapper objectMapper;
     
     @Autowired
-    private TradingEngineApiProxyService tradingEngineApiProxyService;
+    TradingEngineApiProxyService tradingEngineApiProxyService;
     
     private Long asyncTimeout = Long.valueOf(500);
     
@@ -172,13 +172,13 @@ public class TradingApiController extends LoggerSupport {
     @GetMapping("/history/orders/{orderId}/matches")
     public List<SimpleMatchDetailRecord> getOrderMatchDetails(@PathVariable("orderId") Long orderId) throws Exception {
         final Long userId = UserContext.getRequiredUserId();
-        // 查找活动Order:
+        // search active order
         String strOpenOrder = tradingEngineApiProxyService.get("/internal/" + userId + "/orders/" + orderId);
         if (strOpenOrder.equals("null")) {
-            // 查找历史Order:
+            // search history order
             OrderEntity orderEntity = this.historyService.getHistoryOrder(userId, orderId);
             if (orderEntity == null) {
-                // Order未找到:
+                // order not found
                 throw new ApiException(ApiError.ORDER_NOT_FOUND, orderId.toString(), "Order not found.");
             }
         }

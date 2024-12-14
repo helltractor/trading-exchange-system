@@ -1,4 +1,4 @@
-package com.helltractor.exchange.entity.trade.asset;
+package com.helltractor.exchange.assets;
 
 import com.fasterxml.jackson.annotation.JsonIgnore;
 

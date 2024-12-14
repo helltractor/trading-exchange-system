@@ -1,6 +1,6 @@
 package com.helltractor.exchange.match;
 
-import com.helltractor.exchange.entity.trade.order.OrderEntity;
+import com.helltractor.exchange.model.trade.OrderEntity;
 
 import java.math.BigDecimal;
 

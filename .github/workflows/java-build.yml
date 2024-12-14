@@ -22,9 +22,6 @@ jobs:
           java-version: '21'
           distribution: 'adopt'
 
-      - name: Build, Test and Package with Maven
-        run: |
-          mvn clean install
-          mvn test
-          mvn package
+      - name: Build Maven
+        run: mvn clean install
         working-directory: build

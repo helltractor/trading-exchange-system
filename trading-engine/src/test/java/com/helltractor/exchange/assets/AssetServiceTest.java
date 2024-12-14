@@ -1,7 +1,6 @@
 package com.helltractor.exchange.assets;
 
 import com.helltractor.exchange.enums.AssetEnum;
-import com.helltractor.exchange.enums.Transfer;
 import org.junit.jupiter.api.AfterEach;
 import org.junit.jupiter.api.BeforeEach;
 import org.junit.jupiter.api.Test;
@@ -32,13 +31,13 @@ public class AssetServiceTest {
 
     @Test
     void tryTransfer() {
-        // A -> B ok:
+        // A -> B ok
         service.tryTransfer(Transfer.AVAILABLE_TO_AVAILABLE, USER_A, USER_B, AssetEnum.USD, new BigDecimal("12000"),
                 true);
         assertBDEquals(300, service.getAsset(USER_A, AssetEnum.USD).available);
         assertBDEquals(12000 + 45600, service.getAsset(USER_B, AssetEnum.USD).available);
 
-        // A -> B failed:
+        // A -> B failed
         assertFalse(service.tryTransfer(Transfer.AVAILABLE_TO_AVAILABLE, USER_A, USER_B, AssetEnum.USD,
                 new BigDecimal("301"), true));
 
@@ -48,12 +47,12 @@ public class AssetServiceTest {
 
     @Test
     void tryFreeze() {
-        // freeze 12000 ok:
+        // freeze 12000 ok
         service.tryFreeze(USER_A, AssetEnum.USD, new BigDecimal("12000"));
         assertBDEquals(300, service.getAsset(USER_A, AssetEnum.USD).available);
         assertBDEquals(12000, service.getAsset(USER_A, AssetEnum.USD).frozen);
 
-        // freeze 301 failed:
+        // freeze 301 failed
         assertFalse(service.tryFreeze(USER_A, AssetEnum.USD, new BigDecimal("301")));
 
         assertBDEquals(300, service.getAsset(USER_A, AssetEnum.USD).available);
@@ -62,17 +61,17 @@ public class AssetServiceTest {
 
     @Test
     void unfreeze() {
-        // freeze 12000 ok:
+        // freeze 12000 ok
         service.tryFreeze(USER_A, AssetEnum.USD, new BigDecimal("12000"));
         assertBDEquals(300, service.getAsset(USER_A, AssetEnum.USD).available);
         assertBDEquals(12000, service.getAsset(USER_A, AssetEnum.USD).frozen);
 
-        // unfreeze 9000 ok:
+        // unfreeze 9000 ok
         service.unfreeze(USER_A, AssetEnum.USD, new BigDecimal("9000"));
         assertBDEquals(9300, service.getAsset(USER_A, AssetEnum.USD).available);
         assertBDEquals(3000, service.getAsset(USER_A, AssetEnum.USD).frozen);
 
-        // unfreeze 3001 failed:
+        // unfreeze 3001 failed
         assertThrows(RuntimeException.class, () -> {
             service.unfreeze(USER_A, AssetEnum.USD, new BigDecimal("3001"));
         });
@@ -80,17 +79,17 @@ public class AssetServiceTest {
 
     @Test
     void transfer() {
-        // A USD -> A frozen:
+        // A USD -> A frozen
         service.transfer(Transfer.AVAILABLE_TO_FROZEN, USER_A, USER_A, AssetEnum.USD, new BigDecimal("9000"));
         assertBDEquals(3300, service.getAsset(USER_A, AssetEnum.USD).available);
         assertBDEquals(9000, service.getAsset(USER_A, AssetEnum.USD).frozen);
 
-        // A frozen -> C available:
+        // A frozen -> C available
         service.transfer(Transfer.FROZEN_TO_AVAILABLE, USER_A, USER_C, AssetEnum.USD, new BigDecimal("8000"));
         assertBDEquals(1000, service.getAsset(USER_A, AssetEnum.USD).frozen);
         assertBDEquals(8000, service.getAsset(USER_C, AssetEnum.USD).available);
 
-        // A frozen -> B available failed:
+        // A frozen -> B available failed
         assertThrows(RuntimeException.class, () -> {
             service.transfer(Transfer.FROZEN_TO_AVAILABLE, USER_A, USER_B, AssetEnum.USD, new BigDecimal("1001"));
         });
@@ -98,9 +97,7 @@ public class AssetServiceTest {
 
     /**
      * A: USD=12300, BTC=12
-     *
      * B: USD=45600
-     *
      * C: BTC=34
      */
     void init() {

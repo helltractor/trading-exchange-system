@@ -1,4 +1,4 @@
-# disable template cache for default profile:
+# disable template cache for default profile
 
 pebble:
   cache: false

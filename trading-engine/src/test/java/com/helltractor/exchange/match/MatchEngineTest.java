@@ -1,6 +1,6 @@
 package com.helltractor.exchange.match;
 
-import com.helltractor.exchange.entity.trade.order.OrderEntity;
+import com.helltractor.exchange.model.trade.OrderEntity;
 import com.helltractor.exchange.enums.Direction;
 import com.helltractor.exchange.enums.OrderStatus;
 import org.junit.jupiter.api.BeforeEach;
@@ -13,9 +13,6 @@ import java.util.List;
 import static org.junit.jupiter.api.Assertions.assertArrayEquals;
 import static org.junit.jupiter.api.Assertions.assertTrue;
 
-/**
- * 订单撮合引擎测试
- */
 public class MatchEngineTest {
 
     static Long USER_A = 12345L;
@@ -29,7 +26,7 @@ public class MatchEngineTest {
 
     @Test
     void processOrders() {
-        List<OrderEntity> orders = List.of( //
+        List<OrderEntity> orders = List.of(
                 createOrder(Direction.BUY, "12300.21", "1.02"), // 0
                 createOrder(Direction.BUY, "12305.39", "0.33"), // 1
                 createOrder(Direction.SELL, "12305.39", "0.11"), // 2
@@ -44,7 +41,7 @@ public class MatchEngineTest {
             MatchResult mr = this.engine.processOrder(order.sequenceId, order);
             matches.addAll(mr.matchDetails);
         }
-        assertArrayEquals(new MatchDetailRecord[] { //
+        assertArrayEquals(new MatchDetailRecord[] {
                 new MatchDetailRecord(bd("12305.39"), bd("0.11"), orders.get(2), orders.get(1)), //
                 new MatchDetailRecord(bd("12305.39"), bd("0.22"), orders.get(3), orders.get(1)), //
                 new MatchDetailRecord(bd("12300.21"), bd("0.11"), orders.get(3), orders.get(0)), //
@@ -72,5 +69,4 @@ public class MatchEngineTest {
     BigDecimal bd(String s) {
         return new BigDecimal(s);
     }
-
 }

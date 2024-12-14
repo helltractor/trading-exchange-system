@@ -20,6 +20,7 @@ import java.time.ZoneId;
 import java.util.Random;
 
 public class TradingEngineServiceTest {
+    
     static final Long USER_A = 11111L;
     static final Long USER_B = 22222L;
     static final Long USER_C = 33333L;

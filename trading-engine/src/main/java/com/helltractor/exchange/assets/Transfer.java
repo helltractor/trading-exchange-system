@@ -1,5 +1,8 @@
-package com.helltractor.exchange.enums;
+package com.helltractor.exchange.assets;
 
+/**
+ * Transfer type constants.
+ */
 public enum Transfer {
     
     AVAILABLE_TO_AVAILABLE,

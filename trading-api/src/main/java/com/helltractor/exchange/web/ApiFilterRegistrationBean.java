@@ -1,11 +1,11 @@
 package com.helltractor.exchange.web;
 
 import com.fasterxml.jackson.databind.ObjectMapper;
-import com.helltractor.exchange.api.ApiException;
+import com.helltractor.exchange.ApiException;
 import com.helltractor.exchange.bean.AuthToken;
 import com.helltractor.exchange.ctx.UserContext;
-import com.helltractor.exchange.entity.ui.UserProfileEntity;
-import com.helltractor.exchange.enums.ApiError;
+import com.helltractor.exchange.model.ui.UserProfileEntity;
+import com.helltractor.exchange.ApiError;
 import com.helltractor.exchange.support.AbstractFilter;
 import com.helltractor.exchange.user.UserService;
 import jakarta.annotation.PostConstruct;
@@ -23,16 +23,16 @@ import java.nio.charset.StandardCharsets;
 import java.util.Base64;
 
 /**
- * API 过滤器注册 Bean
+ * Filter to process API requests.
  */
 @Component
 public class ApiFilterRegistrationBean extends FilterRegistrationBean<Filter> {
     
     @Autowired
-    private UserService userService;
+    UserService userService;
     
     @Autowired
-    private ObjectMapper objectMapper;
+    ObjectMapper objectMapper;
     
     @Value("#{exchangeConfiguration.hmacKey}")
     String hmacKey;

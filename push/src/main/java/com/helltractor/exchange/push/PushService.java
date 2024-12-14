@@ -33,7 +33,7 @@ public class PushService extends LoggerSupport {
     private String redisPassword;
     
     @Value("${spring.redis.standalone.database:0}")
-    private int redisDatabase = 0;
+    private int redisDatabase;
     
     Vertx vertx;
     

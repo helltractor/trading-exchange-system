@@ -1,14 +1,11 @@
 package com.helltractor.exchange.match;
 
-import com.helltractor.exchange.entity.trade.order.OrderEntity;
+import com.helltractor.exchange.model.trade.OrderEntity;
 
 import java.math.BigDecimal;
 import java.util.ArrayList;
 import java.util.List;
 
-/**
- * 匹配结果
- */
 public class MatchResult {
     
     public final OrderEntity takerOrder;

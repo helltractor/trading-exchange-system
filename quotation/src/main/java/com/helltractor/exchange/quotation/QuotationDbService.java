@@ -1,6 +1,6 @@
 package com.helltractor.exchange.quotation;
 
-import com.helltractor.exchange.entity.quatation.*;
+import com.helltractor.exchange.model.quatation.*;
 import com.helltractor.exchange.support.AbstractDbService;
 import org.springframework.stereotype.Component;
 import org.springframework.transaction.annotation.Transactional;
@@ -29,5 +29,4 @@ public class QuotationDbService extends AbstractDbService {
     public void saveTicks(List<TickEntity> ticks) {
         this.dataBase.insertIgnore(ticks);
     }
-    
 }

@@ -6,16 +6,16 @@ import org.springframework.boot.autoconfigure.SpringBootApplication;
 import org.springframework.boot.autoconfigure.jdbc.DataSourceAutoConfiguration;
 
 /**
- * 基于VertX的推送服务（WebSocket）
+ * WebSocket push based on VertX.
  */
-@SpringBootApplication(exclude = {DataSourceAutoConfiguration.class}) // 禁用数据库自动配置 (无DataSource, JdbcTemplate...)
+@SpringBootApplication(exclude = {DataSourceAutoConfiguration.class}) // forbid database auto-configuration (no DataSource, JdbcTemplate...)
 public class PushApplication {
     
     public static void main(String[] args) {
         System.setProperty("vertx.disableFileCPResolving", "true");
         System.setProperty("vertx.logger-delegate-factory-class-name", "io.vertx.core.logging.SLF4JLogDelegateFactory");
         SpringApplication app = new SpringApplication(PushApplication.class);
-        // 禁用Spring的Web
+        // forbid Spring web
         app.setWebApplicationType(WebApplicationType.NONE);
         app.run(args);
     }

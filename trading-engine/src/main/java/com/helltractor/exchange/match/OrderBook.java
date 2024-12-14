@@ -1,54 +1,35 @@
-package com.helltractor.exchange.entity.trade.order;
+package com.helltractor.exchange.match;
 
 import com.helltractor.exchange.bean.OrderBookItemBean;
 import com.helltractor.exchange.enums.Direction;
+import com.helltractor.exchange.model.trade.OrderEntity;
 
 import java.util.*;
 
-/**
- * 订单簿
- */
 public class OrderBook {
     
     public final Direction direction;
     
     public final TreeMap<OrderKey, OrderEntity> book;
     
-    public OrderBook(Direction direction, TreeMap<OrderKey, OrderEntity> book) {
-        this.direction = direction;
-        this.book = book;
-    }
-    
     public OrderBook(Direction direction) {
         this.direction = direction;
         this.book = new TreeMap<>(direction == Direction.BUY ? SORT_BUY : SORT_SELL);
     }
     
-    /**
-     * 获取首个订单
-     *
-     * @return
-     */
+    public OrderBook(Direction direction, TreeMap<OrderKey, OrderEntity> book) {
+        this.direction = direction;
+        this.book = book;
+    }
+    
     public OrderEntity getFirst() {
         return this.book.isEmpty() ? null : this.book.firstEntry().getValue();
     }
     
-    /**
-     * 删除订单
-     *
-     * @param order
-     * @return
-     */
     public boolean remove(OrderEntity order) {
         return this.book.remove(new OrderKey(order.sequenceId, order.price)) != null;
     }
     
-    /**
-     * 添加订单
-     *
-     * @param order
-     * @return
-     */
     public boolean add(OrderEntity order) {
         return this.book.put(new OrderKey(order.sequenceId, order.price), order) == null;
     }
@@ -101,8 +82,8 @@ public class OrderBook {
     }
     
     /**
-     * 卖单排序
-     * 价格低在前，价格相同时间早在前
+     * sell order sorting
+     * price low to high, same price sequenceId low to high
      */
     private static final Comparator<OrderKey> SORT_SELL = new Comparator<>() {
         @Override
@@ -113,8 +94,8 @@ public class OrderBook {
     };
     
     /**
-     * 买单排序
-     * 价格高在前，价格相同时间早在前
+     * buy order sorting
+     * price high to low, same price sequenceId low to high
      */
     private static final Comparator<OrderKey> SORT_BUY = new Comparator<>() {
         @Override

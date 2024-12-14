@@ -1,9 +1,9 @@
 package com.helltractor.exchange.clearing;
 
 import com.helltractor.exchange.assets.AssetService;
-import com.helltractor.exchange.entity.trade.order.OrderEntity;
+import com.helltractor.exchange.model.trade.OrderEntity;
 import com.helltractor.exchange.enums.AssetEnum;
-import com.helltractor.exchange.enums.Transfer;
+import com.helltractor.exchange.assets.Transfer;
 import com.helltractor.exchange.match.MatchDetailRecord;
 import com.helltractor.exchange.match.MatchResult;
 import com.helltractor.exchange.order.OrderService;
@@ -29,9 +29,6 @@ public class ClearingService extends LoggerSupport {
         this.orderService = orderService;
     }
     
-    /**
-     * 清算撮合结果
-     */
     public void clearMatchResult(MatchResult result) {
         OrderEntity taker = result.takerOrder;
         switch (taker.direction) {
@@ -90,9 +87,6 @@ public class ClearingService extends LoggerSupport {
         }
     }
     
-    /**
-     * 清算取消订单
-     */
     public void clearCancelOrder(OrderEntity order) {
         switch (order.direction) {
             case BUY -> {
@@ -105,7 +99,7 @@ public class ClearingService extends LoggerSupport {
             }
             default -> throw new IllegalArgumentException("Invalid direction: " + order.direction);
         }
-        // 从OrderService中删除订单:
+        // 从OrderService中删除订单
         orderService.removeOrder(order.id);
     }
 }

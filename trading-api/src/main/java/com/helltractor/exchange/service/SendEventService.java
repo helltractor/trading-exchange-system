@@ -9,7 +9,7 @@ import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.stereotype.Component;
 
 /**
- * 发送事件服务
+ * Send event service.
  */
 @Component
 public class SendEventService {

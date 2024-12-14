@@ -1,4 +1,4 @@
-package com.helltractor.exchange.web;
+package com.helltractor.exchange.web.api;
 
 import com.helltractor.exchange.bean.TransferRequestBean;
 import com.helltractor.exchange.enums.UserType;
@@ -18,7 +18,7 @@ import java.util.Map;
 public class TradingInternalApiController extends AbstractApiController {
     
     @Autowired
-    private SendEventService sendEventService;
+    SendEventService sendEventService;
     
     /**
      * 处理一个转账请求，可重复调用，重复发送消息，根据uniqueId去重，仅定序一次。

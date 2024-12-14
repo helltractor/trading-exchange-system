@@ -1,11 +1,11 @@
 package com.helltractor.exchange.web;
 
-import com.helltractor.exchange.api.ApiException;
+import com.helltractor.exchange.ApiException;
 import com.helltractor.exchange.bean.AuthToken;
 import com.helltractor.exchange.bean.TransferRequestBean;
 import com.helltractor.exchange.client.RestClient;
 import com.helltractor.exchange.ctx.UserContext;
-import com.helltractor.exchange.entity.ui.UserProfileEntity;
+import com.helltractor.exchange.model.ui.UserProfileEntity;
 import com.helltractor.exchange.enums.AssetEnum;
 import com.helltractor.exchange.enums.UserType;
 import com.helltractor.exchange.support.LoggerSupport;
@@ -67,9 +67,6 @@ public class MvcController extends LoggerSupport {
         }
     }
     
-    /**
-     * 首页
-     */
     @GetMapping("/")
     public ModelAndView index() {
         if (UserContext.getUserId() == null) {
@@ -78,9 +75,6 @@ public class MvcController extends LoggerSupport {
         return prepareModelAndView("index");
     }
     
-    /**
-     * 跳转注册页面
-     */
     @GetMapping("/signup")
     public ModelAndView signup() {
         if (UserContext.getUserId() != null) {
@@ -89,9 +83,6 @@ public class MvcController extends LoggerSupport {
         return prepareModelAndView("signup");
     }
     
-    /**
-     * 注册
-     */
     @PostMapping("/signup")
     public ModelAndView signup(@RequestParam("email") String email, @RequestParam("name") String name, @RequestParam("password") String password) {
         // check email
@@ -133,9 +124,6 @@ public class MvcController extends LoggerSupport {
         return "\"" + strToken + "\"";
     }
     
-    /**
-     * 跳转登录页面
-     */
     @GetMapping("/signin")
     public ModelAndView signin(HttpServletRequest request) {
         if (UserContext.getUserId() != null) {
@@ -144,9 +132,6 @@ public class MvcController extends LoggerSupport {
         return prepareModelAndView("signin");
     }
     
-    /**
-     * 登录
-     */
     @PostMapping("/signin")
     public ModelAndView signin(@RequestParam("email") String email, @RequestParam("password") String password, HttpServletRequest request, HttpServletResponse response) {
         // 检查email和password
@@ -177,9 +162,6 @@ public class MvcController extends LoggerSupport {
         return redirect("/");
     }
     
-    /**
-     * 登出
-     */
     @GetMapping("/signout")
     public ModelAndView signout(HttpServletRequest request, HttpServletResponse response) {
         cookieService.deleteSessionCookie(request, response);
@@ -199,6 +181,12 @@ public class MvcController extends LoggerSupport {
         }
         logger.info("user signed up: {}", profile);
         return profile;
+    }
+    
+    private boolean isLocalDevEnv() {
+        logger.info("activeProfiles: {}, defaultProfiles: {}", environment.getActiveProfiles(), environment.getDefaultProfiles());
+        return environment.getActiveProfiles().length == 0
+                && Arrays.equals(environment.getDefaultProfiles(), new String[]{"default"});
     }
     
     private void deposit(Long userId, AssetEnum asset, BigDecimal amount) {
@@ -247,11 +235,5 @@ public class MvcController extends LoggerSupport {
     
     ModelAndView redirect(String url) {
         return new ModelAndView("redirect:" + url);
-    }
-    
-    private boolean isLocalDevEnv() {
-        logger.info("activeProfiles: {}, defaultProfiles: {}", environment.getActiveProfiles(), environment.getDefaultProfiles());
-        return environment.getActiveProfiles().length == 0
-                && Arrays.equals(environment.getDefaultProfiles(), new String[]{"default"});
     }
 }

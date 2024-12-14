@@ -1,6 +1,4 @@
-package com.helltractor.exchange.api;
-
-import com.helltractor.exchange.enums.ApiError;
+package com.helltractor.exchange;
 
 public class ApiException extends RuntimeException {
     

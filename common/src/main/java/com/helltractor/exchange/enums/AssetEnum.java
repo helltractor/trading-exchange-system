@@ -1,5 +1,8 @@
 package com.helltractor.exchange.enums;
 
+/**
+ * Asset type constants.
+ */
 public enum AssetEnum {
 
     BTC,

@@ -1,4 +1,4 @@
-package com.helltractor.exchange.support;
+package com.helltractor.exchange.model.support;
 
 import jakarta.persistence.Column;
 import jakarta.persistence.Id;
@@ -13,10 +13,8 @@ import java.util.Locale;
 import java.util.Map;
 
 /**
- * 存储K线数据的实体类的抽象类
- * 存储秒，分钟，小时，日的柱状数据
+ * Store bars of second, minute, hour and day.
  */
-// @MappedSuperclass用于标记一个类，让它的映射信息能够被子类继承。这个注解的类本身并不会映射到数据库表，但它的属性会映射到其子类对应的数据库表字段
 @MappedSuperclass
 public class AbstractBarEntity implements EntitySupport {
     

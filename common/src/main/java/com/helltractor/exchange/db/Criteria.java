@@ -7,13 +7,13 @@ import java.util.ArrayList;
 import java.util.List;
 
 /**
- * 保留条件查询信息
+ * Hold criteria query information.
  *
  * @param <T> Entity type.
  */
 final class Criteria<T> {
     
-    DataBaseTemplate dataBase;
+    DbTemplate dataBase;
     Mapper<T> mapper;
     Class<T> clazz;
     List<String> select = null;
@@ -25,7 +25,7 @@ final class Criteria<T> {
     int offset = 0;
     int maxResults = 0;
     
-    Criteria(DataBaseTemplate dataBase) {
+    Criteria(DbTemplate dataBase) {
         this.dataBase = dataBase;
     }
     

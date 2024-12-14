@@ -1,22 +1,16 @@
-package com.helltractor.exchange.entity.ui;
+package com.helltractor.exchange.model.ui;
 
-import com.helltractor.exchange.support.EntitySupport;
+import com.helltractor.exchange.model.support.EntitySupport;
 import jakarta.persistence.*;
 
 @Entity
 @Table(name = "user_profiles", uniqueConstraints = {@UniqueConstraint(name = "UNI_EMAIL", columnNames = {"email"})})
 public class UserProfileEntity implements EntitySupport {
     
-    /**
-     * 关联至用户ID.
-     */
     @Id
     @Column(nullable = false, updatable = false)
     public Long userId;
     
-    /**
-     * 登录Email
-     */
     @Column(nullable = false, updatable = false, length = VAR_CHAR_100)
     public String email;
     

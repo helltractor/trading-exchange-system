@@ -1,9 +1,10 @@
-package com.helltractor.exchange.support;
+package com.helltractor.exchange.model.support;
 
 /**
  * Entity support interface.
  */
 public interface EntitySupport {
+    
     /**
      * Default big decimal storage type: DECIMAL(PRECISION, SCALE)
      *

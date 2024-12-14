@@ -27,21 +27,21 @@ import java.util.stream.Stream;
  * A simple ORM wrapper for JdbcTemplate.
  */
 @Component
-public class DataBaseTemplate {
-    
-    final JdbcTemplate jdbcTemplate;
+public class DbTemplate {
     
     private final Logger logger = LoggerFactory.getLogger(getClass());
     
-    // class -> Mapper:
+    final JdbcTemplate jdbcTemplate;
+    
+    // class -> Mapper
     private Map<Class<?>, Mapper<?>> classMapping;
     
-    public DataBaseTemplate(@Autowired JdbcTemplate jdbcTemplate) {
+    public DbTemplate(@Autowired JdbcTemplate jdbcTemplate) {
         this.jdbcTemplate = jdbcTemplate;
         String pkg = getClass().getPackageName();
         int pos = pkg.lastIndexOf(".");
-        // 自定义扫描包路径
-        String basePackage = pkg.substring(0, pos) + ".entity";
+        // locate model package
+        String basePackage = pkg.substring(0, pos) + ".model";
         
         List<Class<?>> classes = scanEntities(basePackage);
         Map<Class<?>, Mapper<?>> classMapping = new HashMap<>();
@@ -59,7 +59,7 @@ public class DataBaseTemplate {
     
     private static List<Class<?>> scanEntities(String basePackage) {
         ClassPathScanningCandidateComponentProvider provider = new ClassPathScanningCandidateComponentProvider(false);
-        // 通过注解过滤器，只扫描带有@Entity注解的类
+        // user annotation filter to scan classes with @Entity
         provider.addIncludeFilter(new AnnotationTypeFilter(Entity.class));
         List<Class<?>> classes = new ArrayList<>();
         Set<BeanDefinition> beans = provider.findCandidateComponents(basePackage);
@@ -86,7 +86,7 @@ public class DataBaseTemplate {
     }
     
     /**
-     * 按类类型和 id 获取模型实例。如果未找到，则引发 EntityNotFoundException
+     * Get a model instance by class type and id. EntityNotFoundException is thrown if not found.
      *
      * @param <T>   Generic type.
      * @param clazz Entity class.
@@ -102,7 +102,7 @@ public class DataBaseTemplate {
     }
     
     /**
-     * 按类类型和 id 获取模型实例。如果未找到，则返回 null
+     * Get a model instance by class type and id. Return null if not found.
      *
      * @param <T>   Generic type.
      * @param clazz Entity class.
@@ -122,9 +122,9 @@ public class DataBaseTemplate {
     }
     
     /**
-     * 删除 bean
+     * Remove bean by id.
      *
-     * @param bean The entity.
+     * @param bean The model.
      */
     public <T> void delete(T bean) {
         try {
@@ -136,9 +136,9 @@ public class DataBaseTemplate {
     }
     
     /**
-     * 按 id 删除 bean
+     * Remove bean by id.
      *
-     * @param id The entity.
+     * @param id The model.
      */
     public <T> void delete(Class<T> clazz, Object id) {
         Mapper<?> mapper = getMapper(clazz);
@@ -159,7 +159,7 @@ public class DataBaseTemplate {
     }
     
     /**
-     * 按 id 更新实体的可更新属性
+     * Update model object.
      *
      * @param <T>  Generic type.
      * @param bean Entity object.
@@ -257,18 +257,12 @@ public class DataBaseTemplate {
         }
     }
     
-    /**
-     * 获取指定类的 Mapper
-     *
-     * @param <T>   Generic type.
-     * @param clazz Entity class.
-     * @return Mapper instance.
-     */
+    // get mapper by class
     @SuppressWarnings("unchecked")
     <T> Mapper<T> getMapper(Class<T> clazz) {
         Mapper<T> mapper = (Mapper<T>) this.classMapping.get(clazz);
         if (mapper == null) {
-            throw new RuntimeException("Target class is not a registered entity: " + clazz.getName());
+            throw new RuntimeException("Target class is not a registered model: " + clazz.getName());
         }
         return mapper;
     }

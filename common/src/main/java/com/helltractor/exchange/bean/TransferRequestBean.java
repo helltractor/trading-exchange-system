@@ -1,15 +1,12 @@
 package com.helltractor.exchange.bean;
 
-import com.helltractor.exchange.api.ApiException;
-import com.helltractor.exchange.enums.ApiError;
+import com.helltractor.exchange.ApiException;
+import com.helltractor.exchange.ApiError;
 import com.helltractor.exchange.enums.AssetEnum;
 import com.helltractor.exchange.util.IdUtil;
 
 import java.math.BigDecimal;
 
-/**
- * Transfer request.
- */
 public class TransferRequestBean implements ValidatableBean {
     
     public String transferId;

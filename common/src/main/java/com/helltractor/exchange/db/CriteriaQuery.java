@@ -16,5 +16,4 @@ abstract class CriteriaQuery<T> {
     String sql() {
         return criteria.sql();
     }
-    
 }

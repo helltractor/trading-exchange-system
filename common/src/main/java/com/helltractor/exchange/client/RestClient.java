@@ -2,9 +2,9 @@ package com.helltractor.exchange.client;
 
 import com.fasterxml.jackson.core.type.TypeReference;
 import com.fasterxml.jackson.databind.ObjectMapper;
-import com.helltractor.exchange.api.ApiErrorResponse;
-import com.helltractor.exchange.api.ApiException;
-import com.helltractor.exchange.enums.ApiError;
+import com.helltractor.exchange.ApiErrorResponse;
+import com.helltractor.exchange.ApiException;
+import com.helltractor.exchange.ApiError;
 import okhttp3.*;
 import org.slf4j.Logger;
 import org.slf4j.LoggerFactory;

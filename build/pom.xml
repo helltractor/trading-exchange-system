@@ -19,4 +19,5 @@
         <module>../trading-sequencer</module>
         <module>../ui</module>
     </modules>
+
 </project>

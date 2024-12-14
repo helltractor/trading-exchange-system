@@ -1,10 +1,10 @@
 package com.helltractor.exchange.ctx;
 
-import com.helltractor.exchange.api.ApiException;
-import com.helltractor.exchange.enums.ApiError;
+import com.helltractor.exchange.ApiException;
+import com.helltractor.exchange.ApiError;
 
 /**
- * 在线程本地中保存用户上下文
+ * store user context in thread local
  */
 public class UserContext implements AutoCloseable {
     
@@ -14,9 +14,6 @@ public class UserContext implements AutoCloseable {
         THREAD_LOCAL_CTX.set(userId);
     }
     
-    /**
-     * 获取当前用户ID，如果没有用户，则引发异常
-     */
     public static Long getRequiredUserId() {
         Long userId = getUserId();
         if (userId == null) {
@@ -24,10 +21,7 @@ public class UserContext implements AutoCloseable {
         }
         return userId;
     }
-    
-    /**
-     * 获取当前用户ID，如果没有用户则返回null
-     */
+
     public static Long getUserId() {
         return THREAD_LOCAL_CTX.get();
     }

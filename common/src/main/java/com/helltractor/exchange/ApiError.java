@@ -1,4 +1,4 @@
-package com.helltractor.exchange.enums;
+package com.helltractor.exchange;
 
 /**
  * ApiError constants.

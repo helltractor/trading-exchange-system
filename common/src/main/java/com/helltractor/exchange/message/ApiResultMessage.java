@@ -1,8 +1,8 @@
 package com.helltractor.exchange.message;
 
-import com.helltractor.exchange.api.ApiErrorResponse;
-import com.helltractor.exchange.entity.trade.order.OrderEntity;
-import com.helltractor.exchange.enums.ApiError;
+import com.helltractor.exchange.ApiErrorResponse;
+import com.helltractor.exchange.model.trade.OrderEntity;
+import com.helltractor.exchange.ApiError;
 
 /**
  * API result message.

@@ -1,14 +1,11 @@
-package com.helltractor.exchange.entity.ui;
+package com.helltractor.exchange.model.ui;
 
-import com.helltractor.exchange.support.EntitySupport;
+import com.helltractor.exchange.model.support.EntitySupport;
 import jakarta.persistence.Column;
 import jakarta.persistence.Entity;
 import jakarta.persistence.Id;
 import jakarta.persistence.Table;
 
-/**
- * 使用API Key认证
- */
 @Entity
 @Table(name = "api_key_auths")
 public class ApiKeyAuthEntity implements EntitySupport {

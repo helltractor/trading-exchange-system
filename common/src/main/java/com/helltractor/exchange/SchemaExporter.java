@@ -1,6 +1,6 @@
 package com.helltractor.exchange;
 
-import com.helltractor.exchange.db.DataBaseTemplate;
+import com.helltractor.exchange.db.DbTemplate;
 
 import java.io.IOException;
 import java.nio.file.Files;
@@ -9,7 +9,7 @@ import java.nio.file.Path;
 public class SchemaExporter {
     
     public static void main(String[] args) throws IOException {
-        DataBaseTemplate dataBaseTemplate = new DataBaseTemplate(null);
+        DbTemplate dbTemplate = new DbTemplate(null);
         String ddl = """
                 -- init exchange database
                 
@@ -20,12 +20,11 @@ public class SchemaExporter {
                 USE exchange;
                 
                 """;
-        ddl = ddl + dataBaseTemplate.exportDDL();
+        ddl = ddl + dbTemplate.exportDDL();
         System.out.println(ddl);
-        Path path = Path.of(".").toAbsolutePath().getParent().resolve("build").resolve("sql")
+        Path path = Path.of(".").toAbsolutePath().getParent().resolve("build").resolve("mysql")
                 .resolve("schema.sql");
         Files.writeString(path, ddl);
         System.out.println("mysql -u root --password=password < " + path);
     }
-    
 }

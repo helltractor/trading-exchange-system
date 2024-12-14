@@ -1,6 +1,6 @@
 package com.helltractor.exchange.message;
 
-import com.helltractor.exchange.entity.quatation.TickEntity;
+import com.helltractor.exchange.model.quatation.TickEntity;
 
 import java.util.List;
 

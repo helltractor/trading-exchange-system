@@ -40,15 +40,15 @@ class AccessibleProperty {
         DEFAULT_COLUMN_TYPES.put(BigDecimal.class, "DECIMAL($1,$2)");
     }
     
-    // java type:
+    // java type
     final Class<?> propertyType;
     final Function<Object, Object> javaToSqlMapper;
     final Function<Object, Object> sqlToJavaMapper;
-    // java bean property name:
+    // java bean property name
     final String propertyName;
-    // table column definition:
+    // table column definition
     final String columnDefinition;
-    // Field:
+    // field
     final Field field;
     
     @SuppressWarnings({"unchecked", "rawtypes"})

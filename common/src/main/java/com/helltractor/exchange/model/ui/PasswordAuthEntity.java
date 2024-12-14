@@ -1,21 +1,15 @@
-package com.helltractor.exchange.entity.ui;
+package com.helltractor.exchange.model.ui;
 
-import com.helltractor.exchange.support.EntitySupport;
+import com.helltractor.exchange.model.support.EntitySupport;
 import jakarta.persistence.Column;
 import jakarta.persistence.Entity;
 import jakarta.persistence.Id;
 import jakarta.persistence.Table;
 
-/**
- * 使用密码认证
- */
 @Entity
 @Table(name = "password_auths")
 public class PasswordAuthEntity implements EntitySupport {
     
-    /**
-     * 关联至用户ID.
-     */
     @Id
     @Column(nullable = false, updatable = false)
     public Long userId;
@@ -31,5 +25,4 @@ public class PasswordAuthEntity implements EntitySupport {
      */
     @Column(nullable = false, length = VAR_CHAR_100)
     public String password;
-    
 }

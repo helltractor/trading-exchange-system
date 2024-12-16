@@ -71,7 +71,7 @@ spring:
     database: ${REDIS_DATABASE:0}
     
   datasource:
-    url: jdbc:mysql://${DB_HOST:localhost}/${DB_NAME:exchange}?useSSL=false&allowMultiQueries=true&useUnicode=true&characterEncoding=utf8
+    url: jdbc:mysql://${DB_HOST:localhost}/${DB_NAME:exchange}?allowPublicKeyRetrieval=true&useSSL=false&allowMultiQueries=true&useUnicode=true&characterEncoding=utf8
     username: ${DB_USERNAME:root}
     password: ${DB_PASSWORD:password}
     driver-class-name: com.mysql.cj.jdbc.Driver

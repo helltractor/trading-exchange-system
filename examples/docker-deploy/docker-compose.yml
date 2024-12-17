@@ -1,0 +1,158 @@
+version: '3.8'
+services:
+  zookeeper:
+    image: bitnami/zookeeper:3.5
+    user: "root"
+    container_name: trading-zookeeper
+    ports:
+      - "2181:2181"
+    environment:
+      - ALLOW_ANONYMOUS_LOGIN=yes
+    volumes:
+      - ./docker/zookeeper-data:/bitnami
+    networks:
+      - trade
+
+  kafka:
+    image: bitnami/kafka:3.0
+    user: "root"
+    container_name: trading-kafka
+    ports:
+      - "9092:9092"
+    depends_on:
+      - zookeeper
+    environment:
+      - KAFKA_BROKER_ID=1
+      - KAFKA_CFG_LISTENERS=PLAINTEXT://:9092
+      - KAFKA_CFG_ADVERTISED_LISTENERS=PLAINTEXT://trading-kafka:9092
+      - KAFKA_CFG_ZOOKEEPER_CONNECT=trading-zookeeper:2181
+      - KAFKA_CFG_AUTO_CREATE_TOPICS_ENABLE=true
+      - ALLOW_PLAINTEXT_LISTENER=yes
+    volumes:
+      - ./docker/kafka-data:/bitnami
+    networks:
+      - trade
+
+  redis:
+    image: redis:6.2
+    container_name: trading-redis
+    ports:
+      - "6379:6379"
+    volumes:
+      - ./docker/redis-data:/data
+    networks:
+      - trade
+
+  mysql:
+    image: mysql:8.0
+    container_name: trading-mysql
+    ports:
+      - "3306:3306"
+    restart: always
+    command: --default-authentication-plugin=mysql_native_password
+    environment:
+      - MYSQL_ROOT_PASSWORD=password
+      - MYSQL_AUTH_PLUGIN=caching_sha2_password
+    volumes:
+      - ./mysql/schema.sql:/docker-entrypoint-initdb.d/exchange-schema.sql:ro
+      - ./mysql/conf/my.cnf:/etc/mysql/my.cnf
+      - ./docker/mysql-data:/var/lib/mysql
+    entrypoint: bash -c "chmod 644 /etc/mysql/my.cnf && exec /usr/local/bin/docker-entrypoint.sh mysqld"
+    networks:
+      - trade
+
+  config:
+    container_name: config-server
+    build:
+      context: ./config
+      dockerfile: Dockerfile
+    ports:
+      - "8888:8888"
+    depends_on:
+      - mysql
+      - redis
+      - kafka
+      - zookeeper
+    environment:
+      - SPRING_CLOUD_CONFIG_SERVER_NATIVE=file:/config-repo
+    volumes:
+      - ./config-repo:/config-repo
+    networks:
+      - trade
+
+  push:
+    container_name: push
+    build:
+      context: ./push
+      dockerfile: Dockerfile
+    ports:
+      - "8006:8006"
+    environment:
+      - CONFIG_SERVER=http://config-server:8888
+      - spring.redis.standalone.host=trading-redis
+    networks:
+      - trade
+
+  quotation:
+    container_name: quotation
+    build:
+      context: ./quotation
+      dockerfile: Dockerfile
+    ports:
+      - "8005:8005"
+    environment:
+      - CONFIG_SERVER=http://config-server:8888
+    networks:
+      - trade
+
+  trading-api:
+    container_name: trading-api
+    build:
+      context: ./trading-api
+      dockerfile: Dockerfile
+    ports:
+      - "8001:8001"
+    environment:
+      - CONFIG_SERVER=http://config-server:8888
+    networks:
+      - trade
+
+  trading-engine:
+    container_name: trading-engine
+    build:
+      context: ./trading-engine
+      dockerfile: Dockerfile
+    ports:
+      - "8002:8002"
+    environment:
+      - CONFIG_SERVER=http://config-server:8888
+    networks:
+      - trade
+
+  trading-sequencer:
+    container_name: trading-sequencer
+    build:
+      context: ./trading-sequencer
+      dockerfile: Dockerfile
+    ports:
+      - "8003:8003"
+    environment:
+      - CONFIG_SERVER=http://config-server:8888
+    networks:
+      - trade
+
+  ui:
+    container_name: ui
+    build:
+      context: ./ui
+      dockerfile: Dockerfile
+    ports:
+      - "8000:8000"
+    environment:
+      - CONFIG_SERVER=http://config-server:8888
+    networks:
+      - trade
+
+networks:
+  trade:
+    driver: bridge

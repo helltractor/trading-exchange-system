@@ -1,3 +1,4 @@
+*.jar
 target/
 docker/
 !**/src/main/**/target/

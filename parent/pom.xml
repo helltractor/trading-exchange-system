@@ -5,7 +5,7 @@
     <modelVersion>4.0.0</modelVersion>
     <groupId>com.helltractor.exchange</groupId>
     <artifactId>parent</artifactId>
-    <version>1.0-dev</version>
+    <version>1.0.0</version>
     <packaging>pom</packaging>
     <name>Trading Exchange System</name>
 
@@ -16,7 +16,7 @@
     </parent>
 
     <properties>
-        <project.version>1.0-dev</project.version>
+        <project.version>1.0.0</project.version>
         <project.build.sourceEncoding>UTF-8</project.build.sourceEncoding>
         <project.reporting.outputEncoding>UTF-8</project.reporting.outputEncoding>
         <java.version>21</java.version>

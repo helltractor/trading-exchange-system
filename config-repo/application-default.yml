@@ -3,8 +3,4 @@
 exchange:
   config:
     # turn on debug for default env
-    debug-mode: ${EXCHANGE_DEBUG_MODE:true}
-
-logging:
-  level:
-    com.helltractor.exchange: ${LOGGING_EXCHANGE_LEVEL:DEBUG}
+    debug-mode: ${EXCHANGE_DEBUG_MODE:false}

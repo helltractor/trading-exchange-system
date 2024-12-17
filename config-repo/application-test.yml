@@ -3,8 +3,4 @@
 exchange:
   config:
     # turn on debug for test env
-    debug-mode: ${EXCHANGE_DEBUG_MODE:true}
-
-logging:
-  level:
-    root: ${LOGGING_ROOT_LEVEL:DEBUG}
+    debug-mode: ${EXCHANGE_DEBUG_MODE:false}

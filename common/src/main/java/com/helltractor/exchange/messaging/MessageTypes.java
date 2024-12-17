@@ -93,5 +93,4 @@ public class MessageTypes {
         String json = data.substring(pos + 1);
         return JsonUtil.readJson(json, clazz);
     }
-    
 }

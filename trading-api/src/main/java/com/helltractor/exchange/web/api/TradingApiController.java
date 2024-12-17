@@ -239,7 +239,6 @@ public class TradingApiController extends LoggerSupport {
         return deferred;
     }
     
-    
     public void onTradingApiResult(String msg) {
         logger.info("on subscribed msg: {}", msg);
         try {

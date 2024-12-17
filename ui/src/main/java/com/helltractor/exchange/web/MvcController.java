@@ -30,7 +30,6 @@ import java.util.Map;
 import java.util.Random;
 import java.util.regex.Pattern;
 
-
 @Controller
 public class MvcController extends LoggerSupport {
     

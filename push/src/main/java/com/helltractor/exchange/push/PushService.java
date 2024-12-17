@@ -1,6 +1,5 @@
 package com.helltractor.exchange.push;
 
-
 import com.helltractor.exchange.redis.RedisCache;
 import com.helltractor.exchange.support.LoggerSupport;
 import io.vertx.core.Vertx;
@@ -13,21 +12,26 @@ import org.springframework.stereotype.Component;
 /**
  * 用于初始化和管理与Redis服务器的连接和消息处理，通过Vertx框架实现异步操作，并将接收到的Redis推送消息广播给其他组件。
  */
-
 @Component
 public class PushService extends LoggerSupport {
     
     Vertx vertx;
+    
     @Value("${exchange.config.hmac-key}")
     private String hmacKey;
+    
     @Value("${server.port}")
     private int serverPort;
+    
     @Value("${spring.redis.standalone.host:localhost}")
     private String redisHost;
+    
     @Value("${spring.redis.standalone.port:6379}")
     private int redisPort;
+    
     @Value("${spring.redis.standalone.password:}")
     private String redisPassword;
+    
     @Value("${spring.redis.standalone.database:0}")
     private int redisDatabase;
     

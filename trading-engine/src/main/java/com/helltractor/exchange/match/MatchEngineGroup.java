@@ -3,9 +3,6 @@ package com.helltractor.exchange.match;
 import java.util.HashMap;
 import java.util.Map;
 
-/**
- * 订单撮合引擎组
- */
 public class MatchEngineGroup {
     final Map<Long, MatchEngine> engines = new HashMap<>();
 

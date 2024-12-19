@@ -41,7 +41,7 @@ exchange:
 
 spring:
   kafka:
-    bootstrap-servers: ${KAFKA_SERVERS:http://trading-kafka:9092}
+    bootstrap-servers: ${KAFKA_SERVERS:http://docker-deploy-kafka:9092}
     consumer:
       group-id: ${KAFKA_CONSUMER_GROUP_ID:}
       auto-offset-reset: ${KAFKA_CONSUMER_AUTO_OFFSET_RESET:latest}
@@ -49,13 +49,13 @@ spring:
       max-partition-fetch-bytes: ${KAFKA_MAX_PARTITION_FETCH_BYTES:1000000}
 
   redis:
-    host: ${REDIS_HOST:trading-redis}
+    host: ${REDIS_HOST:docker-deploy-redis}
     port: ${REDIS_PORT:6379}
     password: ${REDIS_PASSWORD:}
     database: ${REDIS_DATABASE:0}
 
   datasource:
-    url: jdbc:mysql://${DB_HOST:trading-mysql}/${DB_NAME:exchange}?allowPublicKeyRetrieval=true&useSSL=false&allowMultiQueries=true&useUnicode=true&characterEncoding=utf8
+    url: jdbc:mysql://${DB_HOST:docker-deploy-mysql}/${DB_NAME:exchange}?allowPublicKeyRetrieval=true&useSSL=false&allowMultiQueries=true&useUnicode=true&characterEncoding=utf8
     username: ${DB_USERNAME:root}
     password: ${DB_PASSWORD:password}
     driver-class-name: com.mysql.cj.jdbc.Driver

@@ -3,7 +3,7 @@ services:
   zookeeper:
     image: bitnami/zookeeper:3.5
     user: "root"
-    container_name: trading-zookeeper
+    container_name: docker-deploy-zookeeper
     ports:
       - "2181:2181"
     environment:
@@ -11,12 +11,12 @@ services:
     volumes:
       - ./docker/zookeeper-data:/bitnami
     networks:
-      - trade
+      - docker-deploy
 
   kafka:
     image: bitnami/kafka:3.0
     user: "root"
-    container_name: trading-kafka
+    container_name: docker-deploy-kafka
     ports:
       - "9092:9092"
     depends_on:
@@ -24,32 +24,31 @@ services:
     environment:
       - KAFKA_BROKER_ID=1
       - KAFKA_CFG_LISTENERS=PLAINTEXT://:9092
-      - KAFKA_CFG_ADVERTISED_LISTENERS=PLAINTEXT://trading-kafka:9092
-      - KAFKA_CFG_ZOOKEEPER_CONNECT=trading-zookeeper:2181
+      - KAFKA_CFG_ADVERTISED_LISTENERS=PLAINTEXT://docker-deploy-kafka:9092
+      - KAFKA_CFG_ZOOKEEPER_CONNECT=docker-deploy-zookeeper:2181
       - KAFKA_CFG_AUTO_CREATE_TOPICS_ENABLE=true
       - ALLOW_PLAINTEXT_LISTENER=yes
     volumes:
       - ./docker/kafka-data:/bitnami
     networks:
-      - trade
+      - docker-deploy
 
   redis:
     image: redis:6.2
-    container_name: trading-redis
+    container_name: docker-deploy-redis
     ports:
       - "6379:6379"
     volumes:
       - ./docker/redis-data:/data
     networks:
-      - trade
+      - docker-deploy
 
   mysql:
     image: mysql:8.0
-    container_name: trading-mysql
+    container_name: docker-deploy-mysql
     ports:
       - "3306:3306"
     restart: always
-    command: --default-authentication-plugin=mysql_native_password
     environment:
       - MYSQL_ROOT_PASSWORD=password
       - MYSQL_AUTH_PLUGIN=caching_sha2_password
@@ -57,9 +56,8 @@ services:
       - ./mysql/schema.sql:/docker-entrypoint-initdb.d/exchange-schema.sql:ro
       - ./mysql/conf/my.cnf:/etc/mysql/my.cnf
       - ./docker/mysql-data:/var/lib/mysql
-    entrypoint: bash -c "chmod 644 /etc/mysql/my.cnf && exec /usr/local/bin/docker-entrypoint.sh mysqld"
     networks:
-      - trade
+      - docker-deploy
 
   config:
     container_name: config-server
@@ -78,7 +76,7 @@ services:
     volumes:
       - ./config-repo:/config-repo
     networks:
-      - trade
+      - docker-deploy
 
   push:
     container_name: push
@@ -89,9 +87,9 @@ services:
       - "8006:8006"
     environment:
       - CONFIG_SERVER=http://config-server:8888
-      - spring.redis.standalone.host=trading-redis
+      - spring.redis.standalone.host=docker-deploy-redis
     networks:
-      - trade
+      - docker-deploy
 
   quotation:
     container_name: quotation
@@ -103,7 +101,7 @@ services:
     environment:
       - CONFIG_SERVER=http://config-server:8888
     networks:
-      - trade
+      - docker-deploy
 
   trading-api:
     container_name: trading-api
@@ -115,8 +113,8 @@ services:
     environment:
       - CONFIG_SERVER=http://config-server:8888
     networks:
-      - trade
-
+      - docker-deploy
+      
   trading-engine:
     container_name: trading-engine
     build:
@@ -127,7 +125,7 @@ services:
     environment:
       - CONFIG_SERVER=http://config-server:8888
     networks:
-      - trade
+      - docker-deploy
 
   trading-sequencer:
     container_name: trading-sequencer
@@ -139,7 +137,7 @@ services:
     environment:
       - CONFIG_SERVER=http://config-server:8888
     networks:
-      - trade
+      - docker-deploy
 
   ui:
     container_name: ui
@@ -151,8 +149,8 @@ services:
     environment:
       - CONFIG_SERVER=http://config-server:8888
     networks:
-      - trade
+      - docker-deploy
 
 networks:
-  trade:
+  docker-deploy:
     driver: bridge

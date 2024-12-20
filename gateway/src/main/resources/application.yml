@@ -1,0 +1,28 @@
+spring:
+  main:
+    web-application-type: reactive
+  application:
+    name: gateway
+  config:
+    import: configserver:${CONFIG_SERVER:http://localhost:8888}
+  cloud:
+    gateway:
+      routes:
+        - id: trading-api
+          uri: ${TRADING_API_SERVER:http://localhost:8001}
+          predicates:
+            - Path=/api/**
+            - Path=/internal/transfer/**
+          filters:
+            - RewritePath=/api/(?<path>.*), /$\{path}
+            - RewritePath=/internal/transfer/(?<path>.*), /$\{path}
+        - id: trading-engine
+          uri: ${TRADING_ENGINE_SERVER:http://localhost:8002}
+          predicates:
+            - Path=/internal/{userId}/**
+          filters:
+            - RewritePath=/internal/(?<userId>.*), /$\{userId}
+        - id: ui
+          uri: ${UI_SERVER:http://localhost:8000}
+          predicates:
+            - Path=/**

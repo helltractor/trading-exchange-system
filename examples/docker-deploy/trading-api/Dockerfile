@@ -1,4 +1,4 @@
-FROM openjdk:21
+FROM openjdk:17
 ENV APP_HOME=/apps
 WORKDIR $APP_HOME
 ADD trading-api.jar trading-api.jar

@@ -483,12 +483,12 @@ public class TradingEngineService extends LoggerSupport {
                 AssetEnum assetId = entry.getKey();
                 Asset asset = entry.getValue();
                 if (userId.longValue() == UserType.DEBT.getInternalUserId()) {
-                    // 系统负债账户available不允许为正:
+                    // 系统负债账户available不允许为正
                     require(asset.getAvailable().signum() <= 0, "Debt has positive available: " + asset);
-                    // 系统负债账户frozen必须为0:
+                    // 系统负债账户frozen必须为0
                     require(asset.getFrozen().signum() == 0, "Debt has non-zero frozen: " + asset);
                 } else {
-                    // 交易用户的available/frozen不允许为负数:
+                    // 交易用户的available/frozen不允许为负数
                     require(asset.getAvailable().signum() >= 0, "Trader has negative available: " + asset);
                     require(asset.getFrozen().signum() >= 0, "Trader has negative frozen: " + asset);
                 }
@@ -499,7 +499,7 @@ public class TradingEngineService extends LoggerSupport {
                 }
             }
         }
-        // 各类别资产总额为0:
+        // 各类别资产总额为0
         require(totalUSD.signum() == 0, "Non zero USD balance: " + totalUSD);
         require(totalBTC.signum() == 0, "Non zero BTC balance: " + totalBTC);
     }

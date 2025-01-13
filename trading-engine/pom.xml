@@ -20,6 +20,11 @@
         </dependency>
 
         <dependency>
+            <groupId>org.springframework.boot</groupId>
+            <artifactId>spring-boot-starter-actuator</artifactId>
+        </dependency>
+
+        <dependency>
             <groupId>com.helltractor.exchange</groupId>
             <artifactId>common</artifactId>
             <version>${project.version}</version>

@@ -4,7 +4,7 @@ import com.helltractor.exchange.ApiError;
 import com.helltractor.exchange.ApiException;
 
 /**
- * store user context in thread local
+ * Store user context in thread local.
  */
 public class UserContext implements AutoCloseable {
     

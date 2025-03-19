@@ -1,4 +1,0 @@
-# gateway configuration
-
-server:
-  port: ${APP_PORT:8080}

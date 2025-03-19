@@ -7,7 +7,11 @@ import com.helltractor.exchange.message.TickMessage;
 import com.helltractor.exchange.messaging.MessageConsumer;
 import com.helltractor.exchange.messaging.Messaging;
 import com.helltractor.exchange.messaging.MessagingFactory;
-import com.helltractor.exchange.model.quatation.*;
+import com.helltractor.exchange.model.quatation.TickEntity;
+import com.helltractor.exchange.model.quatation.DayBarEntity;
+import com.helltractor.exchange.model.quatation.HourBarEntity;
+import com.helltractor.exchange.model.quatation.MinBarEntity;
+import com.helltractor.exchange.model.quatation.SecBarEntity;
 import com.helltractor.exchange.model.support.AbstractBarEntity;
 import com.helltractor.exchange.redis.RedisCache;
 import com.helltractor.exchange.redis.RedisService;
@@ -33,34 +37,34 @@ import java.util.function.Supplier;
 @Component
 public class QuotationService extends LoggerSupport {
     
-    static final TypeReference<Map<BarType, BigDecimal[]>> TYPE_BARS = new TypeReference<>() {
+    private static final TypeReference<Map<BarType, BigDecimal[]>> TYPE_BARS = new TypeReference<>() {
     };
     
     @Autowired
-    ZoneId zoneId;
+    private ZoneId zoneId;
     
     @Autowired
-    RedisService redisService;
+    private RedisService redisService;
     
     @Autowired
-    QuotationDbService quotationDbService;
+    private QuotationDbService quotationDbService;
     
     @Autowired
-    MessagingFactory messagingFactory;
+    private MessagingFactory messagingFactory;
     
-    MessageConsumer tickConsumer;
+    private MessageConsumer tickConsumer;
     
-    String shaUpdateRecentTicksLua = null;
+    private String shaUpdateRecentTicksLua = null;
     
-    String shaUpdateBarLua = null;
+    private String shaUpdateBarLua = null;
     
-    long sequenceId;
+    private long sequenceId;
     
-    static <T extends AbstractBarEntity> T createBar(Supplier<T> fn, BigDecimal[] data) {
+    private static <T extends AbstractBarEntity> T createBar(Supplier<T> supplier, BigDecimal[] data) {
         if (data == null) {
             return null;
         }
-        T bar = fn.get();
+        T bar = supplier.get();
         bar.startTime = data[0].longValue();
         bar.openPrice = data[1];
         bar.highPrice = data[2];
@@ -96,12 +100,14 @@ public class QuotationService extends LoggerSupport {
     }
     
     private void processMessage(TickMessage message) {
+        // ignore repeated messages
         if (message.sequenceId < this.sequenceId) {
             return;
         }
         if (logger.isDebugEnabled()) {
             logger.debug("process ticks: sequenceId = {}, {} ticks...", message.sequenceId, message.ticks.size());
         }
+        
         this.sequenceId = message.sequenceId;
         final long createTime = message.createTime;
         StringJoiner ticksStrJoiner = new StringJoiner(",", "[", "]");
@@ -141,38 +147,47 @@ public class QuotationService extends LoggerSupport {
             logger.debug("generated ticks data: {}", ticksData);
         }
         Boolean tickOk = redisService.executeScriptReturnBoolean(this.shaUpdateRecentTicksLua,
+                // KEYS
                 new String[]{RedisCache.Key.RECENT_TICKS},
+                // ARGV
                 new String[]{String.valueOf(this.sequenceId), ticksData, ticksStrJoiner.toString()});
         if (!tickOk.booleanValue()) {
             logger.warn("ticks are ignored by Redis.");
+            return;
         }
         // save ticks to database
         this.quotationDbService.saveTicks(message.ticks);
         // update bars in Redis
         String strCreatedBars = redisService.executeScriptReturnString(this.shaUpdateBarLua,
-                new String[]{RedisCache.Key.SEC_BARS, RedisCache.Key.MIN_BARS, RedisCache.Key.HOUR_BARS,
-                        RedisCache.Key.DAY_BARS},
-                new String[]{ // ARGV
-                        String.valueOf(this.sequenceId), // sequence id
-                        String.valueOf(secStartTime), // sec-start-time
-                        String.valueOf(minStartTime), // min-start-time
-                        String.valueOf(hourStartTime), // hour-start-time
-                        String.valueOf(dayStartTime), // day-start-time
-                        String.valueOf(openPrice), // open
-                        String.valueOf(highPrice), // high
-                        String.valueOf(lowPrice), // low
-                        String.valueOf(closePrice), // close
-                        String.valueOf(quantity) // quantity
+                // KEYS
+                new String[]{
+                        RedisCache.Key.SEC_BARS,
+                        RedisCache.Key.MIN_BARS,
+                        RedisCache.Key.HOUR_BARS,
+                        RedisCache.Key.DAY_BARS
+                },
+                // ARGV
+                new String[]{
+                        String.valueOf(this.sequenceId),
+                        String.valueOf(secStartTime),
+                        String.valueOf(minStartTime),
+                        String.valueOf(hourStartTime),
+                        String.valueOf(dayStartTime),
+                        String.valueOf(openPrice),
+                        String.valueOf(highPrice),
+                        String.valueOf(lowPrice),
+                        String.valueOf(closePrice),
+                        String.valueOf(quantity)
                 });
         
         logger.info("returned created bars: {}", strCreatedBars);
         // save bars to database from Redis
-        Map<BarType, BigDecimal[]> barMap = JsonUtil.readJson(strCreatedBars, TYPE_BARS);
-        if (!barMap.isEmpty()) {
-            SecBarEntity secBar = createBar(SecBarEntity::new, barMap.get(BarType.SEC));
-            MinBarEntity minBar = createBar(MinBarEntity::new, barMap.get(BarType.MIN));
-            HourBarEntity hourBar = createBar(HourBarEntity::new, barMap.get(BarType.HOUR));
-            DayBarEntity dayBar = createBar(DayBarEntity::new, barMap.get(BarType.DAY));
+        Map<BarType, BigDecimal[]> barTypeMap = JsonUtil.readJson(strCreatedBars, TYPE_BARS);
+        if (!barTypeMap.isEmpty()) {
+            SecBarEntity secBar = createBar(SecBarEntity::new, barTypeMap.get(BarType.SEC));
+            MinBarEntity minBar = createBar(MinBarEntity::new, barTypeMap.get(BarType.MIN));
+            HourBarEntity hourBar = createBar(HourBarEntity::new, barTypeMap.get(BarType.HOUR));
+            DayBarEntity dayBar = createBar(DayBarEntity::new, barTypeMap.get(BarType.DAY));
             this.quotationDbService.saveBars(secBar, minBar, hourBar, dayBar);
         }
     }

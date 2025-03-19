@@ -15,7 +15,7 @@ import org.springframework.stereotype.Component;
 @Component
 public class PushService extends LoggerSupport {
     
-    Vertx vertx;
+    private Vertx vertx;
     
     @Value("${exchange.config.hmac-key}")
     private String hmacKey;
@@ -71,16 +71,28 @@ public class PushService extends LoggerSupport {
                 logger.info("subscribe success.");
             }).onFailure(err -> {
                 logger.error("subscribe failed.", err);
-                System.exit(1);
+                exit(1);
             });
         }).onFailure(err -> {
             logger.error("connect to redis failed.", err);
-            System.exit(1);
+            exit(1);
         });
     }
     
     void exit(int exitCode) {
-        this.vertx.close();
-        System.exit(exitCode);
+        logger.warn("exit with code: {}", exitCode);
+        
+        if (this.vertx != null) {
+            this.vertx.close(result -> {
+                if (result.succeeded()) {
+                    logger.info("vertx closed.");
+                } else {
+                    logger.error("vertx close failed.", result.cause());
+                }
+            });
+            System.exit(exitCode);
+        } else {
+            System.exit(exitCode);
+        }
     }
 }

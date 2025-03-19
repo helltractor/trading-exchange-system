@@ -57,7 +57,7 @@ public class PushVerticle extends AbstractVerticle {
         // 处理请求 GET /notification
         router.get("/notification").handler(requestHandler -> {
             HttpServerRequest request = requestHandler.request();
-            // 从token参数解析userId
+            // 从 token 参数解析 userId
             Supplier<Long> supplier = () -> {
                 String tokenStr = request.getParam("token");
                 if (tokenStr != null && !tokenStr.isEmpty()) {

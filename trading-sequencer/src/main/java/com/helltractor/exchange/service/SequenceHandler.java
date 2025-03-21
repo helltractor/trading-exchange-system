@@ -21,7 +21,7 @@ import java.util.concurrent.atomic.AtomicLong;
 @Transactional(rollbackFor = Throwable.class)
 public class SequenceHandler extends AbstractDbService {
     
-    long lastTimestamp = 0;
+    private long lastTimestamp = 0;
     
     public long getMaxSequenceId() {
         EventEntity last = dataBase.from(EventEntity.class).orderBy("sequenceId").desc().first();
@@ -83,12 +83,12 @@ public class SequenceHandler extends AbstractDbService {
             if (unique != null) {
                 unique.sequenceId = message.sequenceId;
             }
-            // create AbstractEvent and save to db later
+            // create AbstractEvent and save to database later
             EventEntity event = new EventEntity();
             event.previousId = previousId;
             event.sequenceId = currentId;
             event.data = messageTypes.serialize(message);
-            event.createTime = this.lastTimestamp; // same as message.createTime
+            event.createTime = this.lastTimestamp;
             events.add(event);
             // will send later
             sequenceMessages.add(message);

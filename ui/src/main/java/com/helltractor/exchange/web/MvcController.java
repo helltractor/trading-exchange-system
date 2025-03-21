@@ -33,26 +33,26 @@ import java.util.regex.Pattern;
 @Controller
 public class MvcController extends LoggerSupport {
     
-    static Pattern EMAIL = Pattern.compile("^[a-z0-9\\-\\.]+\\@([a-z0-9\\-]+\\.){1,3}[a-z]{2,20}$");
+    public final static Pattern EMAIL = Pattern.compile("^[a-z0-9\\-\\.]+\\@([a-z0-9\\-]+\\.){1,3}[a-z]{2,20}$");
     
     @Value("#{exchangeConfiguration.hmacKey}")
-    String hmacKey;
+    private String hmacKey;
     
     @Autowired
-    CookieService cookieService;
+    private CookieService cookieService;
     
     @Autowired
-    UserService userService;
+    private UserService userService;
     
     @Autowired
-    RestClient restClient;
+    private RestClient tradingApiClient;
     
     @Autowired
-    Environment environment;
+    private Environment environment;
     
     @PostConstruct
     public void init() {
-        // 本地开发环境下自动创建用户user0@example.com ~ user9@example.com
+        // init users: user0@example.com ~ user99@example.com
         if (isLocalDevEnv()) {
             for (int i = 0; i <= 99; i++) {
                 String email = "user" + i + "@example.com";
@@ -116,7 +116,7 @@ public class MvcController extends LoggerSupport {
             // 无登录信息，返回JSON空字符串""
             return "\"\"";
         }
-        // 1分钟后过期
+        // expire in 60 seconds
         AuthToken token = new AuthToken(userId, System.currentTimeMillis() + 60_000);
         String strToken = token.toSecureString(hmacKey);
         // 返回JSON字符串"xxx"
@@ -133,7 +133,7 @@ public class MvcController extends LoggerSupport {
     
     @PostMapping("/signin")
     public ModelAndView signin(@RequestParam("email") String email, @RequestParam("password") String password, HttpServletRequest request, HttpServletResponse response) {
-        // 检查email和password
+        // check email and password
         if (email == null || email.isEmpty()) {
             return prepareModelAndView("signin", Map.of("email", email, "error", "Invalid email or password."));
         }
@@ -196,43 +196,43 @@ public class MvcController extends LoggerSupport {
         req.asset = asset;
         req.fromUserId = UserType.DEBT.getInternalUserId();
         req.toUserId = userId;
-        restClient.post(Map.class, "/internal/transfer", null, req);
+        tradingApiClient.post(Map.class, "/internal/transfer", null, req);
     }
     
-    ModelAndView prepareModelAndView(String view, String key, Object value) {
+    private ModelAndView prepareModelAndView(String view, String key, Object value) {
         ModelAndView mv = new ModelAndView(view);
         mv.addObject(key, value);
         addGlobalModel(mv);
         return mv;
     }
     
-    ModelAndView prepareModelAndView(String view, Map<String, Object> model) {
+    private ModelAndView prepareModelAndView(String view, Map<String, Object> model) {
         ModelAndView mv = new ModelAndView(view);
         mv.addAllObjects(model);
         addGlobalModel(mv);
         return mv;
     }
     
-    ModelAndView prepareModelAndView(String view) {
+    private ModelAndView prepareModelAndView(String view) {
         ModelAndView mv = new ModelAndView(view);
         addGlobalModel(mv);
         return mv;
     }
     
-    ModelAndView notFound() {
+    private ModelAndView notFound() {
         ModelAndView mv = new ModelAndView("404");
         addGlobalModel(mv);
         return mv;
     }
     
-    void addGlobalModel(ModelAndView mv) {
+    private void addGlobalModel(ModelAndView mv) {
         final Long userId = UserContext.getUserId();
         mv.addObject("__userId__", userId);
         mv.addObject("__profile__", userId == null ? null : userService.getUserProfile(userId));
         mv.addObject("__time__", Long.valueOf(System.currentTimeMillis()));
     }
     
-    ModelAndView redirect(String url) {
+    private ModelAndView redirect(String url) {
         return new ModelAndView("redirect:" + url);
     }
 }

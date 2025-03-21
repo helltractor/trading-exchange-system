@@ -38,26 +38,31 @@ import java.util.concurrent.ConcurrentHashMap;
 @RequestMapping("/api")
 public class TradingApiController extends LoggerSupport {
     
-    Map<String, DeferredResult<ResponseEntity<String>>> deferredResultMap = new ConcurrentHashMap<>();
-    
-    @Autowired
-    HistoryService historyService;
-    
-    @Autowired
-    SendEventService sendEventService;
-    
-    @Autowired
-    RedisService redisService;
-    
-    @Autowired
-    ObjectMapper objectMapper;
-    
-    @Autowired
-    TradingEngineApiProxyService tradingEngineApiProxyService;
+    private final Map<String, DeferredResult<ResponseEntity<String>>> deferredResultMap = new ConcurrentHashMap<>();
     
     private final Long asyncTimeout = Long.valueOf(500);
     
+    @Autowired
+    private HistoryService historyService;
+    
+    @Autowired
+    private SendEventService sendEventService;
+    
+    @Autowired
+    private RedisService redisService;
+    
+    @Autowired
+    private ObjectMapper objectMapper;
+    
+    @Autowired
+    private TradingEngineApiProxyService tradingEngineApiProxyService;
+    
     private String timeoutJson = null;
+    
+    @PostConstruct
+    public void init() {
+        this.redisService.subscribe(RedisCache.Topic.TRADING_API_RESULT, this::onTradingApiResult);
+    }
     
     private String getTimeoutJson() throws JsonProcessingException {
         if (timeoutJson == null) {
@@ -66,9 +71,26 @@ public class TradingApiController extends LoggerSupport {
         return timeoutJson;
     }
     
-    @PostConstruct
-    public void init() {
-        this.redisService.subscribe(RedisCache.Topic.TRADING_API_RESULT, this::onTradingApiResult);
+    private void onTradingApiResult(String msg) {
+        logger.info("on subscribed msg: {}", msg);
+        try {
+            ApiResultMessage message = this.objectMapper.readValue(msg, ApiResultMessage.class);
+            if (message.refId != null) {
+                DeferredResult<ResponseEntity<String>> deferredResult = this.deferredResultMap.remove(message.refId);
+                if (deferredResult != null) {
+                    if (message.error != null) {
+                        String error = objectMapper.writeValueAsString(message.error);
+                        ResponseEntity<String> responseEntity = new ResponseEntity<>(error, HttpStatus.BAD_GATEWAY);
+                        deferredResult.setResult(responseEntity);
+                    } else {
+                        ResponseEntity<String> responseEntity = new ResponseEntity<>(JsonUtil.writeJson(message.result), HttpStatus.OK);
+                        deferredResult.setResult(responseEntity);
+                    }
+                }
+            }
+        } catch (Exception e) {
+            logger.error("Invalid ApiResultMessage: {}", msg, e);
+        }
     }
     
     @GetMapping("/timestamp")
@@ -79,7 +101,8 @@ public class TradingApiController extends LoggerSupport {
     @ResponseBody
     @GetMapping(value = "/assets", produces = "application/json")
     public String getAssets() throws IOException {
-        return tradingEngineApiProxyService.get("/internal/" + UserContext.getRequiredUserId() + "/assets");
+        final Long userId = UserContext.getRequiredUserId();
+        return tradingEngineApiProxyService.get("/internal/" + userId + "/assets");
     }
     
     @ResponseBody
@@ -92,7 +115,8 @@ public class TradingApiController extends LoggerSupport {
     @ResponseBody
     @GetMapping(value = "/orders", produces = "application/json")
     public String getOpenOrders() throws IOException {
-        return tradingEngineApiProxyService.get("/internal/" + UserContext.getRequiredUserId() + "/orders");
+        final Long userId = UserContext.getRequiredUserId();
+        return tradingEngineApiProxyService.get("/internal/" + userId + "/orders");
     }
     
     @ResponseBody
@@ -163,10 +187,11 @@ public class TradingApiController extends LoggerSupport {
     @GetMapping("/history/orders")
     public List<OrderEntity> getHistoryOrders(
             @RequestParam(value = "maxResults", defaultValue = "100") int maxResults) {
+        final Long userId = UserContext.getRequiredUserId();
         if (maxResults < 1 || maxResults > 1000) {
             throw new ApiException(ApiError.PARAMETER_INVALID, "maxResults", "Invalid parameter.");
         }
-        return historyService.getHistoryOrders(UserContext.getRequiredUserId(), maxResults);
+        return historyService.getHistoryOrders(userId, maxResults);
     }
     
     @GetMapping("/history/orders/{orderId}/matches")
@@ -237,27 +262,5 @@ public class TradingApiController extends LoggerSupport {
         this.deferredResultMap.put(event.refId, deferred);
         this.sendEventService.sendMessage(event);
         return deferred;
-    }
-    
-    public void onTradingApiResult(String msg) {
-        logger.info("on subscribed msg: {}", msg);
-        try {
-            ApiResultMessage message = this.objectMapper.readValue(msg, ApiResultMessage.class);
-            if (message.refId != null) {
-                DeferredResult<ResponseEntity<String>> deferredResult = this.deferredResultMap.remove(message.refId);
-                if (deferredResult != null) {
-                    if (message.error != null) {
-                        String error = objectMapper.writeValueAsString(message.error);
-                        ResponseEntity<String> responseEntity = new ResponseEntity<>(error, HttpStatus.BAD_GATEWAY);
-                        deferredResult.setResult(responseEntity);
-                    } else {
-                        ResponseEntity<String> responseEntity = new ResponseEntity<>(JsonUtil.writeJson(message.result), HttpStatus.OK);
-                        deferredResult.setResult(responseEntity);
-                    }
-                }
-            }
-        } catch (Exception e) {
-            logger.error("Invalid ApiResultMessage: {}", msg, e);
-        }
     }
 }

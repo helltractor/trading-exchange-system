@@ -18,10 +18,10 @@ public class CookieService extends LoggerSupport {
     public final String SESSION_COOKIE = "_exsession_";
     
     @Value("#{exchangeConfiguration.hmacKey}")
-    String hmacKey;
+    private String hmacKey;
     
     @Value("#{exchangeConfiguration.sessionTimeout}")
-    Duration sessionTimeout;
+    private Duration sessionTimeout;
     
     public long getExpiresInSeconds() {
         return sessionTimeout.toSeconds();

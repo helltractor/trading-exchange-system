@@ -29,13 +29,13 @@ import java.util.Base64;
 public class ApiFilterRegistrationBean extends FilterRegistrationBean<Filter> {
     
     @Autowired
-    UserService userService;
+    private UserService userService;
     
     @Autowired
-    ObjectMapper objectMapper;
+    private ObjectMapper objectMapper;
     
     @Value("#{exchangeConfiguration.hmacKey}")
-    String hmacKey;
+    private String hmacKey;
     
     @PostConstruct
     public void init() {
@@ -54,10 +54,10 @@ public class ApiFilterRegistrationBean extends FilterRegistrationBean<Filter> {
             HttpServletResponse response = (HttpServletResponse) resp;
             String path = request.getRequestURI();
             logger.info("process api {} {}...", request.getMethod(), path);
-            // set default encoding:
+            // set default encoding
             request.setCharacterEncoding("UTF-8");
             response.setCharacterEncoding("UTF-8");
-            // try parse user:
+            // try parse user
             Long userId = null;
             try {
                 userId = parseUser(request);
@@ -83,12 +83,12 @@ public class ApiFilterRegistrationBean extends FilterRegistrationBean<Filter> {
         }
         
         private Long parseUser(HttpServletRequest request) {
-            // 尝试通过Authorization Header认证用户:
+            // 尝试通过Authorization Header认证用户
             String auth = request.getHeader("Authorization");
             if (auth != null) {
                 return parseUserFromAuthorization(auth);
             }
-            // 尝试通过API Key认证用户:
+            // 尝试通过API Key认证用户
             String apiKey = request.getHeader("API-Key");
             String apiSignature = request.getHeader("API-Signature");
             if (apiKey != null && apiSignature != null) {

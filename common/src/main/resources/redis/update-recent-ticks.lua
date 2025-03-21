@@ -31,7 +31,7 @@ if not lastSeqId or tonumber(seqId) > tonumber(lastSeqId) then
     len = redis.call('RPUSH', LIST_RECENT_TICKS, unpack(ticks))
     if len > 100 then
         -- 裁剪LIST以保存最新的100个Tick
-        redis.call('LTRIM', LIST_RECENT_TICKS, len-100, len-1)
+        redis.call('LTRIM', LIST_RECENT_TICKS, len - 100, len - 1)
     end
     return true
 end

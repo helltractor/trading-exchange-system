@@ -22,7 +22,7 @@ public class UserService extends AbstractDbService {
     }
     
     /**
-     * 通过邮件从数据库查找用户信息
+     * fetch user profile by email
      */
     @Nullable
     public UserProfileEntity fetchUserProfileByEmail(String email) {
@@ -30,7 +30,7 @@ public class UserService extends AbstractDbService {
     }
     
     /**
-     * 通过邮件查找用户信息
+     * fetch user profile by email
      */
     public UserProfileEntity getUserProfileByEmail(String email) {
         UserProfileEntity userProfile = fetchUserProfileByEmail(email);
@@ -41,7 +41,7 @@ public class UserService extends AbstractDbService {
     }
     
     /**
-     * 通过邮箱，名字和密码注册用户
+     * signup with email, name, password
      */
     public UserProfileEntity signup(String email, String name, String password) {
         final long timestamp = System.currentTimeMillis();
@@ -67,7 +67,7 @@ public class UserService extends AbstractDbService {
     }
     
     /**
-     * 使用邮箱，密码进行登录
+     * signin with email, password
      */
     public UserProfileEntity signin(String email, String passwd) {
         UserProfileEntity userProfile = getUserProfileByEmail(email);

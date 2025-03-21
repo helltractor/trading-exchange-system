@@ -16,7 +16,7 @@ import java.util.List;
 import java.util.concurrent.atomic.AtomicLong;
 
 /**
- * Sequence events
+ * Sequence service.
  */
 @Component
 public class SequenceService extends LoggerSupport implements CommonErrorHandler {
@@ -24,13 +24,13 @@ public class SequenceService extends LoggerSupport implements CommonErrorHandler
     private static final String GROUP_ID = "SequenceGroup";
     
     @Autowired
-    SequenceHandler sequenceHandler;
+    private SequenceHandler sequenceHandler;
     
     @Autowired
-    MessagingFactory messagingFactory;
+    private MessagingFactory messagingFactory;
     
     @Autowired
-    MessageTypes messageTypes;
+    private MessageTypes messageTypes;
     
     private MessageProducer<AbstractEvent> messageProducer;
     
@@ -43,17 +43,14 @@ public class SequenceService extends LoggerSupport implements CommonErrorHandler
     
     @PostConstruct
     public void init() {
-        Thread thread = new Thread(() -> {
+        this.jobThread = new Thread(() -> {
             logger.info("start sequence service...");
-            // TODO: try get global DB lock
-            // while (!hasLock()) { sleep(10000); }
             this.messageProducer = this.messagingFactory.createMessageProducer(Messaging.Topic.TRADE,
                     AbstractEvent.class);
             // find max event id
             this.sequence = new AtomicLong(this.sequenceHandler.getMaxSequenceId());
-            // init consumer
             logger.info("create message consumer for {} ...", getClass().getName());
-            // share same group id
+            // init consumer, share same group id
             MessageConsumer consumer = this.messagingFactory.createBatchMessageListener(Messaging.Topic.SEQUENCE, GROUP_ID,
                     this::processMessage, this);
             // start running
@@ -70,7 +67,6 @@ public class SequenceService extends LoggerSupport implements CommonErrorHandler
             consumer.stop();
             System.exit(1);
         });
-        this.jobThread = thread;
         this.jobThread.start();
     }
     

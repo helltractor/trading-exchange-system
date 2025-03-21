@@ -10,9 +10,13 @@ import java.math.BigDecimal;
 public class TransferRequestBean implements ValidatableBean {
     
     public String transferId;
+    
     public AssetEnum asset;
+    
     public Long fromUserId;
+    
     public Long toUserId;
+    
     public BigDecimal amount;
     
     @Override

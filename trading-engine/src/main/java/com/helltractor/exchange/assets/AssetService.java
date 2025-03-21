@@ -16,7 +16,7 @@ import java.util.concurrent.ConcurrentMap;
 public class AssetService extends LoggerSupport {
     
     // UserId -> Map(AssetEnum -> Assets[available/frozen])
-    final ConcurrentMap<Long, ConcurrentMap<AssetEnum, Asset>> userAssets = new ConcurrentHashMap<>();
+    private final ConcurrentMap<Long, ConcurrentMap<AssetEnum, Asset>> userAssets = new ConcurrentHashMap<>();
     
     public Asset getAsset(Long userId, AssetEnum assetId) {
         ConcurrentMap<AssetEnum, Asset> assets = userAssets.get(userId);
@@ -38,7 +38,7 @@ public class AssetService extends LoggerSupport {
         return this.userAssets;
     }
     
-    Asset initAssets(Long userId, AssetEnum assetId) {
+    private Asset initAssets(Long userId, AssetEnum assetId) {
         ConcurrentMap<AssetEnum, Asset> assets = userAssets.get(userId);
         if (assets == null) {
             assets = new ConcurrentHashMap<>();

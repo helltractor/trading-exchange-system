@@ -56,7 +56,7 @@ public class UIFilterRegistrationBean extends FilterRegistrationBean<Filter> {
                 logger.info("refresh session cookie...");
                 cookieService.setSessionCookie(request, response, auth.refresh());
             }
-            Long userId = auth == null ? null : auth.userId();
+            final Long userId = auth == null ? null : auth.userId();
             if (logger.isDebugEnabled()) {
                 logger.debug("parsed user {} from session cookie.", userId);
             }

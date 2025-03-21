@@ -17,9 +17,9 @@ import java.util.concurrent.TimeUnit;
 public class TradingEngineApiProxyService extends LoggerSupport {
     
     @Value("#{exchangeConfiguration.apiEndpoints.tradingEngineApi}")
-    String tradingEngineInternalApiEndpoint;    // http://localhost:8002/
+    private String tradingEngineInternalApiEndpoint;
     
-    OkHttpClient okHttpClient = new OkHttpClient.Builder()
+    private OkHttpClient okHttpClient = new OkHttpClient.Builder()
             .connectTimeout(1, TimeUnit.SECONDS)
             .readTimeout(1, TimeUnit.SECONDS)
             .connectionPool(new ConnectionPool(20, 60, TimeUnit.SECONDS))

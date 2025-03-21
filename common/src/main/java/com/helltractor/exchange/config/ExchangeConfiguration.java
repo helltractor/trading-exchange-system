@@ -11,12 +11,17 @@ import java.time.ZoneId;
 @ConfigurationProperties(prefix = "exchange.config")
 public class ExchangeConfiguration {
     
-    int orderBookDepth = 50;
-    boolean debugMode = false;
-    String timeZone = ZoneId.systemDefault().getId();
-    String hmacKey;
-    Duration sessionTimeout;
-    ApiEndpoints apiEndpoints;
+    private int orderBookDepth = 50;
+    
+    private boolean debugMode = false;
+    
+    private String timeZone = ZoneId.systemDefault().getId();
+    
+    private String hmacKey;
+    
+    private Duration sessionTimeout;
+    
+    private ApiEndpoints apiEndpoints;
     
     @Bean
     public ZoneId createZoneId() {

@@ -17,12 +17,12 @@ import java.math.BigDecimal;
 @Component
 public class ClearingService extends LoggerSupport {
     
-    final AssetService assetService;
+    private final AssetService assetService;
     
-    final OrderService orderService;
+    private final OrderService orderService;
     
     @Value("${exchange.fee-rate:0.0005}")
-    BigDecimal feeRate;
+    private BigDecimal feeRate;
     
     public ClearingService(@Autowired AssetService assetService, @Autowired OrderService orderService) {
         this.assetService = assetService;

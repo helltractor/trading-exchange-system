@@ -24,9 +24,6 @@ public class UIApplication {
         return new RestClient.Builder(tradingApiEndpoint).build(objectMapper);
     }
     
-    /**
-     * webMvcConfigurer用于自定义Spring MVC的配置。
-     */
     @Bean
     public WebMvcConfigurer webMvcConfigurer() {
         return new WebMvcConfigurer() {

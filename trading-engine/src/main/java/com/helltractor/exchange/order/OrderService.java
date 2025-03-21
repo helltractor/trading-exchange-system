@@ -17,13 +17,11 @@ import java.util.concurrent.ConcurrentMap;
 @Component
 public class OrderService {
     
-    final AssetService assetService;
+    private final AssetService assetService;
     
-    // active orders
-    final ConcurrentMap<Long, OrderEntity> activeOrders = new ConcurrentHashMap<>();
+    private final ConcurrentMap<Long, OrderEntity> activeOrders = new ConcurrentHashMap<>();
     
-    // user orders
-    final ConcurrentMap<Long, ConcurrentHashMap<Long, OrderEntity>> userOrders = new ConcurrentHashMap<>();
+    private final ConcurrentMap<Long, ConcurrentHashMap<Long, OrderEntity>> userOrders = new ConcurrentHashMap<>();
     
     public OrderService(@Autowired AssetService assetService) {
         this.assetService = assetService;

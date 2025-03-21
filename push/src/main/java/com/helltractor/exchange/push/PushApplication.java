@@ -8,7 +8,8 @@ import org.springframework.boot.autoconfigure.jdbc.DataSourceAutoConfiguration;
 /**
  * WebSocket push based on VertX.
  */
-@SpringBootApplication(exclude = {DataSourceAutoConfiguration.class})   // forbid database auto-configuration (no DataSource, JdbcTemplate...)
+// forbid database auto-configuration (no DataSource, JdbcTemplate...)
+@SpringBootApplication(exclude = {DataSourceAutoConfiguration.class})
 public class PushApplication {
     
     public static void main(String[] args) {

@@ -52,15 +52,7 @@ import java.util.concurrent.ConcurrentMap;
 public class TradingEngineService extends LoggerSupport {
     
     @Autowired(required = false)
-    ZoneId zoneId = ZoneId.systemDefault();
-    
-    @Value("#{exchangeConfiguration.orderBookDepth}")
-    int orderBookDepth = 100;
-    
-    @Value("#{exchangeConfiguration.debugMode}")
-    boolean debugMode = false;
-    
-    boolean fatalError = false;
+    private ZoneId zoneId = ZoneId.systemDefault();
     
     @Autowired
     ClearingService clearingService;
@@ -83,14 +75,17 @@ public class TradingEngineService extends LoggerSupport {
     @Autowired
     MessagingFactory messagingFactory;
     
+    @Value("#{exchangeConfiguration.orderBookDepth}")
+    private final int orderBookDepth = 100;
+    
+    @Value("#{exchangeConfiguration.debugMode}")
+    private boolean debugMode = false;
+    
+    private boolean fatalError = false;
     private MessageConsumer consumer;
-    
     private MessageProducer<TickMessage> producer;
-    
     private long lastSequenceId = 0;
-    
     private boolean orderBookChanged = false;
-    
     private String shaUpdateOrderBookLua;
     
     private Thread tickThread;
@@ -308,7 +303,7 @@ public class TradingEngineService extends LoggerSupport {
         }
     }
     
-    void createOrder(OrderRequestEvent event) {
+    private void createOrder(OrderRequestEvent event) {
         // 创建订单ID
         ZonedDateTime zonedDateTime = ZonedDateTime.ofInstant(Instant.ofEpochMilli(event.createTime), zoneId);
         int year = zonedDateTime.getYear();
@@ -384,7 +379,7 @@ public class TradingEngineService extends LoggerSupport {
         return msg;
     }
     
-    void cancelOrder(OrderCancelEvent event) {
+    private void cancelOrder(OrderCancelEvent event) {
         OrderEntity order = this.orderService.getOrder(event.refOrderId);
         
         if (order == null || order.userId.longValue() != event.userId.longValue()) {
@@ -400,7 +395,7 @@ public class TradingEngineService extends LoggerSupport {
         this.notificationQueue.add(createNotification(event.createTime, "order_canceled", order.userId, order));
     }
     
-    boolean transfer(TransferEvent event) {
+    private boolean transfer(TransferEvent event) {
         return this.assetService.tryTransfer(Transfer.AVAILABLE_TO_AVAILABLE, event.fromUserId, event.toUserId, event.asset, event.amount, event.sufficient);
     }
     
@@ -449,7 +444,7 @@ public class TradingEngineService extends LoggerSupport {
         }
     }
     
-    MatchDetailEntity generateMatchDetailEntity(long sequenceId, long timeStamp, MatchDetailRecord detail, boolean forTaker) {
+    private MatchDetailEntity generateMatchDetailEntity(long sequenceId, long timeStamp, MatchDetailRecord detail, boolean forTaker) {
         MatchDetailEntity entity = new MatchDetailEntity();
         entity.sequenceId = sequenceId;
         entity.orderId = forTaker ? detail.takerOrder().id : detail.makerOrder().id;
@@ -472,7 +467,7 @@ public class TradingEngineService extends LoggerSupport {
         logger.debug("validate ok.");
     }
     
-    void validateAssets() {
+    private void validateAssets() {
         // 验证系统资产完整性
         BigDecimal totalUSD = BigDecimal.ZERO;
         BigDecimal totalBTC = BigDecimal.ZERO;
@@ -504,7 +499,7 @@ public class TradingEngineService extends LoggerSupport {
         require(totalBTC.signum() == 0, "Non zero BTC balance: " + totalBTC);
     }
     
-    void validateOrders() {
+    private void validateOrders() {
         // 验证订单
         Map<Long, Map<AssetEnum, BigDecimal>> userOrderFrozen = new HashMap<>();
         for (Map.Entry<Long, OrderEntity> entry : this.orderService.getActiveOrders().entrySet()) {
@@ -561,7 +556,7 @@ public class TradingEngineService extends LoggerSupport {
         }
     }
     
-    void validateMatchEngine() {
+    private void validateMatchEngine() {
         // OrderBook的Order必须在ActiveOrders中
         Map<Long, OrderEntity> copyOfActiveOrders = new HashMap<>(this.orderService.getActiveOrders());
         for (OrderEntity order : this.matchEngine.buyBook.book.values()) {
@@ -590,7 +585,7 @@ public class TradingEngineService extends LoggerSupport {
         System.exit(1);
     }
     
-    void require(boolean condition, String errorMessage) {
+    private void require(boolean condition, String errorMessage) {
         if (!condition) {
             logger.error("validate failed: {}", errorMessage);
             panic();

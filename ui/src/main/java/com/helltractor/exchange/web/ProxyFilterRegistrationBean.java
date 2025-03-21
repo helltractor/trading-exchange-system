@@ -29,13 +29,13 @@ import java.util.Map;
 public class ProxyFilterRegistrationBean extends FilterRegistrationBean<Filter> {
     
     @Autowired
-    RestClient tradingApiClient;
+    private RestClient tradingApiClient;
     
     @Autowired
-    ObjectMapper objectMapper;
+    private ObjectMapper objectMapper;
     
     @Value("#{exchangeConfiguration.hmacKey}")
-    String hmacKey;
+    private String hmacKey;
     
     @PostConstruct
     public void init() {
@@ -54,7 +54,7 @@ public class ProxyFilterRegistrationBean extends FilterRegistrationBean<Filter> 
             HttpServletResponse response = (HttpServletResponse) resp;
             String path = request.getRequestURI();
             logger.info("process {} {}...", request.getMethod(), path);
-            Long userId = UserContext.getUserId();
+            final Long userId = UserContext.getUserId();
             logger.info("process with userId={}...", userId);
             proxyForward(userId, request, response);
         }

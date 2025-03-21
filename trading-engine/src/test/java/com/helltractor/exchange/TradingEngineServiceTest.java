@@ -29,7 +29,7 @@ public class TradingEngineServiceTest {
     long currentSequenceId = 0;
     
     @Test
-    public void testTradingEngine() {
+    void testTradingEngine() {
         var engine = createTradingEngine();
         
         engine.processEvent(depositEvent(USER_A, bd("58000"), AssetEnum.USD));
@@ -64,7 +64,7 @@ public class TradingEngineServiceTest {
     }
     
     @Test
-    public void testRandom() {
+    void testRandom() {
         var engine = createTradingEngine();
         var r = new Random(123456789);
         for (Long user : USERS) {

@@ -36,7 +36,6 @@ public record AuthToken(Long userId, long expireTime) {
     
     /**
      * hash = hmacSha256(userId : expireTime, hmacKey)
-     * <p>
      * secureString = userId : expireTime : hash
      */
     public String toSecureString(String hmacKey) {

@@ -20,21 +20,21 @@ import java.util.Objects;
 import java.util.concurrent.TimeUnit;
 
 /**
- * Http client for accessing exchange REST APIs.
+ * OkHttp client for accessing exchange REST APIs.
  */
 public class RestClient {
     
-    static final MediaType JSON = MediaType.parse("application/json; charset=utf-8");
+    private static final MediaType JSON = MediaType.parse("application/json; charset=utf-8");
     
-    static final ApiException ERROR_UNKNOWN = new ApiException(ApiError.INTERNAL_SERVER_ERROR, "api", "Api failed without error code.");
+    private static final ApiException ERROR_UNKNOWN = new ApiException(ApiError.INTERNAL_SERVER_ERROR, "api", "Api failed without error code.");
     
-    final Logger logger = LoggerFactory.getLogger(getClass());
+    private final Logger logger = LoggerFactory.getLogger(getClass());
     
-    final String endpoint;
+    private final String endpoint;
     
-    final String host;
+    private final String host;
     
-    final ObjectMapper objectMapper;
+    private final ObjectMapper objectMapper;
     
     OkHttpClient okHttpClient;
     
@@ -149,13 +149,15 @@ public class RestClient {
         
         final Logger logger = LoggerFactory.getLogger(getClass());
         
-        String scheme;
-        String host;
-        int port;
+        private final String scheme;
         
-        int connectTimeout = 3;
-        int readTimeout = 3;
-        int keepAlive = 30;
+        private final String host;
+        
+        private final int port;
+        
+        private int connectTimeout = 3;
+        private int readTimeout = 3;
+        private int keepAlive = 30;
         
         /**
          * Create builder with api endpoint. e.g. "http://localhost:8080". NOTE: do not append any PATH.

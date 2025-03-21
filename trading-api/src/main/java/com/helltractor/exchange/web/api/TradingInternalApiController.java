@@ -18,7 +18,7 @@ import java.util.Map;
 public class TradingInternalApiController extends AbstractApiController {
     
     @Autowired
-    SendEventService sendEventService;
+    private SendEventService sendEventService;
     
     /**
      * 处理一个转账请求，可重复调用，重复发送消息，根据uniqueId去重，仅定序一次。

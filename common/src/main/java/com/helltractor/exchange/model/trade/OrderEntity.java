@@ -4,7 +4,11 @@ import com.fasterxml.jackson.annotation.JsonIgnore;
 import com.helltractor.exchange.enums.Direction;
 import com.helltractor.exchange.enums.OrderStatus;
 import com.helltractor.exchange.model.support.EntitySupport;
-import jakarta.persistence.*;
+import jakarta.persistence.Column;
+import jakarta.persistence.Entity;
+import jakarta.persistence.Id;
+import jakarta.persistence.Table;
+import jakarta.persistence.Transient;
 import org.springframework.lang.Nullable;
 
 import java.math.BigDecimal;
@@ -46,35 +50,41 @@ public class OrderEntity implements EntitySupport, Comparable<OrderEntity> {
      */
     @Column(nullable = false, updatable = false, length = VAR_ENUM)
     public OrderStatus status;
+    
     /**
      * The limit-order price. MUST NOT change after insert.
      */
     @Column(nullable = false, updatable = false, precision = PRECISION, scale = SCALE)
     public BigDecimal price;
+    
     /**
      * Created time (milliseconds).
      */
     @Column(nullable = false, updatable = false)
     public long createTime;
+    
     /**
      * Updated time (milliseconds).
      */
     @Column(nullable = false, updatable = false)
     public long updateTime;
+    
     /**
      * The order quantity. MUST NOT change after insert.
      */
     @Column(nullable = false, updatable = false, precision = PRECISION, scale = SCALE)
     public BigDecimal quantity;
+    
     /**
      * How much unfilled during match.
      */
     @Column(nullable = false, updatable = false, precision = PRECISION, scale = SCALE)
     public BigDecimal unfilledQuantity;
+    
     private int version;
     
     public void updateOrder(BigDecimal unfilledQuantity, OrderStatus status, long updateTime) {
-        this.version++;
+        // this.version++;
         this.unfilledQuantity = unfilledQuantity;
         this.status = status;
         this.updateTime = updateTime;
@@ -97,7 +107,6 @@ public class OrderEntity implements EntitySupport, Comparable<OrderEntity> {
         if (ver != this.version) {
             return null;
         }
-        
         entity.createTime = this.createTime;
         entity.direction = this.direction;
         entity.id = this.id;

@@ -2,7 +2,12 @@ package com.helltractor.exchange.model.ui;
 
 import com.helltractor.exchange.enums.UserType;
 import com.helltractor.exchange.model.support.EntitySupport;
-import jakarta.persistence.*;
+import jakarta.persistence.Column;
+import jakarta.persistence.Entity;
+import jakarta.persistence.GeneratedValue;
+import jakarta.persistence.GenerationType;
+import jakarta.persistence.Id;
+import jakarta.persistence.Table;
 
 @Entity
 @Table(name = "users")

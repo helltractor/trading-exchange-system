@@ -32,7 +32,7 @@
             <artifactId>spring-kafka</artifactId>
         </dependency>
 
-        <!-- redis okHttpClient -->
+        <!-- redis client -->
         <dependency>
             <groupId>io.lettuce</groupId>
             <artifactId>lettuce-core</artifactId>

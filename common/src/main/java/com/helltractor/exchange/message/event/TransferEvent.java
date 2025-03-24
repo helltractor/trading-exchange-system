@@ -10,9 +10,13 @@ import java.math.BigDecimal;
 public class TransferEvent extends AbstractEvent {
     
     public Long fromUserId;
+    
     public Long toUserId;
+    
     public AssetEnum asset;
+    
     public BigDecimal amount;
+    
     public boolean sufficient;
     
     @Override

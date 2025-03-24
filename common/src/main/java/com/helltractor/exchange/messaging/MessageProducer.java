@@ -14,5 +14,4 @@ public interface MessageProducer<T extends AbstractMessage> {
     }
     
     void sendMessages(T message);
-    
 }

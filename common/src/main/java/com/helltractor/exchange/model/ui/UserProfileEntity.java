@@ -1,7 +1,11 @@
 package com.helltractor.exchange.model.ui;
 
 import com.helltractor.exchange.model.support.EntitySupport;
-import jakarta.persistence.*;
+import jakarta.persistence.Column;
+import jakarta.persistence.Entity;
+import jakarta.persistence.Id;
+import jakarta.persistence.Table;
+import jakarta.persistence.UniqueConstraint;
 
 @Entity
 @Table(name = "user_profiles", uniqueConstraints = {@UniqueConstraint(name = "UNI_EMAIL", columnNames = {"email"})})

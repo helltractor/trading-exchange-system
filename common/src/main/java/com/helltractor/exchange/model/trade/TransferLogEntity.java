@@ -10,7 +10,7 @@ import jakarta.persistence.Table;
 import java.math.BigDecimal;
 
 /**
- * 用户转入转出的日志表
+ * User transfer log entity.
  */
 @Entity
 @Table(name = "transfer_logs")

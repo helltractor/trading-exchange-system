@@ -34,13 +34,13 @@ public class MatchEngine {
     }
     
     /**
-     * 处理订单
+     * Process order.
      *
      * @param sequenceId
-     * @param takerOrder  输入订单
-     * @param makerBook   尝试匹配成交的OrderBook
-     * @param anotherBook 未能完全成交后挂单的OrderBook
-     * @return 成交结果
+     * @param takerOrder  need to match OrderEntity
+     * @param makerBook   match success OrderBook
+     * @param anotherBook match fail OrderBook
+     * @return match result
      */
     private MatchResult processOrder(long sequenceId, OrderEntity takerOrder, OrderBook makerBook, OrderBook anotherBook) {
         this.sequenceId = sequenceId;
@@ -88,15 +88,16 @@ public class MatchEngine {
         // Taker未完全成交，放入对应的订单簿
         if (takerUnfilledQuantity.signum() > 0) {
             takerOrder.updateOrder(takerUnfilledQuantity,
-                    takerUnfilledQuantity.compareTo(takerOrder.quantity) == 0 ? OrderStatus.PENDING
-                            : OrderStatus.PARTIAL_FILLED, timeStamp);
+                    takerUnfilledQuantity.compareTo(takerOrder.quantity) == 0 ?
+                            OrderStatus.PENDING : OrderStatus.PARTIAL_FILLED,
+                    timeStamp);
             anotherBook.add(takerOrder);
         }
         return matchResult;
     }
     
     /**
-     * 撤单，查询订单状态
+     * Cancel order. Judge order status and update order status.
      */
     public void cancel(long timeStamp, OrderEntity order) {
         OrderBook book = order.direction == Direction.BUY ? this.buyBook : this.sellBook;

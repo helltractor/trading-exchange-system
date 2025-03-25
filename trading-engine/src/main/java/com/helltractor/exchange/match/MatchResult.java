@@ -9,6 +9,7 @@ import java.util.List;
 public class MatchResult {
     
     public final OrderEntity takerOrder;
+    
     public final List<MatchDetailRecord> matchDetails = new ArrayList<>();
     
     public MatchResult(OrderEntity takerOrder) {

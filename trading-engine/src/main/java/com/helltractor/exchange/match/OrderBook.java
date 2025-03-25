@@ -30,7 +30,9 @@ public class OrderBook {
             return cmp == 0 ? Long.compare(o1.sequenceId(), o2.sequenceId()) : cmp;
         }
     };
+    
     public final Direction direction;
+    
     public final TreeMap<OrderKey, OrderEntity> book;
     
     public OrderBook(Direction direction) {

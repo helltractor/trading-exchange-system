@@ -147,7 +147,6 @@ public class TradingEngineService extends LoggerSupport {
                 }
                 this.producer.sendMessages(messages);
             } else {
-                // 无推送时，暂停1ms
                 try {
                     Thread.sleep(1);
                 } catch (InterruptedException e) {
@@ -165,7 +164,6 @@ public class TradingEngineService extends LoggerSupport {
             if (message != null) {
                 redisService.publish(RedisCache.Topic.NOTIFICATION, JsonUtil.writeJson(message));
             } else {
-                // 无推送时，暂停1ms
                 try {
                     Thread.sleep(1);
                 } catch (InterruptedException e) {
@@ -194,7 +192,6 @@ public class TradingEngineService extends LoggerSupport {
                         new String[]{String.valueOf(orderBook.sequenceId), JsonUtil.writeJson(orderBook)});
                 lastSequenceId = orderBook.sequenceId;
             } else {
-                // 无更新时，暂停1ms
                 try {
                     Thread.sleep(1);
                 } catch (InterruptedException e) {
@@ -310,7 +307,8 @@ public class TradingEngineService extends LoggerSupport {
         int month = zonedDateTime.getMonthValue();
         long orderId = event.sequenceId * 10000 + (year * 100L + month);
         // 创建订单
-        OrderEntity order = orderService.createOrder(event.sequenceId, event.createTime, orderId, event.userId, event.direction, event.price, event.quantity);
+        OrderEntity order = orderService.createOrder(event.sequenceId, event.createTime,
+                orderId, event.userId, event.direction, event.price, event.quantity);
         if (order == null) {
             logger.warn("create order failed.");
             // 推送失败结果
@@ -340,10 +338,10 @@ public class TradingEngineService extends LoggerSupport {
                 if (makerOrder.status.isFinalStatus) {
                     closedOrders.add(makerOrder);
                 }
-                MatchDetailEntity takerDetail = generateMatchDetailEntity(event.sequenceId, event.createTime, detail,
-                        true);
-                MatchDetailEntity makerDetail = generateMatchDetailEntity(event.sequenceId, event.createTime, detail,
-                        false);
+                MatchDetailEntity takerDetail = generateMatchDetailEntity(event.sequenceId, event.createTime,
+                        detail, true);
+                MatchDetailEntity makerDetail = generateMatchDetailEntity(event.sequenceId, event.createTime,
+                        detail, false);
                 matchDetails.add(takerDetail);
                 matchDetails.add(makerDetail);
                 TickEntity tick = new TickEntity();
@@ -381,7 +379,6 @@ public class TradingEngineService extends LoggerSupport {
     
     private void cancelOrder(OrderCancelEvent event) {
         OrderEntity order = this.orderService.getOrder(event.refOrderId);
-        
         if (order == null || order.userId.longValue() != event.userId.longValue()) {
             // 发送失败消息
             this.apiResultQueue.add(ApiResultMessage.cancelOrderFailed(event.refId, event.createTime));
@@ -396,7 +393,8 @@ public class TradingEngineService extends LoggerSupport {
     }
     
     private boolean transfer(TransferEvent event) {
-        return this.assetService.tryTransfer(Transfer.AVAILABLE_TO_AVAILABLE, event.fromUserId, event.toUserId, event.asset, event.amount, event.sufficient);
+        return this.assetService.tryTransfer(Transfer.AVAILABLE_TO_AVAILABLE, event.fromUserId, event.toUserId,
+                event.asset, event.amount, event.sufficient);
     }
     
     private void saveToDb() throws InterruptedException {
@@ -436,7 +434,6 @@ public class TradingEngineService extends LoggerSupport {
             if (logger.isDebugEnabled()) {
                 logger.debug("batch insert {} orders...", batch.size());
             }
-            // 序列化
             this.storeService.insertIgnore(batch);
         }
         if (matchQueue.isEmpty()) {
@@ -513,8 +510,7 @@ public class TradingEngineService extends LoggerSupport {
                     userOrderFrozen.putIfAbsent(order.userId, new HashMap<>());
                     Map<AssetEnum, BigDecimal> frozenAssets = userOrderFrozen.get(order.userId);
                     frozenAssets.putIfAbsent(AssetEnum.USD, BigDecimal.ZERO);
-                    BigDecimal frozen = frozenAssets.get(AssetEnum.USD);
-                    frozenAssets.put(AssetEnum.USD, frozen.add(order.price.multiply(order.unfilledQuantity)));
+                    frozenAssets.computeIfPresent(AssetEnum.USD, (k, frozen) -> frozen.add(order.price.multiply(order.unfilledQuantity)));
                 }
                 case SELL -> {
                     // 订单必须在MatchEngine中
@@ -523,10 +519,11 @@ public class TradingEngineService extends LoggerSupport {
                     userOrderFrozen.putIfAbsent(order.userId, new HashMap<>());
                     Map<AssetEnum, BigDecimal> frozenAssets = userOrderFrozen.get(order.userId);
                     frozenAssets.putIfAbsent(AssetEnum.BTC, BigDecimal.ZERO);
-                    BigDecimal frozen = frozenAssets.get(AssetEnum.BTC);
-                    frozenAssets.put(AssetEnum.BTC, frozen.add(order.unfilledQuantity));
+                    frozenAssets.computeIfPresent(AssetEnum.BTC, (k, frozen) -> frozen.add(order.unfilledQuantity));
                 }
-                default -> require(false, "Unexpected order direction: " + order.direction);
+                default -> {
+                    require(false, "Unexpected order direction: " + order.direction);
+                }
             }
         }
         // 订单冻结的累计金额必须和Asset冻结一致
@@ -548,7 +545,7 @@ public class TradingEngineService extends LoggerSupport {
                 }
             }
         }
-        // userOrderFrozen不存在未验证的Asset数据:
+        // userOrderFrozen不存在未验证的Asset数据
         for (Entry<Long, Map<AssetEnum, BigDecimal>> userEntry : userOrderFrozen.entrySet()) {
             Long userId = userEntry.getKey();
             Map<AssetEnum, BigDecimal> frozenAssets = userEntry.getValue();
@@ -567,7 +564,7 @@ public class TradingEngineService extends LoggerSupport {
             require(copyOfActiveOrders.remove(order.id) == order,
                     "Order in sell book is not in active orders: " + order);
         }
-        // activeOrders的所有Order必须在Order Book中:
+        // activeOrders的所有Order必须在Order Book中
         require(copyOfActiveOrders.isEmpty(), "Not all active orders are in order book.");
     }
     
@@ -579,16 +576,16 @@ public class TradingEngineService extends LoggerSupport {
         System.out.println("========== // trading engine ==========");
     }
     
-    private void panic() {
-        logger.error("Application panic. Exit now...");
-        this.fatalError = true;
-        System.exit(1);
-    }
-    
     private void require(boolean condition, String errorMessage) {
         if (!condition) {
             logger.error("validate failed: {}", errorMessage);
             panic();
         }
+    }
+    
+    private void panic() {
+        logger.error("Application panic. Exit now...");
+        this.fatalError = true;
+        System.exit(1);
     }
 }

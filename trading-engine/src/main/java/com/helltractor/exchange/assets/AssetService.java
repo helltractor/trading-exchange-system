@@ -12,81 +12,80 @@ import java.util.Map;
 import java.util.concurrent.ConcurrentHashMap;
 import java.util.concurrent.ConcurrentMap;
 
+/**
+ * Asset service. Need multi-thread safe.
+ */
 @Component
 public class AssetService extends LoggerSupport {
     
     // UserId -> Map(AssetEnum -> Assets[available/frozen])
-    private final ConcurrentMap<Long, ConcurrentMap<AssetEnum, Asset>> userAssets = new ConcurrentHashMap<>();
+    public final ConcurrentMap<Long, ConcurrentMap<AssetEnum, Asset>> userAssets = new ConcurrentHashMap<>();
     
     public Asset getAsset(Long userId, AssetEnum assetId) {
         ConcurrentMap<AssetEnum, Asset> assets = userAssets.get(userId);
-        if (assets == null) {
-            return null;
-        }
-        return assets.get(assetId);
+        return assets == null ? null : assets.get(assetId);
     }
     
     public Map<AssetEnum, Asset> getAssets(Long userId) {
         Map<AssetEnum, Asset> assets = userAssets.get(userId);
-        if (assets == null) {
-            return Map.of();
-        }
-        return assets;
+        return assets == null ? Map.of() : assets;
     }
     
     public ConcurrentMap<Long, ConcurrentMap<AssetEnum, Asset>> getUserAssets() {
         return this.userAssets;
     }
     
-    private Asset initAssets(Long userId, AssetEnum assetId) {
-        ConcurrentMap<AssetEnum, Asset> assets = userAssets.get(userId);
-        if (assets == null) {
-            assets = new ConcurrentHashMap<>();
-            userAssets.put(userId, assets);
-        }
-        Asset zeroAsset = new Asset();
-        assets.put(assetId, zeroAsset);
-        return zeroAsset;
-    }
-    
     public boolean tryTransfer(Transfer type, Long fromUserId, Long toUserId, AssetEnum assetId,
                                BigDecimal amount, boolean checkBalance) {
+        if (amount.signum() == 0) {
+            return true;
+        }
         if (amount.signum() < 0) {
             throw new IllegalArgumentException("Amount must be positive");
         }
-        
         Asset fromAsset = getAsset(fromUserId, assetId);
         if (fromAsset == null) {
             fromAsset = initAssets(fromUserId, assetId);
         }
-        
         Asset toAsset = getAsset(toUserId, assetId);
         if (toAsset == null) {
             toAsset = initAssets(toUserId, assetId);
         }
         return switch (type) {
             case AVAILABLE_TO_AVAILABLE -> {
-                if (checkBalance && fromAsset.available.compareTo(amount) < 0) {
-                    yield false;
+                synchronized (fromAsset) {
+                    if (checkBalance && fromAsset.available.compareTo(amount) < 0) {
+                        yield  false;
+                    }
+                    fromAsset.available = fromAsset.available.subtract(amount);
                 }
-                fromAsset.available = fromAsset.available.subtract(amount);
-                toAsset.available = toAsset.available.add(amount);
+                synchronized (toAsset) {
+                    toAsset.available = toAsset.available.add(amount);
+                }
                 yield true;
             }
             case FROZEN_TO_AVAILABLE -> {
-                if (checkBalance && fromAsset.frozen.compareTo(amount) < 0) {
-                    yield false;
+                synchronized (fromAsset) {
+                    if (checkBalance && fromAsset.frozen.compareTo(amount) < 0) {
+                        yield false;
+                    }
+                    fromAsset.frozen = fromAsset.frozen.subtract(amount);
                 }
-                fromAsset.frozen = fromAsset.frozen.subtract(amount);
-                toAsset.available = toAsset.available.add(amount);
+                synchronized (toAsset) {
+                    toAsset.available = toAsset.available.add(amount);
+                }
                 yield true;
             }
             case AVAILABLE_TO_FROZEN -> {
-                if (checkBalance && fromAsset.available.compareTo(amount) < 0) {
-                    yield false;
+                synchronized (fromAsset) {
+                    if (checkBalance && fromAsset.available.compareTo(amount) < 0) {
+                        yield false;
+                    }
+                    fromAsset.available = fromAsset.available.subtract(amount);
                 }
-                fromAsset.available = fromAsset.available.subtract(amount);
-                toAsset.frozen = toAsset.frozen.add(amount);
+                synchronized (toAsset) {
+                    toAsset.frozen = toAsset.frozen.add(amount);
+                }
                 yield true;
             }
             default -> {
@@ -121,6 +120,12 @@ public class AssetService extends LoggerSupport {
         if (logger.isDebugEnabled()) {
             logger.debug("unfreezed user {}, assets {}, amount {}", userId, assetId, amount);
         }
+    }
+    
+    private Asset initAssets(Long userId, AssetEnum assetId) {
+        return userAssets
+                .computeIfAbsent(userId, k -> new ConcurrentHashMap<>())
+                .computeIfAbsent(assetId, k -> new Asset());
     }
     
     public void debug() {

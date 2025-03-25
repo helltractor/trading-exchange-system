@@ -6,9 +6,9 @@ import java.math.BigDecimal;
 
 public class Asset {
     
-    public BigDecimal available;
+    BigDecimal available;
     
-    public BigDecimal frozen;
+    BigDecimal frozen;
     
     public Asset() {
         this(BigDecimal.ZERO, BigDecimal.ZERO);

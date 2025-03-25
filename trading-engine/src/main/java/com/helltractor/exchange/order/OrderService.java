@@ -19,8 +19,10 @@ public class OrderService {
     
     private final AssetService assetService;
     
+    // active orders, orderId -> order
     private final ConcurrentMap<Long, OrderEntity> activeOrders = new ConcurrentHashMap<>();
     
+    // all user orders, userId -> orderId -> order
     private final ConcurrentMap<Long, ConcurrentHashMap<Long, OrderEntity>> userOrders = new ConcurrentHashMap<>();
     
     public OrderService(@Autowired AssetService assetService) {
@@ -42,18 +44,20 @@ public class OrderService {
     public OrderEntity createOrder(long sequenceId, long timeStamp, Long orderId, Long userId, Direction direction, BigDecimal price, BigDecimal quantity) {
         switch (direction) {
             case BUY -> {
-                // 买入，需冻结USD
+                // buy, need freeze USD
                 if (!assetService.tryFreeze(userId, AssetEnum.USD, price.multiply(quantity))) {
                     return null;
                 }
             }
             case SELL -> {
-                // 卖出，需冻结BTC
+                // sell, need freeze BTC
                 if (!assetService.tryFreeze(userId, AssetEnum.BTC, quantity)) {
                     return null;
                 }
             }
-            default -> throw new IllegalArgumentException("Invalid direction.");
+            default -> {
+                throw new IllegalArgumentException("Invalid direction.");
+            }
         }
         OrderEntity order = new OrderEntity();
         order.id = orderId;
@@ -66,13 +70,8 @@ public class OrderService {
         order.createTime = order.updateTime = timeStamp;
         // add to active orders
         this.activeOrders.put(order.id, order);
-        ConcurrentHashMap<Long, OrderEntity> tmpUserOrders = this.userOrders.get(userId);
         // add to user orders
-        if (tmpUserOrders == null) {
-            tmpUserOrders = new ConcurrentHashMap<>();
-            userOrders.put(userId, tmpUserOrders);
-        }
-        tmpUserOrders.put(order.id, order);
+        this.userOrders.computeIfAbsent(userId, k -> new ConcurrentHashMap<>()).put(order.id, order);
         return order;
     }
     

@@ -46,7 +46,9 @@ public class ClearingService extends LoggerSupport {
                     if (taker.price.compareTo(maker.price) > 0) {
                         // 实际买入价比报价低，部分USD退回账户
                         BigDecimal unfreezeQuote = taker.price.subtract(maker.price).multiply(matched);
-                        logger.debug("unfree extra unused quote {} back to taker user {}", unfreezeQuote, taker.userId);
+                        if (logger.isDebugEnabled()) {
+                            logger.debug("unfree extra unused quote {} back to taker user {}", unfreezeQuote, taker.userId);
+                        }
                         assetService.unfreeze(taker.userId, AssetEnum.USD, unfreezeQuote);
                     }
                     assetService.transfer(Transfer.FROZEN_TO_AVAILABLE, taker.userId, maker.userId, AssetEnum.USD, maker.price.multiply(matched));
@@ -83,7 +85,9 @@ public class ClearingService extends LoggerSupport {
                     orderService.removeOrder(taker.id);
                 }
             }
-            default -> throw new IllegalArgumentException("Invalid direction: " + taker.direction);
+            default -> {
+                throw new IllegalArgumentException("Invalid direction: " + taker.direction);
+            }
         }
     }
     
@@ -97,9 +101,10 @@ public class ClearingService extends LoggerSupport {
                 // 解冻BTC = 未成交数量
                 assetService.unfreeze(order.userId, AssetEnum.BTC, order.unfilledQuantity);
             }
-            default -> throw new IllegalArgumentException("Invalid direction: " + order.direction);
+            default -> {
+                throw new IllegalArgumentException("Invalid direction: " + order.direction);
+            }
         }
-        // 从OrderService中删除订单
         orderService.removeOrder(order.id);
     }
 }

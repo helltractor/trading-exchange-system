@@ -19,14 +19,13 @@ jobs:
           distribution: "temurin"
 
       - name: Build all modules
-        run: mvn clean install -DskipTests
-        working-directory: ./build
+        run: mvn -B install -DskipTests
+        working-directory: build
 
       - name: Create Github Release
-        id: create_release
         uses: softprops/action-gh-release@v1
         with:
-          name: Release ${{ github.ref_name }}
+          name: ${{ github.ref_name }}
           tag_name: ${{ github.ref_name }}
           body: |
             Release notes for version ${{ github.ref_name }}

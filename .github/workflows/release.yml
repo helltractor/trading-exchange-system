@@ -1,0 +1,43 @@
+name: Release Jars
+
+on:
+  push:
+    tags:
+      - "v*"
+
+jobs:
+  release:
+    runs-on: ubuntu-latest
+    steps:
+      - name: Checkout code
+        uses: actions/checkout@v3
+
+      - name: Set up JDK
+        uses: actions/setup-java@v3
+        with:
+          java-version: "17"
+          distribution: "temurin"
+
+      - name: Build all modules
+        run: mvn clean install --DskipTests
+        working-directory: ./build
+
+      - name: Create Github Release
+        id: create_release
+        uses: softprops/action-gh-release@v1
+        with:
+          name: Release ${{ github.ref }}
+          tag_name: ${{ github.ref }}
+          body: |
+            Release notes for version ${{ github.ref }}
+          files: |
+            common/target/*.jar
+            config/target/*.jar
+            push/target/*.jar
+            quotation/target/*.jar
+            trading-api/target/*.jar
+            trading-engine/target/*.jar
+            trainng-sequencer/target/*.jar
+            ui/target/*.jar
+        env:
+          GITHUB_TOKEN: ${{ secrets.GITHUB_TOKEN }}

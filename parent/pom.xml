@@ -14,7 +14,7 @@
     <artifactId>parent</artifactId>
     <packaging>pom</packaging>
     <name>Trading Exchange System</name>
-    <version>1.0.0</version>
+    <version>0.0.1</version>
 
     <properties>
         <project.version>1.0.0</project.version>

@@ -15,10 +15,10 @@ import java.util.stream.Collectors;
 @Component
 @Transactional
 public class StoreService extends AbstractDbService {
-    
+
     @Autowired
     private MessageTypes messageTypes;
-    
+
     public List<AbstractEvent> loadEventFromDb(long lastEventId) {
         List<EventEntity> events = dataBase.from(EventEntity.class)
                 .where("sequenceId > ?", lastEventId)
@@ -27,7 +27,7 @@ public class StoreService extends AbstractDbService {
         return events.stream().map(event -> (AbstractEvent) messageTypes.deserialize(event.data))
                 .collect(Collectors.toList());
     }
-    
+
     public void insertIgnore(List<? extends EntitySupport> list) {
         dataBase.insertIgnore(list);
     }

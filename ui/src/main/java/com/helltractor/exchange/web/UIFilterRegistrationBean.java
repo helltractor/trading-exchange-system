@@ -1,31 +1,37 @@
 package com.helltractor.exchange.web;
 
-import com.helltractor.exchange.bean.AuthToken;
-import com.helltractor.exchange.ctx.UserContext;
-import com.helltractor.exchange.support.AbstractFilter;
-import com.helltractor.exchange.user.UserService;
-import jakarta.annotation.PostConstruct;
-import jakarta.servlet.*;
-import jakarta.servlet.http.HttpServletRequest;
-import jakarta.servlet.http.HttpServletResponse;
+import java.io.IOException;
+
 import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.boot.web.servlet.FilterRegistrationBean;
 import org.springframework.stereotype.Component;
 
-import java.io.IOException;
+import com.helltractor.exchange.bean.AuthToken;
+import com.helltractor.exchange.ctx.UserContext;
+import com.helltractor.exchange.support.AbstractFilter;
+import com.helltractor.exchange.user.UserService;
+
+import jakarta.annotation.PostConstruct;
+import jakarta.servlet.Filter;
+import jakarta.servlet.FilterChain;
+import jakarta.servlet.ServletException;
+import jakarta.servlet.ServletRequest;
+import jakarta.servlet.ServletResponse;
+import jakarta.servlet.http.HttpServletRequest;
+import jakarta.servlet.http.HttpServletResponse;
 
 /**
  * UIFilter: try parse user from cookie.
  */
 @Component
 public class UIFilterRegistrationBean extends FilterRegistrationBean<Filter> {
-    
+
     @Autowired
     UserService userService;
-    
+
     @Autowired
     CookieService cookieService;
-    
+
     @PostConstruct
     public void init() {
         UIFilter filter = new UIFilter();
@@ -34,9 +40,9 @@ public class UIFilterRegistrationBean extends FilterRegistrationBean<Filter> {
         setName(filter.getClass().getSimpleName());
         setOrder(100);
     }
-    
+
     class UIFilter extends AbstractFilter {
-        
+
         @Override
         public void doFilter(ServletRequest req, ServletResponse resp, FilterChain chain)
                 throws IOException, ServletException {

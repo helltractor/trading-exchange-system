@@ -1,59 +1,61 @@
 package com.helltractor.exchange.push;
 
-import com.helltractor.exchange.bean.AuthToken;
-import com.helltractor.exchange.message.NotificationMessage;
-import com.helltractor.exchange.util.JsonUtil;
-import io.vertx.core.AbstractVerticle;
-import io.vertx.core.eventbus.EventBus;
-import io.vertx.core.http.HttpServer;
-import io.vertx.core.http.HttpServerRequest;
-import io.vertx.core.http.ServerWebSocket;
-import io.vertx.ext.web.Router;
-import org.slf4j.Logger;
-import org.slf4j.LoggerFactory;
-
 import java.util.HashSet;
 import java.util.Map;
 import java.util.Set;
 import java.util.concurrent.ConcurrentHashMap;
 import java.util.function.Supplier;
 
+import org.slf4j.Logger;
+import org.slf4j.LoggerFactory;
+
+import com.helltractor.exchange.bean.AuthToken;
+import com.helltractor.exchange.message.NotificationMessage;
+import com.helltractor.exchange.util.JsonUtil;
+
+import io.vertx.core.AbstractVerticle;
+import io.vertx.core.eventbus.EventBus;
+import io.vertx.core.http.HttpServer;
+import io.vertx.core.http.HttpServerRequest;
+import io.vertx.core.http.ServerWebSocket;
+import io.vertx.ext.web.Router;
+
 public class PushVerticle extends AbstractVerticle {
-    
+
     private final Logger logger = LoggerFactory.getLogger(getClass());
-    
+
     private final String hmacKey;
-    
+
     private final int serverPort;
-    
+
     /**
      * All handlers.
      */
     private final Map<String, Boolean> handlersSet = new ConcurrentHashMap<>(1000);
-    
+
     /**
      * userId -> set of handlers.
      */
     private final Map<Long, Set<String>> userToHandlersMap = new ConcurrentHashMap<>(1000);
-    
+
     /**
      * handler -> userId.
      */
     private final Map<String, Long> handlerToUserMap = new ConcurrentHashMap<>(1000);
-    
+
     public PushVerticle(String hmacKey, int serverPort) {
         this.hmacKey = hmacKey;
         this.serverPort = serverPort;
     }
-    
+
     @Override
     public void start() {
         // 创建VertX HttpServer
         HttpServer server = vertx.createHttpServer();
-        
+
         // 创建路由
         Router router = Router.router(vertx);
-        
+
         // 处理请求 GET /notification
         router.get("/notification").handler(requestHandler -> {
             HttpServerRequest request = requestHandler.request();
@@ -77,14 +79,14 @@ public class PushVerticle extends AbstractVerticle {
                 }
             });
         });
-        
+
         // 处理请求 GET /actuator/health
         router.get("/actuator/health").respond(
                 ctx -> ctx.response().putHeader("Content-Type", "application/json").end("{\"status\":\"UP\"}"));
-        
+
         // 处理其他请求
         router.get().respond(ctx -> ctx.response().setStatusCode(404).setStatusMessage("No Route Found").end());
-        
+
         server.requestHandler(router).listen(this.serverPort, result -> {
             if (result.succeeded()) {
                 logger.info("Vertx started on port(s): {} (http) with context path ''", this.serverPort);
@@ -95,7 +97,7 @@ public class PushVerticle extends AbstractVerticle {
             }
         });
     }
-    
+
     private void initWebSocket(ServerWebSocket websocket, Long userId) {
         String handlerId = websocket.textHandlerID();
         logger.info("websocket accept userId: {}, handlerId: {}", userId, handlerId);
@@ -122,18 +124,18 @@ public class PushVerticle extends AbstractVerticle {
         } else {
             websocket.writeTextMessage(
                     "{\"type\":\"status\",\"status\":\"connected\",\"message\":\"connected as user\",\"userId\":"
-                            + userId + "}");
+                    + userId + "}");
         }
     }
-    
+
     private void subscribeClient(String handlerId) {
         this.handlersSet.put(handlerId, Boolean.TRUE);
     }
-    
+
     private void unsubscribeClient(String handlerId) {
         this.handlersSet.remove(handlerId);
     }
-    
+
     private void subscribeUser(Long userId, String handlerId) {
         if (userId == null) {
             return;
@@ -143,7 +145,7 @@ public class PushVerticle extends AbstractVerticle {
         set.add(handlerId);
         logger.info("subscribe user {} {} ok.", userId, handlerId);
     }
-    
+
     private void unsubscribeUser(Long userId, String handlerId) {
         if (userId == null) {
             return;
@@ -160,7 +162,7 @@ public class PushVerticle extends AbstractVerticle {
             }
         }
     }
-    
+
     public void broadcast(String text) {
         NotificationMessage message;
         try {

@@ -14,19 +14,19 @@ import java.time.Duration;
 
 @Component
 public class CookieService extends LoggerSupport {
-    
+
     public final String SESSION_COOKIE = "_exsession_";
-    
+
     @Value("#{exchangeConfiguration.hmacKey}")
     private String hmacKey;
-    
+
     @Value("#{exchangeConfiguration.sessionTimeout}")
     private Duration sessionTimeout;
-    
+
     public long getExpiresInSeconds() {
         return sessionTimeout.toSeconds();
     }
-    
+
     @Nullable
     public AuthToken findSessionCookie(HttpServletRequest request) {
         Cookie[] cookies = request.getCookies();
@@ -42,7 +42,7 @@ public class CookieService extends LoggerSupport {
         }
         return null;
     }
-    
+
     public void setSessionCookie(HttpServletRequest request, HttpServletResponse response, AuthToken token) {
         String cookieStr = token.toSecureString(this.hmacKey);
         logger.info("[Cookie] set session cookie: {}", cookieStr);
@@ -57,7 +57,7 @@ public class CookieService extends LoggerSupport {
         }
         response.addCookie(cookie);
     }
-    
+
     public void deleteSessionCookie(HttpServletRequest request, HttpServletResponse response) {
         logger.info("delete session cookie...");
         Cookie cookie = new Cookie(SESSION_COOKIE, "-deleted-");

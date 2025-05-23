@@ -1,12 +1,5 @@
 package com.helltractor.exchange.order;
 
-import com.helltractor.exchange.assets.AssetService;
-import com.helltractor.exchange.enums.AssetEnum;
-import com.helltractor.exchange.enums.Direction;
-import com.helltractor.exchange.model.trade.OrderEntity;
-import org.springframework.beans.factory.annotation.Autowired;
-import org.springframework.stereotype.Component;
-
 import java.math.BigDecimal;
 import java.util.ArrayList;
 import java.util.Collections;
@@ -14,33 +7,41 @@ import java.util.List;
 import java.util.concurrent.ConcurrentHashMap;
 import java.util.concurrent.ConcurrentMap;
 
+import org.springframework.beans.factory.annotation.Autowired;
+import org.springframework.stereotype.Component;
+
+import com.helltractor.exchange.assets.AssetService;
+import com.helltractor.exchange.enums.AssetEnum;
+import com.helltractor.exchange.enums.Direction;
+import com.helltractor.exchange.model.trade.OrderEntity;
+
 @Component
 public class OrderService {
-    
+
     private final AssetService assetService;
-    
+
     // active orders, orderId -> order
     private final ConcurrentMap<Long, OrderEntity> activeOrders = new ConcurrentHashMap<>();
-    
+
     // all user orders, userId -> orderId -> order
     private final ConcurrentMap<Long, ConcurrentHashMap<Long, OrderEntity>> userOrders = new ConcurrentHashMap<>();
-    
+
     public OrderService(@Autowired AssetService assetService) {
         this.assetService = assetService;
     }
-    
+
     public OrderEntity getOrder(Long orderId) {
         return this.activeOrders.get(orderId);
     }
-    
+
     public ConcurrentMap<Long, OrderEntity> getActiveOrders() {
         return this.activeOrders;
     }
-    
+
     public ConcurrentMap<Long, OrderEntity> getUserOrders(Long userId) {
         return this.userOrders.get(userId);
     }
-    
+
     public OrderEntity createOrder(long sequenceId, long timeStamp, Long orderId, Long userId, Direction direction, BigDecimal price, BigDecimal quantity) {
         switch (direction) {
             case BUY -> {
@@ -74,7 +75,7 @@ public class OrderService {
         this.userOrders.computeIfAbsent(userId, k -> new ConcurrentHashMap<>()).put(order.id, order);
         return order;
     }
-    
+
     public void removeOrder(long orderId) {
         // remove from active orders
         OrderEntity removed = this.activeOrders.remove(orderId);
@@ -90,7 +91,7 @@ public class OrderService {
             throw new IllegalArgumentException("Order not found by orderId in user orders: " + orderId);
         }
     }
-    
+
     public void debug() {
         System.out.println("---------- orders ----------");
         List<OrderEntity> orders = new ArrayList<>(this.activeOrders.values());

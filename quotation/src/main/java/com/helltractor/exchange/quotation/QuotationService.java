@@ -1,28 +1,5 @@
 package com.helltractor.exchange.quotation;
 
-import com.fasterxml.jackson.core.type.TypeReference;
-import com.helltractor.exchange.enums.BarType;
-import com.helltractor.exchange.message.AbstractMessage;
-import com.helltractor.exchange.message.TickMessage;
-import com.helltractor.exchange.messaging.MessageConsumer;
-import com.helltractor.exchange.messaging.Messaging;
-import com.helltractor.exchange.messaging.MessagingFactory;
-import com.helltractor.exchange.model.quatation.TickEntity;
-import com.helltractor.exchange.model.quatation.DayBarEntity;
-import com.helltractor.exchange.model.quatation.HourBarEntity;
-import com.helltractor.exchange.model.quatation.MinBarEntity;
-import com.helltractor.exchange.model.quatation.SecBarEntity;
-import com.helltractor.exchange.model.support.AbstractBarEntity;
-import com.helltractor.exchange.redis.RedisCache;
-import com.helltractor.exchange.redis.RedisService;
-import com.helltractor.exchange.support.LoggerSupport;
-import com.helltractor.exchange.util.IpUtil;
-import com.helltractor.exchange.util.JsonUtil;
-import jakarta.annotation.PostConstruct;
-import jakarta.annotation.PreDestroy;
-import org.springframework.beans.factory.annotation.Autowired;
-import org.springframework.stereotype.Component;
-
 import java.math.BigDecimal;
 import java.time.Instant;
 import java.time.ZoneId;
@@ -31,35 +8,60 @@ import java.util.Map;
 import java.util.StringJoiner;
 import java.util.function.Supplier;
 
+import org.springframework.beans.factory.annotation.Autowired;
+import org.springframework.stereotype.Component;
+
+import com.fasterxml.jackson.core.type.TypeReference;
+import com.helltractor.exchange.enums.BarType;
+import com.helltractor.exchange.message.AbstractMessage;
+import com.helltractor.exchange.message.TickMessage;
+import com.helltractor.exchange.messaging.MessageConsumer;
+import com.helltractor.exchange.messaging.Messaging;
+import com.helltractor.exchange.messaging.MessagingFactory;
+import com.helltractor.exchange.model.quatation.DayBarEntity;
+import com.helltractor.exchange.model.quatation.HourBarEntity;
+import com.helltractor.exchange.model.quatation.MinBarEntity;
+import com.helltractor.exchange.model.quatation.SecBarEntity;
+import com.helltractor.exchange.model.quatation.TickEntity;
+import com.helltractor.exchange.model.support.AbstractBarEntity;
+import com.helltractor.exchange.redis.RedisCache;
+import com.helltractor.exchange.redis.RedisService;
+import com.helltractor.exchange.support.LoggerSupport;
+import com.helltractor.exchange.util.IpUtil;
+import com.helltractor.exchange.util.JsonUtil;
+
+import jakarta.annotation.PostConstruct;
+import jakarta.annotation.PreDestroy;
+
 /**
  * Quotation service.
  */
 @Component
 public class QuotationService extends LoggerSupport {
-    
+
     private static final TypeReference<Map<BarType, BigDecimal[]>> TYPE_BARS = new TypeReference<>() {
     };
-    
+
     @Autowired
     private ZoneId zoneId;
-    
+
     @Autowired
     private RedisService redisService;
-    
+
     @Autowired
     private QuotationDbService quotationDbService;
-    
+
     @Autowired
     private MessagingFactory messagingFactory;
-    
+
     private MessageConsumer tickConsumer;
-    
+
     private String shaUpdateRecentTicksLua = null;
-    
+
     private String shaUpdateBarLua = null;
-    
+
     private long sequenceId;
-    
+
     private static <T extends AbstractBarEntity> T createBar(Supplier<T> supplier, BigDecimal[] data) {
         if (data == null) {
             return null;
@@ -73,7 +75,7 @@ public class QuotationService extends LoggerSupport {
         bar.quantity = data[5];
         return bar;
     }
-    
+
     @PostConstruct
     public void init() {
         // init redis lua script
@@ -84,7 +86,7 @@ public class QuotationService extends LoggerSupport {
         this.tickConsumer = this.messagingFactory.createBatchMessageListener(Messaging.Topic.TICK, groupId,
                 this::processMessages);
     }
-    
+
     @PreDestroy
     public void shutdown() {
         if (this.tickConsumer != null) {
@@ -92,13 +94,13 @@ public class QuotationService extends LoggerSupport {
             this.tickConsumer = null;
         }
     }
-    
+
     private void processMessages(List<AbstractMessage> messages) {
         for (AbstractMessage message : messages) {
             processMessage((TickMessage) message);
         }
     }
-    
+
     private void processMessage(TickMessage message) {
         // ignore repeated messages
         if (message.sequenceId < this.sequenceId) {
@@ -107,7 +109,7 @@ public class QuotationService extends LoggerSupport {
         if (logger.isDebugEnabled()) {
             logger.debug("process ticks: sequenceId = {}, {} ticks...", message.sequenceId, message.ticks.size());
         }
-        
+
         this.sequenceId = message.sequenceId;
         final long createTime = message.createTime;
         StringJoiner ticksStrJoiner = new StringJoiner(",", "[", "]");
@@ -133,7 +135,7 @@ public class QuotationService extends LoggerSupport {
             }
             quantity = quantity.add(tick.quantity);
         }
-        
+
         long sec = createTime / 1000;
         long min = sec / 60;
         long hour = min / 60;
@@ -161,25 +163,25 @@ public class QuotationService extends LoggerSupport {
         String strCreatedBars = redisService.executeScriptReturnString(this.shaUpdateBarLua,
                 // KEYS
                 new String[]{
-                        RedisCache.Key.SEC_BARS,
-                        RedisCache.Key.MIN_BARS,
-                        RedisCache.Key.HOUR_BARS,
-                        RedisCache.Key.DAY_BARS
+                    RedisCache.Key.SEC_BARS,
+                    RedisCache.Key.MIN_BARS,
+                    RedisCache.Key.HOUR_BARS,
+                    RedisCache.Key.DAY_BARS
                 },
                 // ARGV
                 new String[]{
-                        String.valueOf(this.sequenceId),
-                        String.valueOf(secStartTime),
-                        String.valueOf(minStartTime),
-                        String.valueOf(hourStartTime),
-                        String.valueOf(dayStartTime),
-                        String.valueOf(openPrice),
-                        String.valueOf(highPrice),
-                        String.valueOf(lowPrice),
-                        String.valueOf(closePrice),
-                        String.valueOf(quantity)
+                    String.valueOf(this.sequenceId),
+                    String.valueOf(secStartTime),
+                    String.valueOf(minStartTime),
+                    String.valueOf(hourStartTime),
+                    String.valueOf(dayStartTime),
+                    String.valueOf(openPrice),
+                    String.valueOf(highPrice),
+                    String.valueOf(lowPrice),
+                    String.valueOf(closePrice),
+                    String.valueOf(quantity)
                 });
-        
+
         logger.info("returned created bars: {}", strCreatedBars);
         // save bars to database from Redis
         Map<BarType, BigDecimal[]> barTypeMap = JsonUtil.readJson(strCreatedBars, TYPE_BARS);

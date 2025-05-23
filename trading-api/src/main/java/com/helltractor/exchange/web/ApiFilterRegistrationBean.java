@@ -1,5 +1,15 @@
 package com.helltractor.exchange.web;
 
+import java.io.IOException;
+import java.io.PrintWriter;
+import java.nio.charset.StandardCharsets;
+import java.util.Base64;
+
+import org.springframework.beans.factory.annotation.Autowired;
+import org.springframework.beans.factory.annotation.Value;
+import org.springframework.boot.web.servlet.FilterRegistrationBean;
+import org.springframework.stereotype.Component;
+
 import com.fasterxml.jackson.databind.ObjectMapper;
 import com.helltractor.exchange.ApiError;
 import com.helltractor.exchange.ApiException;
@@ -8,35 +18,31 @@ import com.helltractor.exchange.ctx.UserContext;
 import com.helltractor.exchange.model.ui.UserProfileEntity;
 import com.helltractor.exchange.support.AbstractFilter;
 import com.helltractor.exchange.user.UserService;
+
 import jakarta.annotation.PostConstruct;
-import jakarta.servlet.*;
+import jakarta.servlet.Filter;
+import jakarta.servlet.FilterChain;
+import jakarta.servlet.ServletException;
+import jakarta.servlet.ServletRequest;
+import jakarta.servlet.ServletResponse;
 import jakarta.servlet.http.HttpServletRequest;
 import jakarta.servlet.http.HttpServletResponse;
-import org.springframework.beans.factory.annotation.Autowired;
-import org.springframework.beans.factory.annotation.Value;
-import org.springframework.boot.web.servlet.FilterRegistrationBean;
-import org.springframework.stereotype.Component;
-
-import java.io.IOException;
-import java.io.PrintWriter;
-import java.nio.charset.StandardCharsets;
-import java.util.Base64;
 
 /**
  * Filter to process API requests.
  */
 @Component
 public class ApiFilterRegistrationBean extends FilterRegistrationBean<Filter> {
-    
+
     @Autowired
     private UserService userService;
-    
+
     @Autowired
     private ObjectMapper objectMapper;
-    
+
     @Value("#{exchangeConfiguration.hmacKey}")
     private String hmacKey;
-    
+
     @PostConstruct
     public void init() {
         ApiFilter filter = new ApiFilter();
@@ -45,9 +51,9 @@ public class ApiFilterRegistrationBean extends FilterRegistrationBean<Filter> {
         setName(filter.getClass().getSimpleName());
         setOrder(100);
     }
-    
+
     class ApiFilter extends AbstractFilter {
-        
+
         @Override
         public void doFilter(ServletRequest req, ServletResponse resp, FilterChain chain) throws IOException, ServletException {
             HttpServletRequest request = (HttpServletRequest) req;
@@ -73,7 +79,7 @@ public class ApiFilterRegistrationBean extends FilterRegistrationBean<Filter> {
                 }
             }
         }
-        
+
         private void sendErrorResponse(HttpServletResponse response, ApiException e) throws IOException {
             response.sendError(400);
             response.setContentType("application/json");
@@ -81,7 +87,7 @@ public class ApiFilterRegistrationBean extends FilterRegistrationBean<Filter> {
             pw.write(objectMapper.writeValueAsString(e.error));
             pw.flush();
         }
-        
+
         private Long parseUser(HttpServletRequest request) {
             // 尝试通过Authorization Header认证用户
             String auth = request.getHeader("Authorization");
@@ -96,12 +102,12 @@ public class ApiFilterRegistrationBean extends FilterRegistrationBean<Filter> {
             }
             return null;
         }
-        
+
         private Long parseUserFromApiKey(String apiKey, String apiSignature, HttpServletRequest request) {
             // TODO: 验证API-Key, API-Secret并返回userId
             return null;
         }
-        
+
         private Long parseUserFromAuthorization(String auth) {
             if (auth.startsWith("Basic ")) {
                 String eap = new String(Base64.getDecoder().decode(auth.substring(6)), StandardCharsets.UTF_8);

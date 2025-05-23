@@ -1,5 +1,11 @@
 package com.helltractor.exchange.clearing;
 
+import java.math.BigDecimal;
+
+import org.springframework.beans.factory.annotation.Autowired;
+import org.springframework.beans.factory.annotation.Value;
+import org.springframework.stereotype.Component;
+
 import com.helltractor.exchange.assets.AssetService;
 import com.helltractor.exchange.assets.Transfer;
 import com.helltractor.exchange.enums.AssetEnum;
@@ -8,27 +14,22 @@ import com.helltractor.exchange.match.MatchResult;
 import com.helltractor.exchange.model.trade.OrderEntity;
 import com.helltractor.exchange.order.OrderService;
 import com.helltractor.exchange.support.LoggerSupport;
-import org.springframework.beans.factory.annotation.Autowired;
-import org.springframework.beans.factory.annotation.Value;
-import org.springframework.stereotype.Component;
-
-import java.math.BigDecimal;
 
 @Component
 public class ClearingService extends LoggerSupport {
-    
+
     private final AssetService assetService;
-    
+
     private final OrderService orderService;
-    
+
     @Value("${exchange.fee-rate:0.0005}")
     private BigDecimal feeRate;
-    
+
     public ClearingService(@Autowired AssetService assetService, @Autowired OrderService orderService) {
         this.assetService = assetService;
         this.orderService = orderService;
     }
-    
+
     public void clearMatchResult(MatchResult result) {
         OrderEntity taker = result.takerOrder;
         switch (taker.direction) {
@@ -90,7 +91,7 @@ public class ClearingService extends LoggerSupport {
             }
         }
     }
-    
+
     public void clearCancelOrder(OrderEntity order) {
         switch (order.direction) {
             case BUY -> {

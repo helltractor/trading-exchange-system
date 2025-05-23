@@ -32,24 +32,24 @@ import java.util.regex.Pattern;
 
 @Controller
 public class MvcController extends LoggerSupport {
-    
+
     public final static Pattern EMAIL = Pattern.compile("^[a-z0-9\\-\\.]+\\@([a-z0-9\\-]+\\.){1,3}[a-z]{2,20}$");
-    
+
     @Value("#{exchangeConfiguration.hmacKey}")
     private String hmacKey;
-    
+
     @Autowired
     private CookieService cookieService;
-    
+
     @Autowired
     private UserService userService;
-    
+
     @Autowired
     private RestClient tradingApiClient;
-    
+
     @Autowired
     private Environment environment;
-    
+
     @PostConstruct
     public void init() {
         // init users: user0@example.com ~ user99@example.com
@@ -65,7 +65,7 @@ public class MvcController extends LoggerSupport {
             }
         }
     }
-    
+
     @GetMapping("/")
     public ModelAndView index() {
         if (UserContext.getUserId() == null) {
@@ -73,7 +73,7 @@ public class MvcController extends LoggerSupport {
         }
         return prepareModelAndView("index");
     }
-    
+
     @GetMapping("/signup")
     public ModelAndView signup() {
         if (UserContext.getUserId() != null) {
@@ -81,7 +81,7 @@ public class MvcController extends LoggerSupport {
         }
         return prepareModelAndView("signup");
     }
-    
+
     @PostMapping("/signup")
     public ModelAndView signup(@RequestParam("email") String email, @RequestParam("name") String name, @RequestParam("password") String password) {
         // check email
@@ -107,7 +107,7 @@ public class MvcController extends LoggerSupport {
         doSignup(email, name, password);
         return redirect("/signin");
     }
-    
+
     @PostMapping(value = "/websocket/token", produces = "application/json")
     @ResponseBody
     String requestWebSocketToken() {
@@ -122,7 +122,7 @@ public class MvcController extends LoggerSupport {
         // 返回JSON字符串"xxx"
         return "\"" + strToken + "\"";
     }
-    
+
     @GetMapping("/signin")
     public ModelAndView signin(HttpServletRequest request) {
         if (UserContext.getUserId() != null) {
@@ -130,7 +130,7 @@ public class MvcController extends LoggerSupport {
         }
         return prepareModelAndView("signin");
     }
-    
+
     @PostMapping("/signin")
     public ModelAndView signin(@RequestParam("email") String email, @RequestParam("password") String password, HttpServletRequest request, HttpServletResponse response) {
         // check email and password
@@ -160,13 +160,13 @@ public class MvcController extends LoggerSupport {
         logger.info("signin ok.");
         return redirect("/");
     }
-    
+
     @GetMapping("/signout")
     public ModelAndView signout(HttpServletRequest request, HttpServletResponse response) {
         cookieService.deleteSessionCookie(request, response);
         return redirect("/");
     }
-    
+
     private UserProfileEntity doSignup(String email, String name, String password) {
         // 注册用户
         UserProfileEntity profile = userService.signup(email, name, password);
@@ -181,13 +181,13 @@ public class MvcController extends LoggerSupport {
         logger.info("user signed up: {}", profile);
         return profile;
     }
-    
+
     private boolean isLocalDevEnv() {
         logger.info("activeProfiles: {}, defaultProfiles: {}", environment.getActiveProfiles(), environment.getDefaultProfiles());
         return environment.getActiveProfiles().length == 0
                 && Arrays.equals(environment.getDefaultProfiles(), new String[]{"default"});
     }
-    
+
     private void deposit(Long userId, AssetEnum asset, BigDecimal amount) {
         var req = new TransferRequestBean();
         req.transferId = HashUtil.sha256(userId + "/" + asset + "/" + amount.stripTrailingZeros().toPlainString())
@@ -198,40 +198,40 @@ public class MvcController extends LoggerSupport {
         req.toUserId = userId;
         tradingApiClient.post(Map.class, "/internal/transfer", null, req);
     }
-    
+
     private ModelAndView prepareModelAndView(String view, String key, Object value) {
         ModelAndView mv = new ModelAndView(view);
         mv.addObject(key, value);
         addGlobalModel(mv);
         return mv;
     }
-    
+
     private ModelAndView prepareModelAndView(String view, Map<String, Object> model) {
         ModelAndView mv = new ModelAndView(view);
         mv.addAllObjects(model);
         addGlobalModel(mv);
         return mv;
     }
-    
+
     private ModelAndView prepareModelAndView(String view) {
         ModelAndView mv = new ModelAndView(view);
         addGlobalModel(mv);
         return mv;
     }
-    
+
     private ModelAndView notFound() {
         ModelAndView mv = new ModelAndView("404");
         addGlobalModel(mv);
         return mv;
     }
-    
+
     private void addGlobalModel(ModelAndView mv) {
         final Long userId = UserContext.getUserId();
         mv.addObject("__userId__", userId);
         mv.addObject("__profile__", userId == null ? null : userService.getUserProfile(userId));
         mv.addObject("__time__", Long.valueOf(System.currentTimeMillis()));
     }
-    
+
     private ModelAndView redirect(String url) {
         return new ModelAndView("redirect:" + url);
     }

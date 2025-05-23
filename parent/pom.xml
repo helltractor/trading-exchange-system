@@ -3,11 +3,6 @@
          xmlns="http://maven.apache.org/POM/4.0.0"
          xsi:schemaLocation="http://maven.apache.org/POM/4.0.0 http://maven.apache.org/xsd/maven-4.0.0.xsd">
     <modelVersion>4.0.0</modelVersion>
-    <groupId>com.helltractor.exchange</groupId>
-    <artifactId>parent</artifactId>
-    <version>1.0.0</version>
-    <packaging>pom</packaging>
-    <name>Trading Exchange System</name>
 
     <parent>
         <groupId>org.springframework.boot</groupId>
@@ -15,11 +10,17 @@
         <version>3.2.0</version>
     </parent>
 
+    <groupId>com.helltractor.exchange</groupId>
+    <artifactId>parent</artifactId>
+    <packaging>pom</packaging>
+    <name>Trading Exchange System</name>
+    <version>1.0.0</version>
+
     <properties>
         <project.version>1.0.0</project.version>
+        <java.version>17</java.version>
         <project.build.sourceEncoding>UTF-8</project.build.sourceEncoding>
         <project.reporting.outputEncoding>UTF-8</project.reporting.outputEncoding>
-        <java.version>17</java.version>
         <maven.compiler.source>${java.version}</maven.compiler.source>
         <maven.compiler.target>${java.version}</maven.compiler.target>
         <spring-cloud.version>2023.0.0</spring-cloud.version>
@@ -42,7 +43,6 @@
     </dependencyManagement>
 
     <dependencies>
-        <!-- junit5 -->
         <dependency>
             <groupId>org.junit.jupiter</groupId>
             <artifactId>junit-jupiter-api</artifactId>
@@ -58,7 +58,6 @@
             <artifactId>junit-jupiter-engine</artifactId>
             <scope>test</scope>
         </dependency>
-        <!-- spring test -->
         <dependency>
             <groupId>org.springframework</groupId>
             <artifactId>spring-test</artifactId>

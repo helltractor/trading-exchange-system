@@ -1,25 +1,26 @@
 package com.helltractor.exchange.web.api;
 
-import com.helltractor.exchange.bean.TransferRequestBean;
-import com.helltractor.exchange.enums.UserType;
-import com.helltractor.exchange.message.event.TransferEvent;
-import com.helltractor.exchange.service.SendEventService;
-import com.helltractor.exchange.support.AbstractApiController;
+import java.util.Map;
+
 import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.web.bind.annotation.PostMapping;
 import org.springframework.web.bind.annotation.RequestBody;
 import org.springframework.web.bind.annotation.RequestMapping;
 import org.springframework.web.bind.annotation.RestController;
 
-import java.util.Map;
+import com.helltractor.exchange.bean.TransferRequestBean;
+import com.helltractor.exchange.enums.UserType;
+import com.helltractor.exchange.message.event.TransferEvent;
+import com.helltractor.exchange.service.SendEventService;
+import com.helltractor.exchange.support.AbstractApiController;
 
 @RestController
 @RequestMapping("/internal")
 public class TradingInternalApiController extends AbstractApiController {
-    
+
     @Autowired
     private SendEventService sendEventService;
-    
+
     /**
      * 处理一个转账请求，可重复调用，重复发送消息，根据uniqueId去重，仅定序一次。
      */
@@ -32,7 +33,7 @@ public class TradingInternalApiController extends AbstractApiController {
                 transferRequest.asset,
                 transferRequest.amount);
         transferRequest.validate();
-        
+
         var message = new TransferEvent();
         message.uniqueId = transferRequest.transferId;
         message.fromUserId = transferRequest.fromUserId;

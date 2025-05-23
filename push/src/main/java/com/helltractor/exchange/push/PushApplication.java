@@ -11,7 +11,7 @@ import org.springframework.boot.autoconfigure.jdbc.DataSourceAutoConfiguration;
 // forbid database auto-configuration (no DataSource, JdbcTemplate...)
 @SpringBootApplication(exclude = {DataSourceAutoConfiguration.class})
 public class PushApplication {
-    
+
     public static void main(String[] args) {
         System.setProperty("vertx.disableFileCPResolving", "true");
         System.setProperty("vertx.logger-delegate-factory-class-name", "io.vertx.core.logging.SLF4JLogDelegateFactory");

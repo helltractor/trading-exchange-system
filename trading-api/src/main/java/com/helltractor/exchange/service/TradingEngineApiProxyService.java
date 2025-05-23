@@ -1,31 +1,37 @@
 package com.helltractor.exchange.service;
 
-import com.helltractor.exchange.ApiError;
-import com.helltractor.exchange.ApiException;
-import com.helltractor.exchange.support.LoggerSupport;
-import okhttp3.*;
+import java.io.IOException;
+import java.util.concurrent.TimeUnit;
+
 import org.springframework.beans.factory.annotation.Value;
 import org.springframework.stereotype.Component;
 
-import java.io.IOException;
-import java.util.concurrent.TimeUnit;
+import com.helltractor.exchange.ApiError;
+import com.helltractor.exchange.ApiException;
+import com.helltractor.exchange.support.LoggerSupport;
+
+import okhttp3.ConnectionPool;
+import okhttp3.OkHttpClient;
+import okhttp3.Request;
+import okhttp3.Response;
+import okhttp3.ResponseBody;
 
 /**
  * Trading engine API proxy service.
  */
 @Component
 public class TradingEngineApiProxyService extends LoggerSupport {
-    
+
     @Value("#{exchangeConfiguration.apiEndpoints.tradingEngineApi}")
     private String tradingEngineInternalApiEndpoint;
-    
+
     private OkHttpClient okHttpClient = new OkHttpClient.Builder()
             .connectTimeout(1, TimeUnit.SECONDS)
             .readTimeout(1, TimeUnit.SECONDS)
             .connectionPool(new ConnectionPool(20, 60, TimeUnit.SECONDS))
             .retryOnConnectionFailure(false)
             .build();
-    
+
     public String get(String url) throws IOException {
         Request request = new Request.Builder()
                 .url(tradingEngineInternalApiEndpoint + url)

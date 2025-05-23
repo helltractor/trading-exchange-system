@@ -1,24 +1,25 @@
 package com.helltractor.exchange.match;
 
+import java.math.BigDecimal;
+
+import org.springframework.stereotype.Component;
+
 import com.helltractor.exchange.bean.OrderBookBean;
 import com.helltractor.exchange.enums.Direction;
 import com.helltractor.exchange.enums.OrderStatus;
 import com.helltractor.exchange.model.trade.OrderEntity;
-import org.springframework.stereotype.Component;
-
-import java.math.BigDecimal;
 
 @Component
 public class MatchEngine {
-    
+
     public final OrderBook buyBook = new OrderBook(Direction.BUY);
-    
+
     public final OrderBook sellBook = new OrderBook(Direction.SELL);
-    
+
     public BigDecimal marketPrice = BigDecimal.ZERO;
-    
+
     private long sequenceId;
-    
+
     public MatchResult processOrder(long sequenceId, OrderEntity order) {
         switch (order.direction) {
             case BUY -> {
@@ -32,13 +33,13 @@ public class MatchEngine {
             }
         }
     }
-    
+
     /**
      * Process order.
      *
      * @param sequenceId
-     * @param takerOrder  need to match OrderEntity
-     * @param makerBook   match success OrderBook
+     * @param takerOrder need to match OrderEntity
+     * @param makerBook match success OrderBook
      * @param anotherBook match fail OrderBook
      * @return match result
      */
@@ -47,7 +48,7 @@ public class MatchEngine {
         long timeStamp = takerOrder.createTime;
         MatchResult matchResult = new MatchResult(takerOrder);
         BigDecimal takerUnfilledQuantity = takerOrder.quantity;
-        for (; ; ) {
+        for (;;) {
             OrderEntity makerOrder = makerBook.getFirst();
             if (makerOrder == null) {
                 // 对手盘不存在
@@ -69,7 +70,7 @@ public class MatchEngine {
             // 更新订单状态
             takerUnfilledQuantity = takerUnfilledQuantity.subtract(matchQuantity);
             BigDecimal makeUnfilledQuantity = makerOrder.unfilledQuantity.subtract(matchQuantity);
-            
+
             // 对手盘完全成交后，从订单簿中删除
             if (makeUnfilledQuantity.signum() == 0) {
                 makerOrder.updateOrder(makeUnfilledQuantity, OrderStatus.FULLY_FILLED, timeStamp);
@@ -78,7 +79,7 @@ public class MatchEngine {
                 // 对手盘部分成交后，更新订单状态
                 makerOrder.updateOrder(makeUnfilledQuantity, OrderStatus.PARTIAL_FILLED, timeStamp);
             }
-            
+
             // Taker完全成交后，退出循环
             if (takerUnfilledQuantity.signum() == 0) {
                 takerOrder.updateOrder(takerUnfilledQuantity, OrderStatus.FULLY_FILLED, timeStamp);
@@ -88,14 +89,14 @@ public class MatchEngine {
         // Taker未完全成交，放入对应的订单簿
         if (takerUnfilledQuantity.signum() > 0) {
             takerOrder.updateOrder(takerUnfilledQuantity,
-                    takerUnfilledQuantity.compareTo(takerOrder.quantity) == 0 ?
-                            OrderStatus.PENDING : OrderStatus.PARTIAL_FILLED,
+                    takerUnfilledQuantity.compareTo(takerOrder.quantity) == 0
+                    ? OrderStatus.PENDING : OrderStatus.PARTIAL_FILLED,
                     timeStamp);
             anotherBook.add(takerOrder);
         }
         return matchResult;
     }
-    
+
     /**
      * Cancel order. Judge order status and update order status.
      */
@@ -107,11 +108,11 @@ public class MatchEngine {
         OrderStatus status = order.unfilledQuantity.compareTo(order.quantity) == 0 ? OrderStatus.FULLY_CANCELLED : OrderStatus.PARTIAL_CANCELLED;
         order.updateOrder(order.unfilledQuantity, status, timeStamp);
     }
-    
+
     public OrderBookBean getOrderBook(int maxDepth) {
         return new OrderBookBean(this.sequenceId, this.marketPrice, this.buyBook.getOrderBook(maxDepth), this.sellBook.getOrderBook(maxDepth));
     }
-    
+
     public void debug() {
         System.out.println("---------- match engine ----------");
         System.out.println(this.sellBook);

@@ -20,9 +20,9 @@ import java.util.concurrent.atomic.AtomicLong;
 @Component
 @Transactional(rollbackFor = Throwable.class)
 public class SequenceHandler extends AbstractDbService {
-    
+
     private long lastTimestamp = 0;
-    
+
     public long getMaxSequenceId() {
         EventEntity last = dataBase.from(EventEntity.class).orderBy("sequenceId").desc().first();
         if (last == null) {
@@ -33,12 +33,12 @@ public class SequenceHandler extends AbstractDbService {
         logger.info("find max sequenceId = {}, last timestamp = {}", last.sequenceId, this.lastTimestamp);
         return last.sequenceId;
     }
-    
+
     /**
      * Set sequence for each message, persist into database as batch.
      */
     public List<AbstractEvent> sequenceMessages(final MessageTypes messageTypes, final AtomicLong sequence,
-                                                final List<AbstractEvent> messages) {
+            final List<AbstractEvent> messages) {
         final long timestamp = System.currentTimeMillis();
         if (timestamp < this.lastTimestamp) {
             logger.warn("[Sequence] current time {} is turned back from {}!", timestamp, this.lastTimestamp);
@@ -54,8 +54,8 @@ public class SequenceHandler extends AbstractDbService {
             final String uniqueId = message.uniqueId;
             // check uniqueId
             if (uniqueId != null) {
-                if ((uniqueKeys != null && uniqueKeys.contains(uniqueId)) ||
-                        dataBase.fetch(UniqueEventEntity.class, uniqueId) != null) {
+                if ((uniqueKeys != null && uniqueKeys.contains(uniqueId))
+                        || dataBase.fetch(UniqueEventEntity.class, uniqueId) != null) {
                     logger.warn("ignore processed unique message: {}", message);
                     continue;
                 }
@@ -72,7 +72,7 @@ public class SequenceHandler extends AbstractDbService {
                 uniqueKeys.add(uniqueId);
                 logger.info("unique event {} sequenced.", uniqueId);
             }
-            
+
             final long previousId = sequence.get();
             final long currentId = sequence.incrementAndGet();
             // 先设置message的sequenceId / previousId / createTime，再序列化并落库
@@ -93,7 +93,7 @@ public class SequenceHandler extends AbstractDbService {
             // will send later
             sequenceMessages.add(message);
         }
-        
+
         if (uniques != null) {
             dataBase.insert(uniques);
         }

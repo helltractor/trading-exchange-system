@@ -19,7 +19,7 @@ jobs:
           distribution: "temurin"
 
       - name: Build all modules
-        run: mvn clean install --DskipTests
+        run: mvn clean install -DskipTests
         working-directory: ./build
 
       - name: Create Github Release

@@ -37,7 +37,7 @@ jobs:
             quotation/target/*.jar
             trading-api/target/*.jar
             trading-engine/target/*.jar
-            trainng-sequencer/target/*.jar
+            trading-sequencer/target/*.jar
             ui/target/*.jar
         env:
           GITHUB_TOKEN: ${{ secrets.GITHUB_TOKEN }}

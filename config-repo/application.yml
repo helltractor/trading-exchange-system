@@ -11,7 +11,7 @@ exchange:
     order-book-depth: ${ORDER_BOOK_DEPTH:50}
     debug-mode: ${EXCHANGE_DEBUG_MODE:false}
     time-zone: ${EXCHANGE_TIME_ZONE:}
-    hmac-key: ${EXCHANGE_HMAC_KEY:ChangeThisHmacKey4ExchangeConfig}
+    hmac-key: ${EXCHANGE_HMAC_KEY:HmacKey4ExchangeConfig}
     session-timeout: ${EXCHANGE_SESSION_TIMEOUT:P3D}
     api-endpoints:
       trading-api: ${TRADING_API:http://localhost:8001}
@@ -30,7 +30,7 @@ exchange:
     notify-message-expires: ${NOTIFY_MESSAGE_EXPIRES:PT60S}
     # 转出消息失效时间(7天)
     transfer-out-message-expires: ${TRANSFER_OUT_MESSAGE_EXPIRES:P7D}
-    
+
   setting:
     scheduler:
       cron:
@@ -64,13 +64,13 @@ spring:
       auto-offset-reset: ${KAFKA_CONSUMER_AUTO_OFFSET_RESET:latest}
       max-poll-records: ${KAFKA_CONSUMER_MAX_POLL_RECORDS:500}
       max-partition-fetch-bytes: ${KAFKA_MAX_PARTITION_FETCH_BYTES:1000000}
-      
+
   redis:
     host: ${REDIS_HOST:localhost}
     port: ${REDIS_PORT:6379}
     password: ${REDIS_PASSWORD:}
     database: ${REDIS_DATABASE:0}
-    
+
   datasource:
     url: jdbc:mysql://${DB_HOST:localhost}/${DB_NAME:exchange}?allowPublicKeyRetrieval=true&useSSL=false&allowMultiQueries=true&useUnicode=true&characterEncoding=utf8
     username: ${DB_USERNAME:root}

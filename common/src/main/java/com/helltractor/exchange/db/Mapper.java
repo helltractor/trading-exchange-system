@@ -13,11 +13,15 @@ import java.lang.reflect.Modifier;
 import java.sql.ResultSet;
 import java.sql.ResultSetMetaData;
 import java.sql.SQLException;
-import java.util.*;
+import java.util.ArrayList;
+import java.util.Arrays;
+import java.util.HashMap;
+import java.util.List;
+import java.util.Map;
 import java.util.stream.Collectors;
 
-final class Mapper<T> {
-    
+public final class Mapper<T> {
+
     static List<String> columnDefinitionSortBy = Arrays.asList("BIT", "BOOL", "TINYINT", "SMALLINT", "MEDIUMINT", "INT",
             "INTEGER", "BIGINT", "FLOAT", "REAL", "DOUBLE", "DECIMAL", "YEAR", "DATE", "TIME", "DATETIME", "TIMESTAMP",
             "VARCHAR", "CHAR", "BLOB", "TEXT", "MEDIUMTEXT");
@@ -41,7 +45,7 @@ final class Mapper<T> {
     final String insertIgnoreSQL;
     final String updateSQL;
     final String deleteSQL;
-    
+
     public Mapper(Class<T> clazz) throws Exception {
         List<AccessibleProperty> all = getProperties(clazz);
         AccessibleProperty[] ids = all.stream().filter(AccessibleProperty::isId).toArray(AccessibleProperty[]::new);
@@ -64,7 +68,7 @@ final class Mapper<T> {
         this.insertIgnoreSQL = this.insertSQL.replace("INSERT INTO", "INSERT IGNORE INTO");
         this.updateSQL = "UPDATE " + this.tableName + " SET "
                 + String.join(", ",
-                this.updatableProperties.stream().map(p -> p.propertyName + " = ?").toArray(String[]::new))
+                        this.updatableProperties.stream().map(p -> p.propertyName + " = ?").toArray(String[]::new))
                 + " WHERE " + this.id.propertyName + " = ?";
         this.deleteSQL = "DELETE FROM " + this.tableName + " WHERE " + this.id.propertyName + " = ?";
         this.resultSetExtractor = new ResultSetExtractor<>() {
@@ -96,7 +100,7 @@ final class Mapper<T> {
             }
         };
     }
-    
+
     static int columnDefinitionSortIndex(String definition) {
         int pos = definition.indexOf('(');
         if (pos > 0) {
@@ -105,15 +109,15 @@ final class Mapper<T> {
         int index = columnDefinitionSortBy.indexOf(definition.toUpperCase());
         return index == (-1) ? Integer.MAX_VALUE : index;
     }
-    
+
     public T newInstance() throws ReflectiveOperationException {
         return this.constructor.newInstance();
     }
-    
+
     Object getIdValue(Object bean) throws ReflectiveOperationException {
         return this.id.get(bean);
     }
-    
+
     Map<String, AccessibleProperty> buildPropertiesMap(List<AccessibleProperty> props) {
         Map<String, AccessibleProperty> map = new HashMap<>();
         for (AccessibleProperty prop : props) {
@@ -121,14 +125,14 @@ final class Mapper<T> {
         }
         return map;
     }
-    
+
     private String numOfQuestions(int n) {
         String[] qs = new String[n];
         return String.join(", ", Arrays.stream(qs).map((s) -> {
             return "?";
         }).toArray(String[]::new));
     }
-    
+
     private String getTableName(Class<?> clazz) {
         Table table = clazz.getAnnotation(Table.class);
         if (table != null && !table.name().isEmpty()) {
@@ -137,7 +141,7 @@ final class Mapper<T> {
         String name = clazz.getSimpleName();
         return Character.toLowerCase(name.charAt(0)) + name.substring(1);
     }
-    
+
     private List<AccessibleProperty> getProperties(Class<?> clazz) throws Exception {
         List<AccessibleProperty> properties = new ArrayList<>();
         for (Field f : clazz.getFields()) {
@@ -153,7 +157,7 @@ final class Mapper<T> {
         }
         return properties;
     }
-    
+
     public String ddl() {
         StringBuilder sb = new StringBuilder(256);
         sb.append("CREATE TABLE ").append(this.tableName).append(" (\n");
@@ -180,7 +184,7 @@ final class Mapper<T> {
         sb.append(") CHARACTER SET utf8 COLLATE utf8_general_ci AUTO_INCREMENT = 1000;\n");
         return sb.toString();
     }
-    
+
     String getUniqueKey() {
         Table table = this.entityClass.getAnnotation(Table.class);
         if (table != null) {
@@ -193,7 +197,7 @@ final class Mapper<T> {
         }
         return "";
     }
-    
+
     String getIndex() {
         Table table = this.entityClass.getAnnotation(Table.class);
         if (table != null) {

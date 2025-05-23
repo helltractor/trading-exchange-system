@@ -20,7 +20,11 @@ import java.sql.Connection;
 import java.sql.PreparedStatement;
 import java.sql.SQLException;
 import java.sql.Statement;
-import java.util.*;
+import java.util.ArrayList;
+import java.util.HashMap;
+import java.util.List;
+import java.util.Map;
+import java.util.Set;
 import java.util.stream.Stream;
 
 /**
@@ -28,19 +32,19 @@ import java.util.stream.Stream;
  */
 @Component
 public class DbTemplate {
-    
+
     final JdbcTemplate jdbcTemplate;
     private final Logger logger = LoggerFactory.getLogger(getClass());
     // class -> Mapper
     private final Map<Class<?>, Mapper<?>> classMapping;
-    
+
     public DbTemplate(@Autowired JdbcTemplate jdbcTemplate) {
         this.jdbcTemplate = jdbcTemplate;
         String pkg = getClass().getPackageName();
         int pos = pkg.lastIndexOf(".");
         // locate model package
         String basePackage = pkg.substring(0, pos) + ".model";
-        
+
         List<Class<?>> classes = scanEntities(basePackage);
         Map<Class<?>, Mapper<?>> classMapping = new HashMap<>();
         try {
@@ -54,7 +58,7 @@ public class DbTemplate {
         }
         this.classMapping = classMapping;
     }
-    
+
     private static List<Class<?>> scanEntities(String basePackage) {
         ClassPathScanningCandidateComponentProvider provider = new ClassPathScanningCandidateComponentProvider(false);
         // user annotation filter to scan classes with @Entity
@@ -70,11 +74,11 @@ public class DbTemplate {
         }
         return classes;
     }
-    
+
     public JdbcTemplate getJdbcTemplate() {
         return this.jdbcTemplate;
     }
-    
+
     public String getTable(Class<?> clazz) {
         Mapper<?> mapper = classMapping.get(clazz);
         if (mapper == null) {
@@ -82,13 +86,14 @@ public class DbTemplate {
         }
         return mapper.tableName;
     }
-    
+
     /**
-     * Get a model instance by class type and id. EntityNotFoundException is thrown if not found.
+     * Get a model instance by class type and id. EntityNotFoundException is
+     * thrown if not found.
      *
-     * @param <T>   Generic type.
+     * @param <T> Generic type.
      * @param clazz Entity class.
-     * @param id    Id value.
+     * @param id Id value.
      * @return Entity bean found by id.
      */
     public <T> T get(Class<T> clazz, Object id) {
@@ -98,13 +103,13 @@ public class DbTemplate {
         }
         return t;
     }
-    
+
     /**
      * Get a model instance by class type and id. Return null if not found.
      *
-     * @param <T>   Generic type.
+     * @param <T> Generic type.
      * @param clazz Entity class.
-     * @param id    Id value.
+     * @param id Id value.
      * @return Entity bean found by id.
      */
     public <T> T fetch(Class<T> clazz, Object id) {
@@ -118,7 +123,7 @@ public class DbTemplate {
         }
         return list.get(0);
     }
-    
+
     /**
      * Remove bean by id.
      *
@@ -132,7 +137,7 @@ public class DbTemplate {
             throw new PersistenceException(e);
         }
     }
-    
+
     /**
      * Remove bean by id.
      *
@@ -145,21 +150,21 @@ public class DbTemplate {
         }
         jdbcTemplate.update(mapper.deleteSQL, id);
     }
-    
+
     @SuppressWarnings("rawtypes")
     public Select select(String... selectFields) {
         return new Select(new Criteria(this), selectFields);
     }
-    
+
     public <T> From<T> from(Class<T> entityClass) {
         Mapper<T> mapper = getMapper(entityClass);
         return new From<>(new Criteria<>(this), mapper);
     }
-    
+
     /**
      * Update model object.
      *
-     * @param <T>  Generic type.
+     * @param <T> Generic type.
      * @param bean Entity object.
      */
     public <T> void update(T bean) {
@@ -180,39 +185,39 @@ public class DbTemplate {
             throw new PersistenceException(e);
         }
     }
-    
+
     public <T> void insert(List<T> beans) {
         for (T bean : beans) {
             doInsert(bean, false);
         }
     }
-    
+
     public <T> void insertIgnore(List<T> beans) {
         for (T bean : beans) {
             doInsert(bean, true);
         }
     }
-    
+
     public <T> void insert(Stream<T> beans) {
         beans.forEach((bean) -> {
             doInsert(bean, false);
         });
     }
-    
+
     public <T> void insertIgnore(Stream<T> beans) {
         beans.forEach((bean) -> {
             doInsert(bean, true);
         });
     }
-    
+
     public <T> void insert(T bean) {
         doInsert(bean, false);
     }
-    
+
     public <T> void insertIgnore(T bean) {
         doInsert(bean, true);
     }
-    
+
     <T> void doInsert(T bean, boolean isIgnore) {
         try {
             int rows;
@@ -254,7 +259,7 @@ public class DbTemplate {
             throw new PersistenceException(e);
         }
     }
-    
+
     // get mapper by class
     @SuppressWarnings("unchecked")
     <T> Mapper<T> getMapper(Class<T> clazz) {
@@ -264,7 +269,7 @@ public class DbTemplate {
         }
         return mapper;
     }
-    
+
     public String exportDDL() {
         return String.join("\n\n", this.classMapping.values().stream().map((mapper) -> {
             return mapper.ddl();

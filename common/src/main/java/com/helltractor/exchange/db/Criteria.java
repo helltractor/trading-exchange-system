@@ -1,10 +1,10 @@
 package com.helltractor.exchange.db;
 
-import jakarta.persistence.NoResultException;
-import jakarta.persistence.NonUniqueResultException;
-
 import java.util.ArrayList;
 import java.util.List;
+
+import jakarta.persistence.NoResultException;
+import jakarta.persistence.NonUniqueResultException;
 
 /**
  * Hold criteria query information.
@@ -12,7 +12,7 @@ import java.util.List;
  * @param <T> Entity type.
  */
 final class Criteria<T> {
-    
+
     DbTemplate dataBase;
     Mapper<T> mapper;
     Class<T> clazz;
@@ -24,11 +24,11 @@ final class Criteria<T> {
     List<String> orderBy = null;
     int offset = 0;
     int maxResults = 0;
-    
+
     Criteria(DbTemplate dataBase) {
         this.dataBase = dataBase;
     }
-    
+
     String sql() {
         StringBuilder sb = new StringBuilder(128);
         sb.append("SELECT ");
@@ -46,7 +46,7 @@ final class Criteria<T> {
         String s = sb.toString();
         return s;
     }
-    
+
     Object[] params() {
         List<Object> params = new ArrayList<>();
         if (where != null) {
@@ -60,13 +60,13 @@ final class Criteria<T> {
         }
         return params.toArray();
     }
-    
+
     List<T> list() {
         String selectSql = sql();
         Object[] selectParams = params();
         return dataBase.jdbcTemplate.query(selectSql, mapper.resultSetExtractor, selectParams);
     }
-    
+
     T first() {
         this.offset = 0;
         this.maxResults = 1;
@@ -78,7 +78,7 @@ final class Criteria<T> {
         }
         return list.get(0);
     }
-    
+
     T unique() {
         this.offset = 0;
         this.maxResults = 2;

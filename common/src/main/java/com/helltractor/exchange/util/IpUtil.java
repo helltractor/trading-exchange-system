@@ -14,19 +14,19 @@ import java.util.List;
  * IpUtil to get IP address.
  */
 public class IpUtil {
-    
+
     static final Logger logger = LoggerFactory.getLogger(IpUtil.class);
-    
+
     static final String IP;
-    
+
     static final String HOST_ID;
-    
+
     static {
         IP = doGetIpAddress();
         HOST_ID = doGetHostId();
         logger.info("get ip address: {}, host id: {}", IP, HOST_ID);
     }
-    
+
     /**
      * Get localhost's IP address as string.
      *
@@ -35,16 +35,16 @@ public class IpUtil {
     public static String getIpAddress() {
         return IP;
     }
-    
+
     public static String getHostId() {
         return HOST_ID;
     }
-    
+
     static String doGetHostId() {
         String id = getIpAddress();
         return id.replace(".", "_").replace("-", "_");
     }
-    
+
     static String doGetIpAddress() {
         List<InetAddress> ipList = new ArrayList<>();
         try {

@@ -1,18 +1,19 @@
 package com.helltractor.exchange.util;
 
-import javax.crypto.Mac;
-import javax.crypto.SecretKey;
-import javax.crypto.spec.SecretKeySpec;
 import java.nio.charset.StandardCharsets;
 import java.security.GeneralSecurityException;
 import java.security.MessageDigest;
 import java.security.NoSuchAlgorithmException;
 
+import javax.crypto.Mac;
+import javax.crypto.SecretKey;
+import javax.crypto.spec.SecretKeySpec;
+
 /**
  * Utility class for hashing.
  */
 public class HashUtil {
-    
+
     /**
      * Generate SHA-256 as hex string (all lower-case).
      *
@@ -22,7 +23,7 @@ public class HashUtil {
     public static String sha256(String input) {
         return sha256(input.getBytes(StandardCharsets.UTF_8));
     }
-    
+
     /**
      * Generate SHA-256 as hex string (all lower-case).
      *
@@ -40,7 +41,7 @@ public class HashUtil {
         byte[] digest = md.digest();
         return ByteUtil.toHexString(digest);
     }
-    
+
     /**
      * Do HMAC-SHA256.
      *
@@ -58,7 +59,7 @@ public class HashUtil {
         mac.update(data);
         return mac.doFinal();
     }
-    
+
     /**
      * Do HMAC-SHA256.
      *
@@ -67,7 +68,7 @@ public class HashUtil {
     public static String hmacSha256(byte[] data, byte[] key) {
         return ByteUtil.toHexString(hmacSha256AsBytes(data, key));
     }
-    
+
     /**
      * Do HMAC-SHA256.
      *

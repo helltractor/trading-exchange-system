@@ -9,12 +9,12 @@ import java.util.List;
  * @param <T> Generic type.
  */
 public final class OrderBy<T> extends CriteriaQuery<T> {
-    
+
     public OrderBy(Criteria<T> criteria, String orderBy) {
         super(criteria);
         orderBy(orderBy);
     }
-    
+
     /**
      * Order by field name.
      *
@@ -28,7 +28,7 @@ public final class OrderBy<T> extends CriteriaQuery<T> {
         criteria.orderBy.add(orderBy);
         return this;
     }
-    
+
     /**
      * Make a desc order by.
      *
@@ -43,7 +43,7 @@ public final class OrderBy<T> extends CriteriaQuery<T> {
         criteria.orderBy.set(last, s);
         return this;
     }
-    
+
     /**
      * Add limit clause.
      *
@@ -53,18 +53,18 @@ public final class OrderBy<T> extends CriteriaQuery<T> {
     public Limit<T> limit(int maxResults) {
         return limit(0, maxResults);
     }
-    
+
     /**
      * Add limit clause.
      *
-     * @param offset     Offset.
+     * @param offset Offset.
      * @param maxResults The max results.
      * @return Criteria query object.
      */
     public Limit<T> limit(int offset, int maxResults) {
         return new Limit<>(this.criteria, offset, maxResults);
     }
-    
+
     /**
      * Get all results as list.
      *
@@ -73,7 +73,7 @@ public final class OrderBy<T> extends CriteriaQuery<T> {
     public List<T> list() {
         return criteria.list();
     }
-    
+
     /**
      * Get first row of the query, or null if no result found.
      *

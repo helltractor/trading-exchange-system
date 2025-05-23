@@ -6,7 +6,7 @@ import java.security.SecureRandom;
  * Random util.
  */
 public class RandomUtil {
-    
+
     /**
      * Holds "A-Z".
      */
@@ -28,11 +28,11 @@ public class RandomUtil {
      */
     public static final String WORDS = ALPHABET_UPPER + ALPHABET_LOWER + DIGITS;
     static final SecureRandom SECURE_RANDOM = createSecureRandom();
-    
+
     static SecureRandom createSecureRandom() {
         return new SecureRandom();
     }
-    
+
     /**
      * Create a random bytes with specific length.
      *
@@ -44,19 +44,19 @@ public class RandomUtil {
         SECURE_RANDOM.nextBytes(buffer);
         return buffer;
     }
-    
+
     /**
      * Create a secure random string with specific length.
      */
     public static String createRandomString(int length) {
         return createRandomString(WORDS, length);
     }
-    
+
     /**
      * Create a secure random string with specific length based on char list.
      *
      * @param charList A string that holds chars.
-     * @param length   The length of random string.
+     * @param length The length of random string.
      * @return Random string.
      */
     public static String createRandomString(String charList, int length) {

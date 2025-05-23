@@ -1,24 +1,24 @@
 package com.helltractor.exchange.bean;
 
+import java.math.BigDecimal;
+
 import com.helltractor.exchange.ApiError;
 import com.helltractor.exchange.ApiException;
 import com.helltractor.exchange.enums.AssetEnum;
 import com.helltractor.exchange.util.IdUtil;
 
-import java.math.BigDecimal;
-
 public class TransferRequestBean implements ValidatableBean {
-    
+
     public String transferId;
-    
+
     public AssetEnum asset;
-    
+
     public Long fromUserId;
-    
+
     public Long toUserId;
-    
+
     public BigDecimal amount;
-    
+
     @Override
     public void validate() {
         if (!IdUtil.isValidStringId(transferId)) {

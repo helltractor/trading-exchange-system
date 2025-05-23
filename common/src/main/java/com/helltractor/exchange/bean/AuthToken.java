@@ -1,12 +1,12 @@
 package com.helltractor.exchange.bean;
 
-import com.helltractor.exchange.util.HashUtil;
-
 import java.nio.charset.StandardCharsets;
 import java.util.Base64;
 
+import com.helltractor.exchange.util.HashUtil;
+
 public record AuthToken(Long userId, long expireTime) {
-    
+
     public static AuthToken fromSecureString(String b64token, String hmacKey) {
         String token = new String(Base64.getUrlDecoder().decode(b64token), StandardCharsets.UTF_8);
         String[] ss = token.split("\\:");
@@ -21,22 +21,22 @@ public record AuthToken(Long userId, long expireTime) {
         }
         return new AuthToken(Long.parseLong(uid), Long.parseLong(expires));
     }
-    
+
     public boolean isExpired() {
         return System.currentTimeMillis() > expireTime();
     }
-    
+
     public AuthToken refresh() {
         return new AuthToken(userId, System.currentTimeMillis() + 3600_000);
     }
-    
+
     public boolean isAboutToExpire() {
         return expireTime() - System.currentTimeMillis() < 1800_000;
     }
-    
+
     /**
-     * hash = hmacSha256(userId : expireTime, hmacKey)
-     * secureString = userId : expireTime : hash
+     * hash = hmacSha256(userId : expireTime, hmacKey) secureString = userId :
+     * expireTime : hash
      */
     public String toSecureString(String hmacKey) {
         String payload = userId() + ":" + expireTime();

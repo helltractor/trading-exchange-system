@@ -25,18 +25,18 @@ import java.util.function.Consumer;
 
 @Component
 public class RedisService {
-    
+
     final Logger logger = LoggerFactory.getLogger(getClass());
-    
+
     final RedisClient redisClient;
-    
+
     final GenericObjectPool<StatefulRedisConnection<String, String>> redisConnectionPool;
-    
+
     public RedisService(@Autowired RedisConfiguration redisConfig) {
         RedisURI uri = RedisURI.Builder.redis(redisConfig.getHost(), redisConfig.getPort())
                 .withPassword(redisConfig.getPassword().toCharArray()).withDatabase(redisConfig.getDatabase()).build();
         this.redisClient = RedisClient.create(uri);
-        
+
         GenericObjectPoolConfig<StatefulRedisConnection<String, String>> poolConfig = new GenericObjectPoolConfig<>();
         poolConfig.setMaxTotal(20);
         poolConfig.setMaxIdle(5);
@@ -45,13 +45,13 @@ public class RedisService {
         this.redisConnectionPool = ConnectionPoolSupport.createGenericObjectPool(() -> redisClient.connect(),
                 poolConfig);
     }
-    
+
     @PreDestroy
     public void shutdown() {
         this.redisConnectionPool.close();
         this.redisClient.shutdown();
     }
-    
+
     /**
      * Load Lua script from classpath file and return SHA as string.
      *
@@ -71,7 +71,7 @@ public class RedisService {
         }
         return sha;
     }
-    
+
     /**
      * Load Lua script and return SHA as string.
      *
@@ -83,7 +83,7 @@ public class RedisService {
             return commands.scriptLoad(scriptContent);
         });
     }
-    
+
     public void subscribe(String channel, Consumer<String> listener) {
         StatefulRedisPubSubConnection<String, String> conn = this.redisClient.connectPubSub();
         conn.addListener(new RedisPubSubAdapter<String, String>() {
@@ -94,43 +94,43 @@ public class RedisService {
         });
         conn.sync().subscribe(channel);
     }
-    
+
     public Boolean executeScriptReturnBoolean(String sha, String[] keys, String[] values) {
         return executeSync(commands -> {
             return commands.evalsha(sha, ScriptOutputType.BOOLEAN, keys, values);
         });
     }
-    
+
     public String executeScriptReturnString(String sha, String[] keys, String[] values) {
         return executeSync(commands -> {
             return commands.evalsha(sha, ScriptOutputType.VALUE, keys, values);
         });
     }
-    
+
     public String get(String key) {
         return executeSync((commands) -> {
             return commands.get(key);
         });
     }
-    
+
     public void publish(String topic, String data) {
         executeSync((commands) -> {
             return commands.publish(topic, data);
         });
     }
-    
+
     public List<String> lrange(String key, long start, long end) {
         return executeSync((commands) -> {
             return commands.lrange(key, start, end);
         });
     }
-    
+
     public List<String> zrangebyscore(String key, long start, long end) {
         return executeSync((commands) -> {
             return commands.zrangebyscore(key, Range.create(start, end));
         });
     }
-    
+
     public <T> T executeSync(SyncCommandCallback<T> callback) {
         try (StatefulRedisConnection<String, String> connection = redisConnectionPool.borrowObject()) {
             connection.setAutoFlushCommands(true);

@@ -24,12 +24,12 @@ import java.util.Set;
  */
 @Component
 public class MessageTypes {
-    
+
     static final char SEP = '#';
     private final Logger logger = LoggerFactory.getLogger(getClass());
     private final String messagePackage = AbstractMessage.class.getPackageName();
     private final Map<String, Class<? extends AbstractMessage>> messageTypes = new HashMap<>();
-    
+
     @SuppressWarnings("unchecked")
     @PostConstruct
     public void init() {
@@ -61,13 +61,13 @@ public class MessageTypes {
             }
         }
     }
-    
+
     public String serialize(AbstractMessage message) {
         String type = message.getClass().getName();
         String json = JsonUtil.writeJson(message);
         return type + SEP + json;
     }
-    
+
     public List<AbstractMessage> deserialize(List<String> dataList) {
         List<AbstractMessage> list = new ArrayList<>(dataList.size());
         for (String data : dataList) {
@@ -75,7 +75,7 @@ public class MessageTypes {
         }
         return list;
     }
-    
+
     public List<AbstractMessage> deserializeConsumerRecords(List<ConsumerRecord<String, String>> dataList) {
         List<AbstractMessage> list = new ArrayList<>(dataList.size());
         for (ConsumerRecord<String, String> data : dataList) {
@@ -83,7 +83,7 @@ public class MessageTypes {
         }
         return list;
     }
-    
+
     public AbstractMessage deserialize(String data) {
         int pos = data.indexOf(SEP);
         if (pos == -1) {

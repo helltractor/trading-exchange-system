@@ -1,29 +1,29 @@
 package com.helltractor.exchange.db;
 
-import jakarta.persistence.Column;
-import jakarta.persistence.GeneratedValue;
-import jakarta.persistence.GenerationType;
-import jakarta.persistence.Id;
-
 import java.lang.reflect.Field;
 import java.math.BigDecimal;
 import java.util.HashMap;
 import java.util.Map;
 import java.util.function.Function;
 
+import jakarta.persistence.Column;
+import jakarta.persistence.GeneratedValue;
+import jakarta.persistence.GenerationType;
+import jakarta.persistence.Id;
+
 /**
  * Represent a bean public field with JPA annotation.
  */
 class AccessibleProperty {
-    
+
     static final Map<Class<?>, String> DEFAULT_COLUMN_TYPES = new HashMap<>();
-    
+
     static {
         DEFAULT_COLUMN_TYPES.put(String.class, "VARCHAR($1)");
-        
+
         DEFAULT_COLUMN_TYPES.put(boolean.class, "BIT");
         DEFAULT_COLUMN_TYPES.put(Boolean.class, "BIT");
-        
+
         DEFAULT_COLUMN_TYPES.put(byte.class, "TINYINT");
         DEFAULT_COLUMN_TYPES.put(Byte.class, "TINYINT");
         DEFAULT_COLUMN_TYPES.put(short.class, "SMALLINT");
@@ -36,10 +36,10 @@ class AccessibleProperty {
         DEFAULT_COLUMN_TYPES.put(Float.class, "REAL");
         DEFAULT_COLUMN_TYPES.put(double.class, "DOUBLE");
         DEFAULT_COLUMN_TYPES.put(Double.class, "DOUBLE");
-        
+
         DEFAULT_COLUMN_TYPES.put(BigDecimal.class, "DECIMAL($1,$2)");
     }
-    
+
     // java type
     final Class<?> propertyType;
     final Function<Object, Object> javaToSqlMapper;
@@ -50,7 +50,7 @@ class AccessibleProperty {
     final String columnDefinition;
     // field
     final Field field;
-    
+
     @SuppressWarnings({"unchecked", "rawtypes"})
     public AccessibleProperty(Field f) {
         this.field = f;
@@ -62,7 +62,7 @@ class AccessibleProperty {
         this.sqlToJavaMapper = isEnum ? (obj) -> Enum.valueOf((Class<? extends Enum>) this.propertyType, (String) obj)
                 : null;
     }
-    
+
     static String getDefaultColumnType(Class<?> type, Column col) {
         String ddl = DEFAULT_COLUMN_TYPES.get(type);
         if (ddl.equals("VARCHAR($1)")) {
@@ -78,7 +78,7 @@ class AccessibleProperty {
         }
         return ddl;
     }
-    
+
     public Object get(Object bean) throws ReflectiveOperationException {
         Object obj = this.field.get(bean);
         if (this.javaToSqlMapper != null) {
@@ -86,18 +86,18 @@ class AccessibleProperty {
         }
         return obj;
     }
-    
+
     public void set(Object bean, Object value) throws ReflectiveOperationException {
         if (this.sqlToJavaMapper != null) {
             value = this.sqlToJavaMapper.apply(value);
         }
         this.field.set(bean, value);
     }
-    
+
     boolean isId() {
         return this.field.getAnnotation(Id.class) != null;
     }
-    
+
     // is id && is id marked as @GeneratedValue(strategy=GenerationType.IDENTITY)
     boolean isIdentityId() {
         if (!isId()) {
@@ -110,7 +110,7 @@ class AccessibleProperty {
         GenerationType gt = gv.strategy();
         return gt == GenerationType.IDENTITY;
     }
-    
+
     boolean isInsertable() {
         if (isIdentityId()) {
             return false;
@@ -118,7 +118,7 @@ class AccessibleProperty {
         Column col = this.field.getAnnotation(Column.class);
         return col == null || col.insertable();
     }
-    
+
     boolean isUpdatable() {
         if (isId()) {
             return false;
@@ -126,7 +126,7 @@ class AccessibleProperty {
         Column col = this.field.getAnnotation(Column.class);
         return col == null || col.updatable();
     }
-    
+
     String getColumnDefinition(Class<?> type) {
         Column col = this.field.getAnnotation(Column.class);
         if (col == null) {
@@ -148,18 +148,18 @@ class AccessibleProperty {
         }
         boolean nullable = col == null || col.nullable();
         colDef = colDef + " " + (nullable ? "NULL" : "NOT NULL");
-        
+
         if (isIdentityId()) {
             colDef = colDef + " AUTO_INCREMENT";
         }
-        
+
         if (!isId() && col != null && col.unique()) {
             colDef = colDef + " UNIQUE";
         }
-        
+
         return colDef;
     }
-    
+
     @Override
     public String toString() {
         return "AccessibleProperty [propertyName=" + propertyName + ", propertyType=" + propertyType

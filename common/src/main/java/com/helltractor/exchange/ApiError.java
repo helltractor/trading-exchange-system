@@ -4,7 +4,7 @@ package com.helltractor.exchange;
  * ApiError constants.
  */
 public enum ApiError {
-    
+
     PARAMETER_INVALID,
     
     AUTH_SIGNIN_REQUIRED,

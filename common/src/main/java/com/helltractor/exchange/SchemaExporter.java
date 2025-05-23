@@ -1,13 +1,16 @@
 package com.helltractor.exchange;
 
-import com.helltractor.exchange.db.DbTemplate;
-
 import java.io.IOException;
 import java.nio.file.Files;
 import java.nio.file.Path;
 
+import com.helltractor.exchange.db.DbTemplate;
+
+/**
+ * Export schema to file.
+ */
 public class SchemaExporter {
-    
+
     public static void main(String[] args) throws IOException {
         DbTemplate dbTemplate = new DbTemplate(null);
         String ddl = """

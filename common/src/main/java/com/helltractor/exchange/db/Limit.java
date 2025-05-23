@@ -8,7 +8,7 @@ import java.util.List;
  * @param <T> Generic type.
  */
 public final class Limit<T> extends CriteriaQuery<T> {
-    
+
     Limit(Criteria<T> criteria, int offset, int maxResults) {
         super(criteria);
         if (offset < 0) {
@@ -20,7 +20,7 @@ public final class Limit<T> extends CriteriaQuery<T> {
         this.criteria.offset = offset;
         this.criteria.maxResults = maxResults;
     }
-    
+
     /**
      * Get all results as list.
      *

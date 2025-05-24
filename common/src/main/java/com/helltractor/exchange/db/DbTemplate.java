@@ -1,8 +1,17 @@
 package com.helltractor.exchange.db;
 
-import jakarta.persistence.Entity;
-import jakarta.persistence.EntityNotFoundException;
-import jakarta.persistence.PersistenceException;
+import java.math.BigInteger;
+import java.sql.Connection;
+import java.sql.PreparedStatement;
+import java.sql.SQLException;
+import java.sql.Statement;
+import java.util.ArrayList;
+import java.util.HashMap;
+import java.util.List;
+import java.util.Map;
+import java.util.Set;
+import java.util.stream.Stream;
+
 import org.slf4j.Logger;
 import org.slf4j.LoggerFactory;
 import org.springframework.beans.factory.annotation.Autowired;
@@ -15,17 +24,9 @@ import org.springframework.jdbc.support.GeneratedKeyHolder;
 import org.springframework.jdbc.support.KeyHolder;
 import org.springframework.stereotype.Component;
 
-import java.math.BigInteger;
-import java.sql.Connection;
-import java.sql.PreparedStatement;
-import java.sql.SQLException;
-import java.sql.Statement;
-import java.util.ArrayList;
-import java.util.HashMap;
-import java.util.List;
-import java.util.Map;
-import java.util.Set;
-import java.util.stream.Stream;
+import jakarta.persistence.Entity;
+import jakarta.persistence.EntityNotFoundException;
+import jakarta.persistence.PersistenceException;
 
 /**
  * A simple ORM wrapper for JdbcTemplate.
@@ -46,17 +47,16 @@ public class DbTemplate {
         String basePackage = pkg.substring(0, pos) + ".model";
 
         List<Class<?>> classes = scanEntities(basePackage);
-        Map<Class<?>, Mapper<?>> classMapping = new HashMap<>();
+        this.classMapping = new HashMap<>();
         try {
             for (Class<?> clazz : classes) {
                 logger.info("Found class: {}", clazz.getName());
                 Mapper<?> mapper = new Mapper<>(clazz);
-                classMapping.put(clazz, mapper);
+                this.classMapping.put(clazz, mapper);
             }
         } catch (Exception e) {
             throw new RuntimeException(e);
         }
-        this.classMapping = classMapping;
     }
 
     private static List<Class<?>> scanEntities(String basePackage) {
@@ -118,7 +118,7 @@ public class DbTemplate {
             logger.debug("SQL: {}", mapper.selectSQL);
         }
         List<T> list = jdbcTemplate.query(mapper.selectSQL, mapper.resultSetExtractor, id);
-        if (list.isEmpty()) {
+        if (list == null || list.isEmpty()) {
             return null;
         }
         return list.get(0);
@@ -235,6 +235,7 @@ public class DbTemplate {
                 // using identityId
                 KeyHolder keyHolder = new GeneratedKeyHolder();
                 rows = jdbcTemplate.update(new PreparedStatementCreator() {
+                    @Override
                     public PreparedStatement createPreparedStatement(Connection connection) throws SQLException {
                         PreparedStatement ps = connection.prepareStatement(
                                 isIgnore ? mapper.insertIgnoreSQL : mapper.insertSQL, Statement.RETURN_GENERATED_KEYS);

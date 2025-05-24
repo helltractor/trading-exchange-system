@@ -58,7 +58,7 @@ import jakarta.annotation.PreDestroy;
 public class TradingEngineService extends LoggerSupport {
 
     @Autowired(required = false)
-    private ZoneId zoneId = ZoneId.systemDefault();
+    private final ZoneId zoneId = ZoneId.systemDefault();
 
     @Autowired
     ClearingService clearingService;
@@ -85,7 +85,7 @@ public class TradingEngineService extends LoggerSupport {
     private final int orderBookDepth = 100;
 
     @Value("#{exchangeConfiguration.debugMode}")
-    private boolean debugMode = false;
+    private final boolean debugMode = false;
 
     private boolean fatalError = false;
     private MessageConsumer consumer;
@@ -182,7 +182,6 @@ public class TradingEngineService extends LoggerSupport {
 
     private void runOrderBookThread() {
         logger.info("start update orderbook snapshot to redis...");
-        long lastSequenceId = 0;
         for (;;) {
             // 获取OrderBookBean的引用，确保后续操作针对局部变量而非成员变量
             final OrderBookBean orderBook = this.latestOrderBook;
@@ -480,7 +479,7 @@ public class TradingEngineService extends LoggerSupport {
             for (Map.Entry<AssetEnum, Asset> entry : assets.entrySet()) {
                 AssetEnum assetId = entry.getKey();
                 Asset asset = entry.getValue();
-                if (userId.longValue() == UserType.DEBT.getInternalUserId()) {
+                if (userId == UserType.DEBT.getInternalUserId()) {
                     // 系统负债账户available不允许为正
                     require(asset.getAvailable().signum() <= 0, "Debt has positive available: " + asset);
                     // 系统负债账户frozen必须为0

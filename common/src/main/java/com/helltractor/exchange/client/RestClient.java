@@ -123,32 +123,36 @@ public class RestClient {
     <T> T execute(Class<T> clazz, TypeReference<T> ref, Request request) throws IOException {
         logger.info("request: {}...", request.url().url());
         try (Response response = this.okHttpClient.newCall(request).execute()) {
-            if (response.code() == 200) {
-                try (ResponseBody body = response.body()) {
-                    String json = body.string();
-                    if ("null".equals(json)) {
-                        return null;
+            switch (response.code()) {
+                case 200 -> {
+                    try (ResponseBody body = response.body()) {
+                        String json = body.string();
+                        if ("null".equals(json)) {
+                            return null;
+                        }
+                        if (clazz == null) {
+                            return objectMapper.readValue(json, ref);
+                        }
+                        if (clazz == String.class) {
+                            return (T) json;
+                        }
+                        return objectMapper.readValue(json, clazz);
                     }
-                    if (clazz == null) {
-                        return objectMapper.readValue(json, ref);
-                    }
-                    if (clazz == String.class) {
-                        return (T) json;
-                    }
-                    return objectMapper.readValue(json, clazz);
                 }
-            } else if (response.code() == 400) {
-                try (ResponseBody body = response.body()) {
-                    String bodyString = body.string();
-                    logger.warn("response 400. error: {}", bodyString);
-                    ApiErrorResponse err = objectMapper.readValue(bodyString, ApiErrorResponse.class);
-                    if (err == null || err.error() == null) {
-                        throw ERROR_UNKNOWN;
+                case 400 -> {
+                    try (ResponseBody body = response.body()) {
+                        String bodyString = body.string();
+                        logger.warn("response 400. error: {}", bodyString);
+                        ApiErrorResponse err = objectMapper.readValue(bodyString, ApiErrorResponse.class);
+                        if (err == null || err.error() == null) {
+                            throw ERROR_UNKNOWN;
+                        }
+                        throw new ApiException(err.error(), err.data(), err.message());
                     }
-                    throw new ApiException(err.error(), err.data(), err.message());
                 }
-            } else {
-                throw new ApiException(ApiError.INTERNAL_SERVER_ERROR, null, "Http error " + response.code());
+                default -> {
+                    throw new ApiException(ApiError.INTERNAL_SERVER_ERROR, null, "Http error " + response.code());
+                }
             }
         }
     }

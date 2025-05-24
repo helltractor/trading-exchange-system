@@ -22,6 +22,7 @@ import org.springframework.kafka.listener.ConcurrentMessageListenerContainer;
 import org.springframework.kafka.listener.MessageListenerContainer;
 import org.springframework.kafka.support.TopicPartitionOffset;
 import org.springframework.kafka.support.converter.MessageConverter;
+import org.springframework.lang.NonNull;
 import org.springframework.stereotype.Component;
 
 import com.helltractor.exchange.message.AbstractMessage;
@@ -115,7 +116,7 @@ public class MessagingFactory {
         listenerContainer.setupMessageListener(new BatchMessageListener<String, String>() {
             @Override
             @SuppressWarnings("unchecked")
-            public void onMessage(List<ConsumerRecord<String, String>> data) {
+            public void onMessage(@NonNull List<ConsumerRecord<String, String>> data) {
                 List<T> messages = new ArrayList<>(data.size());
                 for (ConsumerRecord<String, String> record : data) {
                     AbstractMessage message = messageTypes.deserialize(record.value());

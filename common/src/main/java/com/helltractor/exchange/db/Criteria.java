@@ -17,7 +17,6 @@ final class Criteria<T> {
     Mapper<T> mapper;
     Class<T> clazz;
     List<String> select = null;
-    boolean distinct = false;
     String table = null;
     String where = null;
     List<Object> whereParams = null;
@@ -73,7 +72,7 @@ final class Criteria<T> {
         String selectSql = sql();
         Object[] selectParams = params();
         List<T> list = dataBase.jdbcTemplate.query(selectSql, mapper.resultSetExtractor, selectParams);
-        if (list.isEmpty()) {
+        if (list == null || list.isEmpty()) {
             return null;
         }
         return list.get(0);
@@ -85,7 +84,7 @@ final class Criteria<T> {
         String selectSql = sql();
         Object[] selectParams = params();
         List<T> list = dataBase.jdbcTemplate.query(selectSql, mapper.resultSetExtractor, selectParams);
-        if (list.isEmpty()) {
+        if (list == null || list.isEmpty()) {
             throw new NoResultException("Expected unique row but nothing found.");
         }
         if (list.size() > 1) {

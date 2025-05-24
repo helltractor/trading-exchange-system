@@ -1,8 +1,11 @@
 package com.helltractor.exchange.messaging;
 
-import com.helltractor.exchange.message.AbstractMessage;
-import com.helltractor.exchange.util.JsonUtil;
-import jakarta.annotation.PostConstruct;
+import java.util.ArrayList;
+import java.util.HashMap;
+import java.util.List;
+import java.util.Map;
+import java.util.Set;
+
 import org.apache.kafka.clients.consumer.ConsumerRecord;
 import org.slf4j.Logger;
 import org.slf4j.LoggerFactory;
@@ -13,11 +16,10 @@ import org.springframework.core.type.classreading.MetadataReaderFactory;
 import org.springframework.core.type.filter.TypeFilter;
 import org.springframework.stereotype.Component;
 
-import java.util.ArrayList;
-import java.util.HashMap;
-import java.util.List;
-import java.util.Map;
-import java.util.Set;
+import com.helltractor.exchange.message.AbstractMessage;
+import com.helltractor.exchange.util.JsonUtil;
+
+import jakarta.annotation.PostConstruct;
 
 /**
  * Holds message types.

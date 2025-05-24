@@ -4,7 +4,7 @@ import java.util.Arrays;
 
 /**
  * SELECT ... from ...
- * <p>
+ *
  * Default to "*".
  */
 @SuppressWarnings("rawtypes")

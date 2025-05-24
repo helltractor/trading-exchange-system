@@ -29,14 +29,5 @@ jobs:
           tag_name: ${{ github.ref_name }}
           body: |
             Release notes for version ${{ github.ref_name }}
-          files: |
-            common/target/*.jar
-            config/target/*.jar
-            push/target/*.jar
-            quotation/target/*.jar
-            trading-api/target/*.jar
-            trading-engine/target/*.jar
-            trading-sequencer/target/*.jar
-            ui/target/*.jar
         env:
           GITHUB_TOKEN: ${{ secrets.GITHUB_TOKEN }}

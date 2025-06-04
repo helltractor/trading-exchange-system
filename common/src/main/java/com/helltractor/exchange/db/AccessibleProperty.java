@@ -137,7 +137,7 @@ class AccessibleProperty {
                     "@Column(name=\"" + col.name() + "\") is not supported: " + this.field);
         }
         String colDef = null;
-        if (col == null || col.columnDefinition().isEmpty()) {
+        if (col.columnDefinition().isEmpty()) {
             if (type.isEnum()) {
                 colDef = "VARCHAR(32)";
             } else {
@@ -146,14 +146,14 @@ class AccessibleProperty {
         } else {
             colDef = col.columnDefinition().toUpperCase();
         }
-        boolean nullable = col == null || col.nullable();
+        boolean nullable = col.nullable();
         colDef = colDef + " " + (nullable ? "NULL" : "NOT NULL");
 
         if (isIdentityId()) {
             colDef = colDef + " AUTO_INCREMENT";
         }
 
-        if (!isId() && col != null && col.unique()) {
+        if (!isId() && col.unique()) {
             colDef = colDef + " UNIQUE";
         }
 

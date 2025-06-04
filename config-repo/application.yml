@@ -89,3 +89,12 @@ logging:
     root: ${LOGGING_ROOT_LEVEL:INFO}
     org.apache.kafka: ${LOGGING_KAFKA_LEVEL:WARN}
     com.helltractor.exchange: ${LOGGING_EXCHANGE_LEVEL:INFO}
+
+management:
+  endpoints:
+    web:
+      exposure:
+        include: "*"
+  endpoint:
+    health:
+      show-details: always

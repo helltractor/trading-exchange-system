@@ -11,82 +11,77 @@ import com.helltractor.exchange.message.event.OrderCancelEvent;
 import com.helltractor.exchange.message.event.OrderRequestEvent;
 import com.helltractor.exchange.message.event.TransferEvent;
 import com.helltractor.exchange.order.OrderService;
-import org.junit.jupiter.api.Assertions;
-import org.junit.jupiter.api.Test;
+import org.openjdk.jmh.annotations.*;
 
 import java.math.BigDecimal;
 import java.time.LocalDateTime;
 import java.time.ZoneId;
 import java.util.Random;
+import java.util.concurrent.TimeUnit;
 
-public class TradingEngineServiceTest {
-
+@BenchmarkMode(Mode.Throughput)
+@OutputTimeUnit(TimeUnit.SECONDS)
+@State(Scope.Thread)
+public class TradingEngineServiceBenchmark {
+    
     static final Long USER_A = 11111L;
     static final Long USER_B = 22222L;
     static final Long USER_C = 33333L;
     static final Long USER_D = 44444L;
     static final Long[] USERS = {USER_A, USER_B, USER_C, USER_D};
-    long currentSequenceId = 0;
-
-    @Test
-    void testTradingEngine() {
-        var engine = createTradingEngine();
-
-        engine.processEvent(depositEvent(USER_A, bd("58000"), AssetEnum.USD));
-        engine.processEvent(depositEvent(USER_B, bd("126700"), AssetEnum.USD));
-        engine.processEvent(depositEvent(USER_C, bd("5.5"), AssetEnum.BTC));
-        engine.processEvent(depositEvent(USER_D, bd("8.6"), AssetEnum.BTC));
-
-        engine.debug();
-        engine.validate();
-
-        engine.processEvent(orderRequestEvent(USER_A, Direction.BUY, bd("2207.33"), bd("1.2")));
-        engine.processEvent(orderRequestEvent(USER_C, Direction.SELL, bd("2215.6"), bd("0.8")));
-        engine.processEvent(orderRequestEvent(USER_C, Direction.SELL, bd("2921.1"), bd("0.3")));
-
-        engine.debug();
-        engine.validate();
-
-        engine.processEvent(orderRequestEvent(USER_D, Direction.SELL, bd("2206"), bd("0.3")));
-
-        engine.debug();
-        engine.validate();
-
-        engine.processEvent(orderRequestEvent(USER_B, Direction.BUY, bd("2219.6"), bd("2.4")));
-
-        engine.debug();
-        engine.validate();
-
-        engine.processEvent(orderCancelEvent(USER_A, 1L));
-
-        engine.debug();
+    
+    long currentSequenceId;
+    TradingEngineService engine;
+    Random random;
+    
+    @Setup(Level.Iteration)
+    public void setup() {
+        this.engine = createTradingEngine();
+        this.random = new Random(123456789);
+        this.currentSequenceId = 0;
+        
+        for (Long user : USERS) {
+            engine.processEvent(depositEvent(user, random(this.random, 1000_0000, 2000_0000), AssetEnum.USD));
+            engine.processEvent(depositEvent(user, random(this.random, 1000, 2000), AssetEnum.BTC));
+        }
+        
+    }
+    
+    @TearDown
+    public void tearDown() {
+        this.engine = null;
+        this.random = null;
+        this.currentSequenceId = 0;
+    }
+    
+    @Benchmark
+    public void testOrders() {
+        for (int i = 0; i < 100000; i++) {
+            Long user = USERS[i % USERS.length];
+            engine.processEvent(orderRequestEvent(user, Direction.BUY, bd("30000.00"), bd("0.001")));
+            
+        }
+        for (int i = 0; i < 100000; i++) {
+            Long user = USERS[i % USERS.length];
+            engine.processEvent(orderRequestEvent(user, Direction.SELL, bd("30000.00"), bd("0.001")));
+        }
+        
         engine.validate();
     }
-
-    @Test
-    void testRandom() {
-        var engine = createTradingEngine();
-        var r = new Random(123456789);
-        for (Long user : USERS) {
-            engine.processEvent(depositEvent(user, random(r, 1000_0000, 2000_0000), AssetEnum.USD));
-            engine.processEvent(depositEvent(user, random(r, 1000, 2000), AssetEnum.BTC));
-        }
-        engine.debug();
-        engine.validate();
-
+    
+    @Benchmark
+    public void testRandom() {
         int low = 20000;
         int high = 40000;
         for (int i = 0; i < 100; i++) {
             Long user = USERS[i % USERS.length];
-            engine.processEvent(orderRequestEvent(user, Direction.BUY, random(r, low, high), random(r, 1, 5)));
-            engine.processEvent(orderRequestEvent(user, Direction.SELL, random(r, low, high), random(r, 1, 5)));
+            engine.processEvent(orderRequestEvent(user, Direction.BUY, random(this.random, low, high), random(this.random, 1, 5)));
+            engine.processEvent(orderRequestEvent(user, Direction.SELL, random(this.random, low, high), random(this.random, 1, 5)));
         }
-        engine.debug();
+        
         engine.validate();
-
-        Assertions.assertEquals("35216.4", engine.matchEngine.marketPrice.stripTrailingZeros().toPlainString());
     }
-
+    
     TradingEngineService createTradingEngine() {
         var tradingEngine = new TradingEngineService();
         var matchEngine = new MatchEngine();
@@ -99,7 +94,7 @@ public class TradingEngineServiceTest {
         tradingEngine.clearingService = clearingService;
         return tradingEngine;
     }
-
+    
     <T extends AbstractEvent> T createEvent(Class<T> clazz) {
         T event;
         try {
@@ -114,7 +109,7 @@ public class TradingEngineServiceTest {
                 + this.currentSequenceId;
         return event;
     }
-
+    
     OrderRequestEvent orderRequestEvent(long userId, Direction direction, BigDecimal price, BigDecimal quantity) {
         var event = createEvent(OrderRequestEvent.class);
         event.userId = userId;
@@ -123,14 +118,14 @@ public class TradingEngineServiceTest {
         event.quantity = quantity;
         return event;
     }
-
+    
     OrderCancelEvent orderCancelEvent(long userId, Long orderId) {
         var event = createEvent(OrderCancelEvent.class);
         event.userId = userId;
         event.refOrderId = orderId;
         return event;
     }
-
+    
     TransferEvent depositEvent(long userId, BigDecimal amount, AssetEnum asset) {
         var event = createEvent(TransferEvent.class);
         event.fromUserId = UserType.DEBT.getInternalUserId();
@@ -140,14 +135,14 @@ public class TradingEngineServiceTest {
         event.sufficient = false;
         return event;
     }
-
+    
     BigDecimal bd(String value) {
         return new BigDecimal(value);
     }
-
+    
     BigDecimal random(Random random, int low, int high) {
         int n = random.nextInt(high - low) + low;
         int m = random.nextInt(100);
         return new BigDecimal(n + "." + m);
     }
-}
+} 

@@ -13,6 +13,7 @@ docker/
 *.iws
 *.iml
 *.ipr
+.flattened-pom.xml
 dependency-reduced-pom.xml
 
 ### Eclipse ###

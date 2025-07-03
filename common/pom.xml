@@ -7,7 +7,7 @@
     <parent>
         <groupId>com.helltractor.exchange</groupId>
         <artifactId>parent</artifactId>
-        <version>0.0.1</version>
+        <version>${revision}</version>
         <relativePath>../parent/pom.xml</relativePath>
     </parent>
 
@@ -65,10 +65,11 @@
             <groupId>jakarta.persistence</groupId>
             <artifactId>jakarta.persistence-api</artifactId>
         </dependency>
+        <dependency>
+            <groupId>com.github.spotbugs</groupId>
+            <artifactId>spotbugs-annotations</artifactId>
+            <version>${spotbugs.version}</version>
+        </dependency>
     </dependencies>
-    
-    <build>
-        <finalName>${project.artifactId}</finalName>
-    </build>
     
 </project>

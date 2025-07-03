@@ -22,4 +22,4 @@ jobs:
 
       - name: Build all modules
         run: mvn -B package
-        working-directory: build
+        working-directory: parent

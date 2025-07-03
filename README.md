@@ -39,45 +39,57 @@ Trading Exchange System 是一个简单的证券交易系统，支持以下功�
 
 ## 🧱 项目模块
 
-| 模块名            | 描述                         |
-| ----------------- | ---------------------------- |
-| config            | 配置中心，管理所有微服务配置 |
-| trading-engine    | 撮合引擎，负责订单匹配       |
-| trading-sequencer | 交易流水管理，保证顺序执行   |
-| trading-api       | 提供 API 接口，供客户端调用  |
-| quotation         | 行情数据处理                 |
-| push              | 消息推送服务                 |
-| ui                | 前端 UI 服务，展示交易界面   |
+| 模块名            | 描述                           |
+| ----------------- | ------------------------------ |
+| benchmark         | 性能测试模块，基准测试交易性能 |
+| config            | 配置中心，管理所有微服务配置   |
+| trading-engine    | 撮合引擎，负责订单匹配         |
+| trading-sequencer | 交易流水管理，保证顺序执行     |
+| trading-api       | 提供 API 接口，供客户端调用    |
+| quotation         | 行情数据处理                   |
+| push              | 消息推送服务                   |
+| ui                | 前端 UI 服务，展示交易界面     |
 
 ## ⚙️ 构建项目
 
-在项目根目录下依次执行：
+在 build 目录执行以下命令：
 
 ```bash
-cd ./build              # 进入构建目录
-docker-compose up -d    # 启动依赖服务
-mvn -B package          # 编译打包项目
+docker-compose -p exchange up -d
+```
+
+在 parent 目录执行以下命令：
+
+```bash
+mvn clean -B install
 ```
 
 构建完成后即可启动各模块运行系统。
 
 ## 🚀 项目启动
 
-先后启动以下服务：
+在根目录，先后启动以下服务：
 
 ```bash
-java -jar ConfigApplication.jar
-java -jar TradingEngineApplication.jar
-java -jar TradingSequencerApplication.jar
-java -jar TradingAPIApplication.jar
-java -jar QuotationApplication.jar
-java -jar PushApplication.jar
-java -jar UIApplication.jar
+java -jar config/target/config.jar
+java -jar trading-engine/target/trading-engine.jar
+java -jar trading-sequencer/target/trading-sequencer.jar
+java -jar trading-api/target/trading-api.jar
+java -jar quotation/target/quotation.jar
+java -jar push/target/push.jar
+java -jar ui/target/ui.jar
 ```
 
-启动完成后，访问浏览器：
-👉 [http://localhost:8080](http://localhost:8080)
+或进入各个模块目录，使用以下命令启动：
+
+```bash
+mvn spring-boot:run
+```
+
+启动完成后，访问浏览器： 👉 [http://localhost:8080](http://localhost:8080)
 
 ## 🧪 测试项目
+
+### 模拟用户交易
 
 > 更多测试细节请参考 [bot](./build/bot/README.md)

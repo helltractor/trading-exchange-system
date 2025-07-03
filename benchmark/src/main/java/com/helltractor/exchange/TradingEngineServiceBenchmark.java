@@ -11,7 +11,20 @@ import com.helltractor.exchange.message.event.OrderCancelEvent;
 import com.helltractor.exchange.message.event.OrderRequestEvent;
 import com.helltractor.exchange.message.event.TransferEvent;
 import com.helltractor.exchange.order.OrderService;
-import org.openjdk.jmh.annotations.*;
+import org.openjdk.jmh.annotations.Benchmark;
+import org.openjdk.jmh.annotations.BenchmarkMode;
+import org.openjdk.jmh.annotations.Level;
+import org.openjdk.jmh.annotations.Mode;
+import org.openjdk.jmh.annotations.OutputTimeUnit;
+import org.openjdk.jmh.annotations.Scope;
+import org.openjdk.jmh.annotations.State;
+import org.openjdk.jmh.annotations.Setup;
+import org.openjdk.jmh.annotations.TearDown;
+import org.openjdk.jmh.runner.Runner;
+import org.openjdk.jmh.runner.RunnerException;
+import org.openjdk.jmh.runner.options.Options;
+import org.openjdk.jmh.runner.options.OptionsBuilder;
+import org.openjdk.jmh.runner.options.TimeValue;
 
 import java.math.BigDecimal;
 import java.time.LocalDateTime;
@@ -34,7 +47,20 @@ public class TradingEngineServiceBenchmark {
     TradingEngineService engine;
     Random random;
     
-    @Setup(Level.Iteration)
+    public static void main(String[] args) throws RunnerException {
+        Options options = new OptionsBuilder()
+                .include(TradingEngineServiceBenchmark.class.getSimpleName())
+                .warmupIterations(1)
+                .warmupTime(TimeValue.seconds(1))
+                .measurementIterations(1)
+                .measurementTime(TimeValue.seconds(1))
+                .forks(1)
+                .build();
+        
+        new Runner(options).run();
+    }
+    
+    @Setup(Level.Invocation)
     public void setup() {
         this.engine = createTradingEngine();
         this.random = new Random(123456789);
@@ -55,13 +81,12 @@ public class TradingEngineServiceBenchmark {
     }
     
     @Benchmark
-    public void testOrders() {
-        for (int i = 0; i < 100000; i++) {
+    public void callOrders() {
+        for (int i = 0; i < 100_000; i++) {
             Long user = USERS[i % USERS.length];
             engine.processEvent(orderRequestEvent(user, Direction.BUY, bd("30000.00"), bd("0.001")));
-            
         }
-        for (int i = 0; i < 100000; i++) {
+        for (int i = 0; i < 100_000; i++) {
             Long user = USERS[i % USERS.length];
             engine.processEvent(orderRequestEvent(user, Direction.SELL, bd("30000.00"), bd("0.001")));
         }
@@ -70,10 +95,23 @@ public class TradingEngineServiceBenchmark {
     }
     
     @Benchmark
-    public void testRandom() {
+    public void callCancelOrders() {
+        for (int i = 0; i < 100_000; i++) {
+            Long user = USERS[i % USERS.length];
+            engine.processEvent(orderRequestEvent(user, Direction.BUY, bd("30000.00"), bd("0.001")));
+            engine.processEvent(orderCancelEvent(user, 1000L + i % 1000));
+            engine.processEvent(orderRequestEvent(user, Direction.SELL, bd("30000.00"), bd("0.001")));
+            engine.processEvent(orderCancelEvent(user, 1000L + i % 1000));
+        }
+        
+        engine.validate();
+    }
+    
+    @Benchmark
+    public void callRandomOrders() {
         int low = 20000;
         int high = 40000;
-        for (int i = 0; i < 100; i++) {
+        for (int i = 0; i < 1000; i++) {
             Long user = USERS[i % USERS.length];
             engine.processEvent(orderRequestEvent(user, Direction.BUY, random(this.random, low, high), random(this.random, 1, 5)));
             engine.processEvent(orderRequestEvent(user, Direction.SELL, random(this.random, low, high), random(this.random, 1, 5)));

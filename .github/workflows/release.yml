@@ -1,4 +1,4 @@
-name: Release Jars
+name: Release
 
 on:
   push:
@@ -12,22 +12,11 @@ jobs:
       - name: Checkout code
         uses: actions/checkout@v3
 
-      - name: Set up JDK
-        uses: actions/setup-java@v3
-        with:
-          java-version: "17"
-          distribution: "temurin"
-
-      - name: Build all modules
-        run: mvn -B install -DskipTests
-        working-directory: build
-
       - name: Create Github Release
         uses: softprops/action-gh-release@v1
         with:
           name: ${{ github.ref_name }}
           tag_name: ${{ github.ref_name }}
-          body: |
-            Release notes for version ${{ github.ref_name }}
+          generate_release_notes: true
         env:
           GITHUB_TOKEN: ${{ secrets.GITHUB_TOKEN }}

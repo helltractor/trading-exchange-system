@@ -14,10 +14,10 @@
     <artifactId>parent</artifactId>
     <packaging>pom</packaging>
     <name>Trading Exchange System</name>
-    <version>0.0.1</version>
+    <version>${revision}</version>
 
     <properties>
-        <project.version>1.0.0</project.version>
+        <revision>0.0.2</revision>
         <java.version>17</java.version>
         <project.build.sourceEncoding>UTF-8</project.build.sourceEncoding>
         <project.reporting.outputEncoding>UTF-8</project.reporting.outputEncoding>
@@ -28,6 +28,8 @@
         <pebble.version>3.2.0</pebble.version>
         <vertx.version>4.3.1</vertx.version>
         <mysql.version>8.2.0</mysql.version>
+        <jmh.version>1.37</jmh.version>
+        <spotbugs.version>4.9.0</spotbugs.version>
     </properties>
 
     <dependencyManagement>
@@ -63,17 +65,59 @@
             <artifactId>spring-test</artifactId>
             <scope>test</scope>
         </dependency>
+        <dependency>
+            <groupId>org.openjdk.jmh</groupId>
+            <artifactId>jmh-core</artifactId>
+            <version>${jmh.version}</version>
+        </dependency>
+        <dependency>
+            <groupId>org.openjdk.jmh</groupId>
+            <artifactId>jmh-generator-annprocess</artifactId>
+            <version>${jmh.version}</version>
+            <scope>provided</scope>
+        </dependency>
     </dependencies>
 
+    <modules>
+        <module>../benchmark</module>
+        <module>../common</module>
+        <module>../config</module>
+        <module>../push</module>
+        <module>../quotation</module>
+        <module>../trading-api</module>
+        <module>../trading-engine</module>
+        <module>../trading-sequencer</module>
+        <module>../ui</module>
+    </modules>
+
     <build>
-        <pluginManagement>
-            <plugins>
-                <plugin>
-                    <groupId>org.springframework.boot</groupId>
-                    <artifactId>spring-boot-maven-plugin</artifactId>
-                </plugin>
-            </plugins>
-        </pluginManagement>
+        <plugins>
+            <plugin>
+                <groupId>org.codehaus.mojo</groupId>
+                <artifactId>flatten-maven-plugin</artifactId>
+                <version>1.1.0</version>
+                <configuration>
+                    <updatePomFile>true</updatePomFile>
+                    <flattenMode>resolveCiFriendliesOnly</flattenMode>
+                </configuration>
+                <executions>
+                    <execution>
+                        <id>flatten</id>
+                        <phase>process-resources</phase>
+                        <goals>
+                            <goal>flatten</goal>
+                        </goals>
+                    </execution>
+                    <execution>
+                        <id>flatten.clean</id>
+                        <phase>clean</phase>
+                        <goals>
+                            <goal>clean</goal>
+                        </goals>
+                    </execution>
+                </executions>
+            </plugin>
+        </plugins>
     </build>
 
 </project>

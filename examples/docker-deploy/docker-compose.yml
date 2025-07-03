@@ -77,18 +77,6 @@ services:
     networks:
       - docker-deploy
 
-  gateway:
-    container_name: gateway
-    build:
-      context: ./gateway
-      dockerfile: Dockerfile
-    ports:
-      - "8080:8080"
-    environment:
-      - CONFIG_SERVER=http://config-server:8888
-    networks:
-      - docker-deploy
-
   push:
     container_name: push
     build:

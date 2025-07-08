@@ -79,7 +79,6 @@
     </dependencies>
 
     <modules>
-        <module>../benchmark</module>
         <module>../common</module>
         <module>../config</module>
         <module>../push</module>

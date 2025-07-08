@@ -1,4 +1,0 @@
-# trading-engine configuration
-
-server:
-  port: ${APP_PORT:8002}

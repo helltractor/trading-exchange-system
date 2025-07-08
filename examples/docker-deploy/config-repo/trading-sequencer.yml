@@ -1,4 +1,0 @@
-# trading sequencer configuration
-
-server:
-  port: ${APP_PORT:8003}

@@ -17,43 +17,12 @@ exchange:
       trading-api: ${TRADING_API:http://localhost:8001}
       trading-engine-api: ${TRADING_ENGINE_API:http://localhost:8002}
 
-  # 风控(See RiskControlService)
-  risk-control:
-    # 时长配置，格式：标准ISO-8601 Period格式。示例：
-    #
-    # P1D = 1天
-    # P2DT10H = 2天10小时
-    # PT2H30M = 2小时30分
-    # PT60S = 60秒
-    #
-    # 通知消息失效时间(60秒)
-    notify-message-expires: ${NOTIFY_MESSAGE_EXPIRES:PT60S}
-    # 转出消息失效时间(7天)
-    transfer-out-message-expires: ${TRANSFER_OUT_MESSAGE_EXPIRES:P7D}
-
   setting:
-    scheduler:
-      cron:
-        reload-trading-metadata: ${CRON_RELOAD_TRADING_METADATA:0 */10 * * * *}
-        # 每10秒钟刷新一次latest-price
-        update-latest-price: ${CRON_UPDATE_LATEST_PRICE:0,10,20,30,40,50 * * * * *}
-      fixed-delay:
-        flush-orderbook: ${FIXED_DELAY_FLUSH_ORDERBOOK:500}
-        reinvoke-transfer: ${FIXED_DELAY_REINVOKE_TRANSFER:60000}
-        # deprecated
-        reload-trading-metadata: ${FIXED_DELAY_RELOAD_TRADING_METADATA:600000}
-        save-sequence-id: ${FIXED_DELAY_SAVE_SEQUENCE_ID:60000}
-    # 交易所时区，默认为ZoneId.systemDefault()
     timezone: ${EXCHANGE_TIMEZONE:}
-    # 全局32个随机ASCII字符作为AES key
     aes-key: ${EXCHANGE_AES_KEY:CryptoExchangeAESRandomSecureKey}
-    # 子系统的endpoint设置
     endpoint:
-      ui: ${UI_ENDPOINT:http://localhost:8000}
-      meta-api: ${META_API_ENDPOINT:http://localhost:8001}
-      wallet-api: ${WALLET_API_ENDPOINT:http://localhost:8901}
-      spots-api: ${SPOTS_API_ENDPOINT:http://localhost:8101}
-      spots-trading-internal-api: ${SPOTS_TRADING_INTERNAL_API_ENDPOINT:http://localhost:8103}
+      tradingApi: ${TRADING_API_ENDPOINT:http://localhost:8002}
+      tradingEngineApi: ${TRADING_ENGINE_API_ENDPOINT:http://localhost:8003}
 
 spring:
   kafka:
@@ -74,7 +43,7 @@ spring:
   datasource:
     url: jdbc:mysql://${DB_HOST:localhost}/${DB_NAME:exchange}?allowPublicKeyRetrieval=true&useSSL=false&allowMultiQueries=true&useUnicode=true&characterEncoding=utf8
     username: ${DB_USERNAME:root}
-    password: ${DB_PASSWORD:password}
+    password: ${DB_PASSWORD:}
     driver-class-name: com.mysql.cj.jdbc.Driver
     hikari:
       auto-commit: false

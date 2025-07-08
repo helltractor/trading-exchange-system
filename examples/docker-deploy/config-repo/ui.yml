@@ -1,8 +1,0 @@
-# ui configuration
-
-server:
-  port: ${APP_PORT:8000}
-
-pebble:
-  prefix: /templates/
-  suffix: .html

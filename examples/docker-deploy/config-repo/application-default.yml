@@ -1,6 +1,0 @@
-# default configuration
-
-exchange:
-  config:
-    # turn on debug for default env
-    debug-mode: ${EXCHANGE_DEBUG_MODE:false}
